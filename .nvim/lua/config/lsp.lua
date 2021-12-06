@@ -151,9 +151,10 @@ end
 
 local lsp_publish_diagnostics_options = {
     virtual_text = {prefix = "", spacing = 0},
+    source = "if_many",
     signs = true,
     underline = true,
-    update_in_insert = false -- update diagnostics insert mode
+    update_in_insert = ture -- update diagnostics insert mode
 }
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] =
@@ -165,6 +166,7 @@ vim.lsp.handlers["textDocument/hover"] =
 
 vim.lsp.handlers["textDocument/signatureHelp"] =
     vim.lsp.with(vim.lsp.handlers.signature_help, {border = "single"})
+
 
 local function goto_definition(split_cmd)
     local util = vim.lsp.util
@@ -197,5 +199,5 @@ local function goto_definition(split_cmd)
 
     return handler
 end
-
 vim.lsp.handlers["textDocument/definition"] = goto_definition('split')
+
