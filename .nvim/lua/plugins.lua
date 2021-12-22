@@ -301,8 +301,7 @@ return require('packer').startup(function(use)
         after = {"cmp-nvim-lsp","nvim-lsp-installer"},
         config = function () require('config.lsp') end 
     }
-    use{'glepnir/lspsaga.nvim'}
-    use {'nvim-lua/lsp-status.nvim'}
+        use {'nvim-lua/lsp-status.nvim'}
 
 
 
