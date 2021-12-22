@@ -63,7 +63,7 @@ require'nvim-tree'.setup {
       ignore = false,
     },
     filters = {
-      dotfiles = false,
+      dotfiles = true,
       custom = {
         '.git', 'node_modules', '.cache'
       }

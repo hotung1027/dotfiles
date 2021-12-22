@@ -18,9 +18,7 @@ cmp.setup({
     end,
   },
   formatting = {
-    format = require("lspkind").cmp_format(
-      {with_text = true,
-        menu = ({
+    format = require("lspkind").cmp_format({with_text = true, menu = ({
         buffer = "[Buffer]",
         nvim_lsp = "[LSP]",
         luasnip = "[LuaSnip]",
@@ -34,10 +32,8 @@ cmp.setup({
         fuzzy_buffer ="[Fuzzy]",
         spell = "[Spell]",
         rg = "[Rg]",
-        tmux = "[Tmux]",
-        cmdline = "[cmd]"
-      }),
-
+        cmdline = "[cmd]",
+      })
     }),
   },
    mapping = {
@@ -55,24 +51,24 @@ cmp.setup({
         if cmp.visible() then
           cmp.select_next_item()
         elseif luasnip and luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()  
+         luasnip.expand_or_jump()
         elseif has_words_before() then
           cmp.complete()
         else
           fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
         end
-      end, { "i", "s","c" }),
+      end, { "i", "s" }),
 
 
       ["<S-Tab>"] = cmp.mapping(function(fallback)
         if cmp.visible() then
           cmp.select_prev_item()
         elseif luasnip and luasnip.jumpable(-1) then
-         luasnip.jump(-1) 
+         luasnip.jump(-1)
         else
           fallback()
         end
-      end, { "i", "s","c"}),
+      end, { "i", "s" }),
    },
   sources = {
     { name = 'cmp_tabnine', priority = 7},
@@ -85,8 +81,9 @@ cmp.setup({
     { name = 'path', priority = 3 ,trigger_characters = {'/'}, max_item_count = 8},
     { name = 'spell', priority = 3, max_item_count = 5},
     { name = 'tmux', priority = 4, max_item_count = 3 },
-    { name = "cmdline" ,priority = 10}
-
+    { name = 'cmdline', priority = 10 },
+    { name = 'nvim_lsp_document_symbol', priority = 12},
+    { name = 'nvim_lsp_signature_help' , priority = 12 },
   },
   
     sorting = {
@@ -122,11 +119,10 @@ cmp.setup.cmdline('/', {
 
 cmp.setup.cmdline(':',{
     source = cmp.config.sources({
-    {name = 'cmdline', priority=99},
+    {name = 'cmdline'  },
     {name = 'path'},
   })
 })
-
 cmp.event:on('confirm_done',cmp_autopairs.on_confirm_done({ map_char = { tex = '' } }))
 
 cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket"
@@ -150,6 +146,7 @@ highlight! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
 highlight! CmpItemKindUnit guibg=NONE guifg=#D4D4D4
 ]])
 
+
 vim.cmd([[autocmd FileType
 \ TelescopePrompt,markdown,asciidoc,gitcommit
-\ lua require('cmp').setup.buffer { enabled = false }]])
+\ lua require('cmp').setup.buffer { enabled = true }]])

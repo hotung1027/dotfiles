@@ -4,6 +4,7 @@ local npairs = require("nvim-autopairs")
 local Rule = require('nvim-autopairs.rule')
 local cond = require('nvim-autopairs.conds')
 
+
 npairs.setup({
     check_ts = true,
     ts_config = {
@@ -20,7 +21,11 @@ npairs.setup({
       highlight = 'Search',
       highlight_grey='Comment'
     },
+    diable_filetype = {
+      "TelescopePrompt","guihua"
+  },
 })
+
 local ts_conds = require('nvim-autopairs.ts-conds')
 npairs.add_rules({
     Rule(' ', ' ')

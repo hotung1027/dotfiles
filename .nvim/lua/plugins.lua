@@ -9,7 +9,6 @@ local map = require('utils').map
 
 
 return require('packer').startup(function(use)
-
 --================ NVIM PACKAGE MANAGER ==================================
   -- Packer can manage itself
   use {'wbthomason/packer.nvim', event = "VimEnter"}
@@ -80,6 +79,10 @@ return require('packer').startup(function(use)
         end,
         cmd = {'NnnPicker', 'NnnExplorer'}
     }
+    use {
+      'VonHeikemen/searchbox.nvim',
+      requires ={'MunifTanjim/nui.nvim'}
+        }
     use {
       'alexghergh/nvim-tmux-navigation' 
     }
@@ -153,9 +156,8 @@ return require('packer').startup(function(use)
         -- Super fast buffer jump
         use { 'phaazon/hop.nvim',
             event = "VimEnter",
-            config = function() require('config.hop') end
-        }
-
+            config = function() require('config.hop') end }
+        use {'ripxorip/aerojump.nvim'}
     -- Better Escape
     use {
       "max397574/better-escape.nvim",
@@ -231,6 +233,7 @@ return require('packer').startup(function(use)
         config = function() 
           require('config.notify')
           require('telescope').load_extension("notify")
+        
         end 
     }
 
@@ -276,11 +279,16 @@ return require('packer').startup(function(use)
     use { 'onsails/lspkind-nvim' }
     use {"hrsh7th/nvim-cmp",
         after = "lspkind-nvim",
-        config = function() require('config.nvim-cmp') end}
+        config = function() require('config.nvim-cmp') end
+    }
+
 
     -- lsp completion sources
+--    use {'prabirshrestha/vim-lsp'}
+ --   use {'mattn/vim-lsp-settings'}
+ --   use {'dmitmel/cmp-vim-lsp'}
     use {"hrsh7th/cmp-nvim-lsp", after = "nvim-cmp"}
-    use {"github/copilot.vim" , run = ":Copilot setup" }
+
     -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
     use {
         'williamboman/nvim-lsp-installer',
@@ -291,7 +299,10 @@ return require('packer').startup(function(use)
     }
     use { "neovim/nvim-lspconfig",
         after = {"cmp-nvim-lsp","nvim-lsp-installer"},
-        config = function () require('config.lsp') end }
+        config = function () require('config.lsp') end 
+    }
+    use{'glepnir/lspsaga.nvim'}
+    use {'nvim-lua/lsp-status.nvim'}
 
 
 
@@ -299,14 +310,23 @@ return require('packer').startup(function(use)
     use {'rhysd/vim-grammarous'}
 
     -- syntax diagnostic
+--    use {
+ --       'dense-analysis/ale',
+ --       ft = {'sh', 'zsh','haskell', 'bash', 'c', 'cpp', 'cmake', 'html', 'markdown', 'racket', 'vim', 'tex'},
+--        config = function() require('config.ale') end,
+ --       cmd = 'ALEEnable',
+  --  }
+    use{
+      'neomake/neomake',
+      config = function() require('config.neomake') end
+  }
     use {
-        'dense-analysis/ale',
-        ft = {'sh', 'zsh', 'bash', 'c', 'cpp', 'cmake', 'html', 'markdown', 'racket', 'vim', 'tex'},
-        cmd = 'ALEEnable',
-        config = 'vim.cmd[[ALEEnable]]'
-    }
-
+      'folke/trouble.nvim',
+      config = function () require('config.trouble') end
+   }
+  
     use {'ray-x/lsp_signature.nvim'}
+    use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
     use {'ray-x/navigator.lua'}
     use {'onsails/diaglist.nvim'}
    
@@ -314,11 +334,13 @@ return require('packer').startup(function(use)
     if utils.executable("ctags") then
       -- plugin to manage your tags
       use {"ludovicchabant/vim-gutentags", event = "VimEnter"}
-      -- gen gtags 
-      use {"jsfaint/gen_tags.vim"}
       -- show file tags in vim window
-      use {"liuchengxu/vista.vim", cmd = "Vista"}
-     
+      use {"liuchengxu/vista.vim",
+      cmd = "Vista",
+      config = function() require("config.tags") end 
+      }
+      -- async tags generation
+      use {'jsfaint/gen_tags.vim'}
     end
 
     -- Quick Fix Preview
@@ -326,10 +348,9 @@ return require('packer').startup(function(use)
         event = "FileType qf",
         config = function () require('config.bqf') end }
     -- Autoformat tools
-    use({ "sbdchd/neoformat", cmd = { "Neoformat" } })
+    use { "sbdchd/neoformat", cmd = { "Neoformat" } ,config = function () require('config.formatter') end }
 
     -- luasnip snippet
-    use {'rafamadriz/friendly-snippets', event = "InsertEnter"}
     use { 'L3MON4D3/LuaSnip'}
     use { 'saadparwaiz1/cmp_luasnip'} 
 
@@ -342,16 +363,17 @@ return require('packer').startup(function(use)
         module = "nvim-treesitter",
     }
     use {'nvim-treesitter/nvim-treesitter-refactor',
-      require = {'nvim-treesitter/nvim-treesitter'}
-  }
+      require = {'nvim-treesitter/nvim-treesitter-refractor'}
+    }
     -- You can specify multiple plugins in a single call
     use {'tjdevries/colorbuddy.vim', after = 'nvim-treesitter'}
 
 
     -- auto pairs
-    use {'windwp/nvim-autopairs',
-    config = function() require('config.autopairs') end
-  }
+    use {
+    'windwp/nvim-autopairs',
+    config = function() require('config.autopairs') end 
+    }
 
     -- Select text object
     use {'gcmt/wildfire.vim', event = "BufRead"}
@@ -381,10 +403,7 @@ return require('packer').startup(function(use)
       module = "dapui",
     }
     if vim.g.is_win or vim.g.is_linux then
-      use { "sakhnik/nvim-gdb",
-      run = { "bash install.sh" },
-      opt = true,
-      setup = [[vim.cmd('packadd nvim-gdb')]] }
+      use { "sakhnik/nvim-gdb", run = { "bash install.sh" }, opt = true, setup = [[vim.cmd('packadd nvim-gdb')]] }
     end
 
     -- ======================== Runner =====================
@@ -402,6 +421,31 @@ return require('packer').startup(function(use)
 
     -- C/CPP
     use {'rhysd/vim-clang-format', ft = {'cpp', 'c', 'h', 'hpp'}}
+
+    -- Haskell
+    use {'neovimhaskell/nvim-hs.vim' }
+
+    use {'neovimhaskell/haskell-vim',
+    config = function()  require("config.lang.haskell") end
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 -- Since tmux is only available on Linux and Mac, we only enable these plugins
@@ -457,6 +501,8 @@ return require('packer').startup(function(use)
     -- Faster footnote generation
     use { "vim-pandoc/vim-markdownfootnotes", ft = { "markdown" } }
     -- Vim tabular plugin for manipulate tabular, required by markdown plugins
+    use { "godlygeek/tabular", cmd = { "Tabularize" } }
+
 
 
   if packer_bootstrap then
@@ -465,4 +511,3 @@ return require('packer').startup(function(use)
 
 
 end)
--- This file can be loaded by calling `lua require('plugins')` from your init.vim
