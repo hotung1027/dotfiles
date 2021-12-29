@@ -94,11 +94,11 @@ return require('packer').startup(function(use)
     }
 
     -- Comment plugin
-    use {"preservim/nerdcommenter",
+    use {"numToStr/Comment.nvim",
         config = function() require("config.comment") end,
-        event = "VimEnter"
     }
-
+    -- Float Terminal
+    use { 'voldikss/vim-floaterm' }
     ---- === Searching =======
         use { 'nvim-lua/plenary.nvim' }
         use {
@@ -249,7 +249,7 @@ return require('packer').startup(function(use)
     use { 'lifepillar/vim-gruvbox8' }
     use { 'lifepillar/vim-colortemplate' }
     use { 'sainnhe/gruvbox-material' }
-
+    use { 'rebelot/kanagawa.nvim' }
 
 
 
@@ -301,7 +301,6 @@ return require('packer').startup(function(use)
         after = {"cmp-nvim-lsp","nvim-lsp-installer"},
         config = function () require('config.lsp') end 
     }
-        use {'nvim-lua/lsp-status.nvim'}
 
 
 
@@ -326,9 +325,10 @@ return require('packer').startup(function(use)
   
     use {'ray-x/lsp_signature.nvim'}
     use {'ray-x/guihua.lua', run = 'cd lua/fzy && make'}
-    use {'ray-x/navigator.lua'}
     use {'onsails/diaglist.nvim'}
-   
+    use {'RishabhRd/popfix'}
+    use {'RishabhRD/nvim-lsputils'}
+    use { 'tami5/lspsaga.nvim' }
     -- Only install these plugins if ctags are installed on the system
     if utils.executable("ctags") then
       -- plugin to manage your tags
@@ -364,6 +364,7 @@ return require('packer').startup(function(use)
     use {'nvim-treesitter/nvim-treesitter-refactor',
       require = {'nvim-treesitter/nvim-treesitter-refractor'}
     }
+    use {'nvim-treesitter/nvim-treesitter-textobjects'}
     -- You can specify multiple plugins in a single call
     use {'tjdevries/colorbuddy.vim', after = 'nvim-treesitter'}
 
@@ -387,7 +388,26 @@ return require('packer').startup(function(use)
     -- Additional powerful text object for vim, this plugin should be studied
     -- carefully to use its full power
     use {"wellle/targets.vim", event = "VimEnter"}
-
+    -- use {
+      -- "nvim-neorg/neorg",
+      -- config = function()
+          -- require('neorg').setup {
+              -- -- Tell Neorg what modules to load
+              -- load = {
+                  -- ["core.defaults"] = {}, -- Load all the default modules
+                  -- ["core.norg.concealer"] = {}, -- Allows for use of icons
+                  -- ["core.norg.dirman"] = { -- Manage your directories with Neorg
+                      -- config = {
+                          -- workspaces = {
+                              -- my_workspace = "~/neorg"
+                          -- }
+                      -- }
+                  -- }
+              -- },
+          -- }
+      -- end,
+      -- requires = "nvim-lua/plenary.nvim"
+    -- }
 -- ====================== Debuggers ======================
     use {
       'mfussenegger/nvim-dap',
@@ -428,7 +448,11 @@ return require('packer').startup(function(use)
     config = function()  require("config.lang.haskell") end
     }
 
-
+  -- Julia
+    use { 
+      'JuliaEditorSupport/julia-vim',
+      config = function() require("config.lang.julia") end
+    }
 
 
 
@@ -457,7 +481,6 @@ return require('packer').startup(function(use)
 -- ======================= GIT ================================
     -- Better git commit experience
     use {"rhysd/committia.vim", opt = true, setup = [[vim.cmd('packadd committia.vim')]]}
-
     -- git information
     use {
         'lewis6991/gitsigns.nvim',

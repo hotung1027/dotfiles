@@ -7,7 +7,7 @@ vim.g.galaxyline_loaded = 1
 local gl = require('galaxyline')
 local gls = gl.section
 local diagnostic = require('galaxyline.provider_diagnostic')
-
+local buffer = require('galaxyline.provider_buffer')
 -- VistaPlugin = extension.vista_nearest
 
 local current_scheme = vim.g.colors_name
@@ -341,6 +341,27 @@ insert_right {
 }
 
 insert_right {
+  FileIcon = {
+          provider = 'FileIcon',
+          condition = buffer_not_empty,
+          highlight = {
+              require('galaxyline.provider_fileinfo').get_file_icon_color,
+              colors.dark
+          }
+      }
+
+}
+
+insert_right {
+  FileTypeName = {
+    provider = 'FileTypeName',
+    highlight = {
+      require('galaxyline.provider_fileinfo').get_file_icon_color,
+      colors.dark
+    }
+  }
+}
+--[[ insert_right {
     FileFormat = {
         provider = 'FileFormat',
         separator = ' ',
@@ -348,7 +369,7 @@ insert_right {
         separator_highlight = {colors.blue, colors.dark},
         highlight = {colors.fg, colors.dark}
     }
-}
+} ]]
 
 insert_right {
     RightSpace = {

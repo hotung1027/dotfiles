@@ -1,7 +1,6 @@
 local lspconfig_present, _ = pcall(require, "lspconfig")
 local installer_present, installer = pcall(require, "nvim-lsp-installer")
-local navigator = require('navigator')
-local lsp_status = require("lsp-status")
+local lspsaga = require("lspsaga")
 if not (lspconfig_present or installer_present) then
   vim.notify("Fail to setup LSP", vim.log.levels.ERROR, {title= 'plugins'})
   return
@@ -10,11 +9,7 @@ end
 
 
 
-navigator.setup({
-  lsp_installer = true,
-})
 
-lsp_status.config { kind_labels = vim.g.completions_customize_lsp_label }
 
 
 local border = {
@@ -28,7 +23,7 @@ local border = {
       {"▏", "FloatBorder"},
 }
 local servers = {
-    "clangd", "hls", "sumneko_lua"
+  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials",
 }
 
 local lua_setting = {
@@ -65,6 +60,9 @@ local lsp_publish_diagnostics_options = {
     serverity_sort = true,
 }
 
+require'lspconfig'.julials.setup{}
+
+
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.documentationFormat = {
     "markdown",
@@ -92,7 +90,7 @@ local function goto_definition(split_cmd)
     local api = vim.api
 
     -- note, this handler style is for neovim 0.5.1/0.6, if on 0.5, call with function(_, method, result)
-    local handler = function(_, result, ctx)
+    local handlers = function(_, result, ctx)
         if result == nil or vim.tbl_isempty(result) then
             local _ = log.info() and log.info(ctx.method, "No location found")
             return nil
@@ -115,10 +113,11 @@ local function goto_definition(split_cmd)
         end
     end
 
-    return handler
+    return handlers
 end
+
 function code_action_listener()
-  local context = { diagnostics = vim.lsp.diagnostic.get() }
+  local context = { diagnostics = vim.diagnostic.get() }
   local params = vim.lsp.util.make_range_params()
   params.context = context
   vim.lsp.buf_request(0, 'textDocument/codeAction', params, function(err, _, result)
@@ -128,6 +127,7 @@ end
 
 
 local handlers ={
+
 ["textDocument/hover"] = 
     vim.lsp.with(
       vim.lsp.handlers.hover,
@@ -139,7 +139,8 @@ local handlers ={
       vim.lsp.handlers.signature_help,
       {
         border = "single"
-        }),
+        }
+    ),
 ["textDocument/references"] =
     vim.lsp.with(
       vim.lsp.handlers["textDocument/references"],
@@ -149,15 +150,16 @@ local handlers ={
 ["textDocument/publishDiagnostics"] =
     vim.lsp.with(
         vim.lsp.diagnostic.on_publish_diagnostics,
-                 lsp_publish_diagnostics_options),
+                 lsp_publish_diagnostics_options
+    ),
 
-["textDocument/definition"] = goto_definition('split')
-[""]
+["textDocument/definition"] = goto_definition('split'),
+
 }
 
 
 vim.diagnostic.config(lsp_publish_diagnostics_options)
-vim.diagnostic.handlers["info/notify"] = {
+--[[ vim.diagnostic.handlers["info/notify"] = {
   show = function(namespace,bufnr,diagnostic,opts)
   local level = opts["info/notify"].log_level
   local name = vim.diagnostic.get_namespace(namespace).name
@@ -167,7 +169,7 @@ vim.diagnostic.handlers["info/notify"] = {
     name)
   vim.notify(msg,level)
   end,
-}
+} ]]
 
 
 
@@ -182,24 +184,69 @@ local on_attach = function (client, bufnr)
     if client.config.flags then
       client.config.flags.allow_incremental_sync = true
     end
-    lsp_status.register_progress()
+
     require'lsp_signature'.on_attach({
       bind = true,
+      hint_prefix = " ",
       handler_opts ={
-        border = "rounded"
+        border = "rounded",
       }
     },bufnr)
+    lspsaga.setup()
+    vim.api.nvim_command('au User LspDiagnosticsChanged lua require("lsp-status/redraw").redraw()')
 
-    lsp_status.on_attach(client)
+    vim.lsp.handlers['textDocument/codeAction'] = function(_, _, actions)
+        require('lsputil.codeAction').code_action_handler(nil, actions, nil, nil, nil)
+    end
+
+    vim.lsp.handlers['textDocument/references'] = function(_, _, result)
+        require('lsputil.locations').references_handler(nil, result, { bufnr = bufnr }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/definition'] = function(_, method, result)
+        require('lsputil.locations').definition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/declaration'] = function(_, method, result)
+        require('lsputil.locations').declaration_handler(nil, result, { bufnr = bufnr, method = method }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/typeDefinition'] = function(_, method, result)
+        require('lsputil.locations').typeDefinition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/implementation'] = function(_, method, result)
+        require('lsputil.locations').implementation_handler(nil, result, { bufnr = bufnr, method = method }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/documentSymbol'] = function(_, _, result, _, bufn)
+        require('lsputil.symbols').document_handler(nil, result, { bufnr = bufn }, nil)
+    end
+
+    vim.lsp.handlers['textDocument/symbol'] = function(_, _, result, _, bufn)
+        require('lsputil.symbols').workspace_handler(nil, result, { bufnr = bufn }, nil)
+    end
 
     buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
     -- Mappings.
     local opts = {noremap = true, silent = true}
+
+    buf_set_keymap("n", "<F2>", "<cmd>Lspsaga rename<cr>", opts)
+    buf_set_keymap("n", "<space>ca", "<cmd>Lspsaga code_action<cr>", opts)
+    buf_set_keymap("x", "<space>ca", ":<c-u>Lspsaga range_code_action<cr>", opts)
+    buf_set_keymap("n", "<C-k>",  "<cmd>lua require('lspsaga.hover').render_hover_doc()<cr>", opts)
+    buf_set_keymap("n", "<space>e", "<cmd>Lspsaga show_line_diagnostics<cr>", opts)
+    buf_set_keymap("n","<space>d","<cmd>lua require('lspsaga.provider).preview_definitions<cr>", opts)
+    buf_set_keymap("n", "gj", "<cmd>Lspsaga diagnostic_jump_next<cr>", opts)
+    buf_set_keymap("n", "gk", "<cmd>Lspsaga diagnostic_jump_prev<cr>", opts)
+    buf_set_keymap("n", "<C-u>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(-1)<cr>",opts)
+    buf_set_keymap("n", "<C-d>", "<cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<cr>",opts)
     buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
     buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+    buf_set_keymap('n', 'gf', "<Cmd>lua require('lspsaga.provider').lsp_finder()",opts)
     buf_set_keymap('n', '<space>h', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
     buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-    buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>',
+    buf_set_keymap('n', '<C-q>', '<cmd>lua vim.lsp.buf.signature_help()<CR>',
                    opts)
     buf_set_keymap('n', '<space>wa',
                    '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
@@ -208,22 +255,27 @@ local on_attach = function (client, bufnr)
     buf_set_keymap('n', '<space>wl',
                    '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>',
                    opts)
-    buf_set_keymap('n', '<space>D',
+    buf_set_keymap('n', 'gt',
                    '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-    buf_set_keymap('n', '<space>ca', "<cmd>lua vim.lsp.buf.code_action()<CR>",opts)
-    buf_set_keymap('v','<space>ca',"<cmd>lua  vims.lsp.buf.range_code_action()<CR>",opts)
+    buf_set_keymap("n","ec","<cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>",opts)
+    buf_set_keymap("n","ed","<cmd>lua require'lspsaga.diagnostic'.show_cursor_diagnostics()<CR>",opts)
+    buf_set_keymap("n","[e","<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_prev()<CR>",opts)
+    buf_set_keymap("n","]e", "<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_next()<CR>",opts)
+
+    -- buf_set_keymap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+    -- buf_set_keymap('n', '<space>ca', "<cmd>lua vim.lsp.buf.code_action()<CR>",opts)
+    -- buf_set_keymap('v','<space>ca',"<cmd>lua  vims.lsp.buf.range_code_action()<CR>",opts)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-    buf_set_keymap('n', '<space>e',
-                   '<cmd>lua vim.diagnostic.open_float()<CR>',
-                   opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>',
-                   opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>',
-                   opts)
+    -- buf_set_keymap('n', '<space>e',
+                   -- '<cmd>lua vim.diagnostic.open_float()<CR>',
+                   -- opts)
+    -- buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>',
+                   -- opts)
+    -- buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>',
+                   -- opts)
     buf_set_keymap('n', '<space>q',
                    '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
-
+--
     -- Set some keybinds conditional on server capabilities
     if client.resolved_capabilities.document_formatting then
         buf_set_keymap("n", "<space>m", "<cmd>lua vim.lsp.buf.formatting()<CR>",
@@ -243,10 +295,7 @@ local on_attach = function (client, bufnr)
     vim.cmd([[
       autocmd BufEnter,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
     ]])
-  --[[   vim.cmd([[ ]]
-      --[[ autocmd CursorHold,CursorHoldI * lua require('config.lsp').code_action_listener() ]]
-    --[[ <]) ]]
-    if client.resolved_capabilities.document_highlight then
+      if client.resolved_capabilities.document_highlight then
       vim.cmd [[
         hi LspReferenceRead cterm=bold ctermbg=red guibg=DarkRed
         hi LspReferenceText cterm=bold ctermbg=red guibg=DarkRed
@@ -288,7 +337,8 @@ end
 installer.on_server_ready(function(server)
     local opts = {
       on_attach = on_attach,
-      capabilities = vim.tbl_extend('keep',capabilities or {}, lsp_status.capabilities),
+      capabilities = capabilities,
+      -- capabilities = capabilities,
       root_dir = vim.loop.cwd,
       handlers = handlers,
     }
@@ -298,7 +348,7 @@ installer.on_server_ready(function(server)
     elseif server.name ==  'hls' then
       opts.settings = haskell_setting
     end
-  
+
     if #vim.lsp.buf_get_clients() > 0 then
       require('lsp-status').status()
     end
@@ -307,6 +357,7 @@ installer.on_server_ready(function(server)
     server:setup(opts)
     vim.cmd [[ do User LspAttachBuffers ]]
 end)
+
 
 local signs = {Error = " ", Warn = " ", Hint = " ", Info = " "}
 

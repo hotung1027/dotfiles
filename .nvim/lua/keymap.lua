@@ -1,4 +1,3 @@
-
 local map = require('utils').map
 vim.g.mapleader = ";"
 
@@ -38,9 +37,9 @@ map('n', "<C-l>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateRight()<cr
 
 
 -- buffer writing
-map("n", "<leader>w", ":w<CR>")
+map("n", "<leader>w", ":wa<CR>")
 map("n", "<leader>q", ":q<CR>")
-map("n","<leader>Q",":qa<CR>")
+map("n","<leader>Q",":qa!<CR>")
 
 
 map("x", "<C-y>", [["+y]])
@@ -61,11 +60,12 @@ map("i", "<C-c>", "<ESC>zzi")
 -- nnn
 map('n', '<Leader>o', ':NnnPicker %:p:h<CR>')
 --aerojump to
-map("n","<Leader>as","<Plug>(AerojumpSpace)")
-map("n","<Leader>ab","<Plug>(AerojumpBolt)")
-map("n","<Leader>aa","<Plug>(AerojumpFromCursorBolt)")
-map("n","<Leader>ad","<Plug>(AerojumpDefault)") -- Boring mode
-
+vim.cmd([[
+nmap <Leader>as <Plug>(AerojumpSpace)
+nmap <Leader>ab <Plug>(AerojumpBolt)
+nmap <Leader>aa <Plug>(AerojumpFromCursorBolt)
+nmap <Leader>ad <Plug>(AerojumpDefault)
+]])
 -- searchbox 
 map('n', '<leader>s',":lua require('searchbox').incsearch()<CR>")
 map('x', '<Leader>s', "<ESC>:lua require('searchbox').insearch({visual_mode = true})<CR>")
@@ -81,10 +81,11 @@ map("n", "<leader>fl", ":NvimTreeToggle<CR>")
 map("n", "<leader>fr", ":NvimTreeRefresh<CR>")
 
 -- FloatTerm
-map("n","<A-d>t","<cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>")
-map("n","<A-d>g","<cmd>lua require('lspsaga.floaterm').open_float_terminal('lazygit')<CR>")
+map("n","<A-d>`","<cmd>:FloatermNew --cwd=<root> --wintype=split --height=0.3 --position=botright<CR>")
+map("n","<A-d>t","<cmd>:FloatermNew --cwd=<root> --position=bottom<CR>")
+map("n","<A-d>g","<cmd>:FloatermNew --cwd=<root> --height=0.8 --width=0.8 --position=center --autoclose=0 lazygit<CR>")
 
-map("t","<A-d>","<C-\\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>")
+map("t","<A-d>","<C-\\><C-n>:FloatermKill<CR>")
 
 
   -- UndoTree
@@ -105,5 +106,20 @@ map("n","<leader>ft","<cmd>lua require('trouble.providers.telescope').open_with_
 map("n","<leader>fs","<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols<CR>")
 map("t", "<C-n>", [[<C-\><C-n>]])
 
+
+-- Git 
+map("n","]c",   "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
+map("n","[c",   "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'")
+
+map("n","<leader>hs", "<cmd>Gitsigns stage_hunk<CR>")
+map("n","<leader>hs", "<cmd>Gitsigns stage_hunk<CR>")
+map("n","<leader>hu", "<cmd>Gitsigns undo_stage_hunk<CR>")
+map("n","<leader>hr", "<cmd>Gitsigns reset_hunk<CR>")
+map("n","<leader>hr", "<cmd>Gitsigns reset_hunk<CR>")
+map("n","<leader>hR", "<cmd>Gitsigns reset_buffer<CR>")
+map("n","<leader>hp", "<cmd>Gitsigns preview_hunk<CR>")
+map("n","<leader>hb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
+map("n","<leader>hS", "<cmd>Gitsigns stage_buffer<CR>")
+map("n","<leader>hU", "<cmd>Gitsigns reset_buffer_index<CR>")
 map("n", "<LEADER>ng", [[<CMD>Neogit<CR>]])
 map("n", "<LEADER>lg", [[<CMD>LazygitToggle<CR>]])

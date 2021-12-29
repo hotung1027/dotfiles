@@ -72,10 +72,11 @@ opt.lazyredraw = true
 opt.signcolumn = "yes:1"
 opt.mouse = 'a'
 
-opt.foldmethod = 'indent'
+opt.foldmethod = 'expr'
 opt.foldlevel = 99
 opt.foldenable = true
 opt.formatoptions = 'qj'
+opt.foldexpr = 'nvim_treesitter#foldexpr()'
 
 opt.hidden = true
 
@@ -97,3 +98,4 @@ end
 
 vim.api.nvim_command('autocmd TermOpen term://* startinsert')
 vim.cmd [[set guifont=Notomono\ Nerd\ Font,\ Book:h14]]
+vim.cmd [[filetype plugin indent on]]
