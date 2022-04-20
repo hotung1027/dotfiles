@@ -17,6 +17,13 @@ export ZSH="/home/randyt/.oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
+# Colorized terminal 
+ZSH_COLORIZE_TOOL=chroma
+ZSH_COLORIZE_STYLE="colorful"
+
+# set chroma fall back for less tool
+export LESSOPEN='| p() { chroma --fail "$1" || cat "$1"; }; p "%s"'
+
 export JAVA_HOME="/usr/local/lib/jdk-11.0.11+9"
 export LOCAL="$HOME/.local"
 export JULIA_HOME="$HOME/.juliavm/julia-current"
@@ -26,8 +33,8 @@ export KITTY_CONFIG_DIRECTORY="$HOME/.kitty.conf"
 export DENO_INSTALL="$HOME/.deno"
 export SURF_HOME="$HOME/.local/share/surf"
 export YARN_HOME="$HOME/.yarn"
-
-export PATH="$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
+export CUDA_HOME="/usr/local/cuda"
+export PATH="$CUDA_HOME/bin:$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
 source $HOME/.cargo/env
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -39,7 +46,7 @@ export GVM_DIR="$HOME/.gvm"
 source "$GVM_DIR/scripts/gvm"
 
 
-export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -72,7 +79,7 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gn
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # Caution: this setting can cause issues with multiline prompts (zsh 5.7.1 and newer seem to work)
@@ -100,12 +107,49 @@ export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gn
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git  docker docker-compose ssh-agent conda-zsh-completion)
-
+plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages ripgrep zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
+autoload -U compinit && compinit
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
+# FZF Configuration for in terminal seraching 
+# Use ~~ as the trigger sequence instead of the default **
+export FZF_COMPLETION_TRIGGER='?'
 
+# export FZF_DEFAULT_OPTS='--algo=v2'
+# Options to fzf command
+export FZF_COMPLETION_OPTS='--border --info=inline'
+
+export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
+export INITIAL_QUERY=""
+export FZF_DEFAULT_COMMAND="$RG_PREFIX '$INITIAL_QUERY' fzf --bind 'change:reload:$RG_PREFIX {q} || true' --ansi --phony --query '$INITIAL_QUERY'"
+# Use fd (https://github.com/sharkdp/fd) instead of the default find
+# command for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fdfind --hidden --follow --exclude ".git" . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fdfind --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+# (EXPERIMENTAL) Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+    cd)           fzf "$@" --preview 'tree -C {} | head -200' ;;
+    export|unset) fzf "$@" --preview "eval 'echo \$'{}" ;;
+    ssh)          fzf "$@" --preview 'dig {}' ;;
+    *)            fzf "$@" ;;
+  esac
+}
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -115,7 +159,7 @@ source $ZSH/oh-my-zsh.sh
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
 # else
-#   export EDITOR='mvim'
+#   export EDITOR='nvim'
 # fi
 
 # Compilation flags
