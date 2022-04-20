@@ -61,6 +61,7 @@ require'nvim-tree'.setup {
     system_open = {cmd = nil, args = {}},
     git = {
       ignore = false,
+      enable = true,
     },
     filters = {
       dotfiles = true,
