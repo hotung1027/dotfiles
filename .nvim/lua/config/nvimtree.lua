@@ -6,7 +6,7 @@ end
 
 local tree_cb = tree_c.nvim_tree_callback
 
-vim.g.nvim_tree_indent_markers = 1
+vim.cmd([[autocmd BufEnter * ++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]])
 vim.g.nvim_tree_git_hl = 1
 vim.g.nvim_tree_highlight_opened_files = 1
 vim.g.nvim_tree_root_folder_modifier = ":t"
@@ -31,11 +31,11 @@ vim.g.nvim_tree_icons = {
         ignored = ""
     },
     folder = {
-        -- arrow_open = "",
-        -- arrow_closed = "",
+        arrow_open = "",
+        arrow_closed = "",
         default = "",
         open = "",
-        empty = "", -- 
+        empty = "",
         empty_open = "",
         symlink = "",
         symlink_open = ""
@@ -44,11 +44,11 @@ vim.g.nvim_tree_icons = {
 
 -- following options are the default
 require'nvim-tree'.setup {
+    auto_reload_on_write = true,
     disable_netrw = true,
     hijack_netrw = true,
     open_on_setup = false,
     ignore_ft_on_setup = {'startify', 'dashboard'},
-    auto_close = true,
     open_on_tab = false,
     hijack_cursor = true,
     update_cwd = true,
@@ -60,21 +60,35 @@ require'nvim-tree'.setup {
     update_focused_file = {enable = false, update_cwd = false, ignore_list = {}},
     system_open = {cmd = nil, args = {}},
     git = {
-      ignore = false,
-      enable = true,
+        ignore = false,
+        enable = true,
     },
     filters = {
-      dotfiles = true,
-      custom = {
+        dotfiles = true,
+        custom = {
         '.git', 'node_modules', '.cache'
-      }
+        }
+    },
+    renderer = {
+        indent_markers = {
+            enable = true,
+        },
+        icons = {
+            webdev_colors = true,
+        }
+    },
+    actions = {
+        use_system_clipboard = true,
+
+        open_file = {
+            resize_window = true,
+        }
     },
 
     view = {
         width = 25,
         -- height = 30,
         side = 'left',
-        auto_resize = false,
         mappings = {
             custom_only = true,
             list = {

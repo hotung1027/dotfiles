@@ -265,7 +265,7 @@ return require('packer').startup(function(use)
     use {"hrsh7th/cmp-buffer", requires = {"hrsh7th/nvim-cmp"}}
     use {"tzachar/cmp-fuzzy-buffer", requires = { "hrsh7th/nvim-cmp",'tzachar/fuzzy.nvim'}}
     use {"lukas-reineke/cmp-rg", requires = {"hrsh7th/nvim-cmp"}}
-    use {"tzachar/cmp-tabnine", requires = {"hrsh7th/nvim-cmp", run = "./install.sh"}}
+    use {"tzachar/cmp-tabnine", install = {"./install.sh"} ,requires = {"hrsh7th/nvim-cmp"}}
     use {"lukas-reineke/cmp-under-comparator", requires = {"hrsh7th/nvim-cmp"}}
     use {"ray-x/cmp-treesitter", requires = {"hrsh7th/nvim-cmp"}}
     use {"hrsh7th/cmp-nvim-lsp-document-symbol", requires = {"hrsh7th/nvim-cmp"}}
@@ -293,7 +293,7 @@ return require('packer').startup(function(use)
         'williamboman/nvim-lsp-installer',
         ft = {
             "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
-            "toml", "json", "python"
+            "toml", "json", "python" , "dart" 
         }
     }
     use { "neovim/nvim-lspconfig",
@@ -415,6 +415,8 @@ return require('packer').startup(function(use)
         require("config.dap_config")
       end
     }
+
+
     use {
       'rcarriga/nvim-dap-ui',
       config = function () require('config.dap_config.dapui') end,
@@ -453,7 +455,8 @@ return require('packer').startup(function(use)
       config = function() require("config.lang.julia") end
     }
 
-
+  -- Flutter
+  use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim', config = function() require("config.lang.flutter") end}
 
 
 

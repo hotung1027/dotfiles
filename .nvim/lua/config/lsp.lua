@@ -6,12 +6,6 @@ if not (lspconfig_present or installer_present) then
   return
 end
 
-
-
-
-
-
-
 local border = {
       {"🭽", "FloatBorder"},
       {"▔", "FloatBorder"},
@@ -23,7 +17,7 @@ local border = {
       {"▏", "FloatBorder"},
 }
 local servers = {
-  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials",
+  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer'
 }
 
 local lua_setting = {

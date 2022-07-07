@@ -1,5 +1,5 @@
 local parser_configs = require('nvim-treesitter.parsers').get_parser_configs()
-
+require('nvim-treesitter.install').compilers = {"gcc-11"}
 parser_configs.norg = {
     install_info = {
         url = "https://github.com/nvim-neorg/tree-sitter-norg",
