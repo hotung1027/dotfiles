@@ -1,0 +1,113 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+M.executable 	.nvim/lua/utils.lua	/^M.executable = function (name)$/;"	f
+M.load_plugins 	.nvim/lua/utils.lua	/^M.load_plugins = function()$/;"	f
+M.log_err 	.nvim/lua/utils.lua	/^M.log_err = function (msg, title)$/;"	f
+M.log_info 	.nvim/lua/utils.lua	/^M.log_info = function (msg, title)$/;"	f
+M.map 	.nvim/lua/utils.lua	/^M.map = function (mode, lhs, rhs, opts)$/;"	f
+M.new_cmd 	.nvim/lua/utils.lua	/^M.new_cmd = function (cmd, repl, force)$/;"	f
+["<S-Tab>"] 	.nvim/lua/config/nvim-cmp.lua	/^      ["<S-Tab>"] = cmp.mapping(function(fallback)$/;"	f
+["<Tab>"] 	.nvim/lua/config/nvim-cmp.lua	/^      ["<Tab>"] = cmp.mapping(function(fallback)$/;"	f
+["<leader>df"] 	.nvim/lua/config/treesitter.lua	/^            ["<leader>df"] = "@function.outer",$/;"	f
+["[M"] 	.nvim/lua/config/treesitter.lua	/^          ["[M"] = "@function.outer",$/;"	f
+["[m"] 	.nvim/lua/config/treesitter.lua	/^          ["[m"] = "@function.outer",$/;"	f
+["]M"] 	.nvim/lua/config/treesitter.lua	/^          ["]M"] = "@function.outer",$/;"	f
+["]m"] 	.nvim/lua/config/treesitter.lua	/^          ["]m"] = "@function.outer",$/;"	f
+["af"] 	.nvim/lua/config/treesitter.lua	/^          ["af"] = "@function.outer",$/;"	f
+["if"] 	.nvim/lua/config/treesitter.lua	/^          ["if"] = "@function.inner",$/;"	f
+buf_set_keymap	.nvim/lua/config/lsp.lua	/^    local function buf_set_keymap(...)$/;"	f
+buf_set_option	.nvim/lua/config/lsp.lua	/^    local function buf_set_option(...)$/;"	f
+c 	.nvim/lua/config/treesitter.lua	/^            c = "(function_definition) @function",$/;"	f
+code_action_listener	.nvim/lua/config/lsp.lua	/^function code_action_listener()$/;"	f
+config 	.nvim/lua/plugins.lua	/^            config = function () require('telescope').load_extension('lsp_handlers') end$/;"	f
+config 	.nvim/lua/plugins.lua	/^            config = function() require("config.telescope") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^            config = function() require('config.hop') end }$/;"	f
+config 	.nvim/lua/plugins.lua	/^            config = function() require('telescope').load_extension('frecency') end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^            config = function() require('telescope').load_extension('fzf') end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^          config = function() require('telescope').load_extension('dap') end$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function () require('config.bqf') end }$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function () require('config.lsp') end $/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() $/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.bufferline") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.comment") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.gitsign") end$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.indent") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.nvimtree") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.statusline") end$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require("config.symbols") end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require('config.nvim-cmp') end$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require('config.treesitter') end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function() require('config.which-key') end}$/;"	f
+config 	.nvim/lua/plugins.lua	/^        config = function()$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function () require('config.dap_config.dapui') end,$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function () require('config.trouble') end$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function() require("config.lang.julia") end$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function() require("config.tags") end $/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function() require('auto-session').setup {$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function() require('config.neomake') end$/;"	f
+config 	.nvim/lua/plugins.lua	/^      config = function()$/;"	f
+config 	.nvim/lua/plugins.lua	/^    config = function()  require("config.lang.haskell") end$/;"	f
+config 	.nvim/lua/plugins.lua	/^    config = function() require('config.autopairs') end $/;"	f
+cpp 	.nvim/lua/config/treesitter.lua	/^            cpp = "(function_definition) @function",$/;"	f
+diagnostic_indicator 	.nvim/lua/config/bufferline.lua	/^        diagnostic_indicator = function(count,level,diagnostics_dict,context)$/;"	f
+expand 	.nvim/lua/config/nvim-cmp.lua	/^    expand = function(args)$/;"	f
+functionStyle 	.nvim/lua/colors.lua	/^      functionStyle = {},$/;"	f
+goto_definition	.nvim/lua/config/lsp.lua	/^local function goto_definition(split_cmd)$/;"	f
+gruvbox_setup	.nvim/lua/colors.lua	/^local function gruvbox_setup()$/;"	f
+handler 	.nvim/lua/config/nvim-cmp.lua	/^        handler = function(char, item, bufnr)$/;"	f
+has_file_type	.nvim/lua/config/statusline.lua	/^local function has_file_type()$/;"	f
+icon 	.nvim/lua/config/statusline.lua	/^        icon = function()$/;"	f
+if vim.api.nvim_call_function('has', {'nvim-0.5'}) ~	.nvim/plugin/packer_compiled.lua	/^if vim.api.nvim_call_function('has', {'nvim-0.5'}) ~= 1 then$/;"	f
+insert_blank_line_at_left	.nvim/lua/config/statusline.lua	/^local function insert_blank_line_at_left()$/;"	f
+insert_left	.nvim/lua/config/statusline.lua	/^local function insert_left(element)$/;"	f
+insert_right	.nvim/lua/config/statusline.lua	/^local function insert_right(element)$/;"	f
+java 	.nvim/lua/config/treesitter.lua	/^            java = "(method_declaration) @function",$/;"	f
+kanagawa_setup	.nvim/lua/colors.lua	/^local function kanagawa_setup()$/;"	f
+keys 	.nvim/lua/plugins.lua	/^            keys = "<Esc>", -- keys used for escaping, if it is a function will use the result everytime$/;"	f
+lazy_load_module	.nvim/plugin/packer_compiled.lua	/^local function lazy_load_module(module_name)$/;"	f
+local buffer_not_empty 	.nvim/lua/config/statusline.lua	/^local buffer_not_empty = function()$/;"	f
+local checkwidth 	.nvim/lua/config/statusline.lua	/^local checkwidth = function()$/;"	f
+local feedkey 	.nvim/lua/config/nvim-cmp.lua	/^local feedkey = function(key, mode)$/;"	f
+local handlers 	.nvim/lua/config/lsp.lua	/^    local handlers = function(_, result, ctx)$/;"	f
+local has_words_before 	.nvim/lua/config/nvim-cmp.lua	/^local has_words_before = function()$/;"	f
+local no_errors, error_msg 	.nvim/plugin/packer_compiled.lua	/^local no_errors, error_msg = pcall(function()$/;"	f
+local on_attach 	.nvim/lua/config/lsp.lua	/^local on_attach = function (client, bufnr)$/;"	f
+neoformat#formatters#haskell	.nvim/lua/config/formatter.lua	/^  function! neoformat#formatters#haskell() abort() $/;"	f
+program 	.nvim/lua/config/dap_config/cpp.lua	/^    program = function()$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^            provider = function() return ' ' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return ' ' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return ' ' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return '  ' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return ' ' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return '' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function() return '' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^        provider = function()$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^      provider = function ()$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^      provider = function() return '' end,$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^      provider = function()$/;"	f
+provider 	.nvim/lua/config/statusline.lua	/^    provider = function() return " " end,$/;"	f
+python 	.nvim/lua/config/treesitter.lua	/^            python = "(function_definition) @function",$/;"	f
+register_configurations 	.nvim/lua/config/lang/flutter.lua	/^        register_configurations = function(_)$/;"	f
+save_profiles	.nvim/plugin/packer_compiled.lua	/^local function save_profiles(threshold)$/;"	f
+setup 	.nvim/lua/plugins.lua	/^        setup = function()$/;"	f
+setup_plugins_after_loaded	.nvim/lua/utils.lua	/^local function setup_plugins_after_loaded()$/;"	f
+setup_plugins_before_loaded	.nvim/lua/utils.lua	/^local function setup_plugins_before_loaded()$/;"	f
+show 	.nvim/lua/config/lsp.lua	/^  show = function(namespace,bufnr,diagnostic,opts)$/;"	f
+time 	.nvim/plugin/packer_compiled.lua	/^    time = function(chunk, start) end$/;"	f
+time 	.nvim/plugin/packer_compiled.lua	/^    time = function(chunk, start)$/;"	f
+try_loadstring	.nvim/plugin/packer_compiled.lua	/^local function try_loadstring(s, component, name)$/;"	f
+use { "sbdchd/neoformat", cmd 	.nvim/lua/plugins.lua	/^    use { "sbdchd\/neoformat", cmd = { "Neoformat" } ,config = function () require('config.formatter') end }$/;"	f
+use {'akinsho/flutter-tools.nvim', requires 	.nvim/lua/plugins.lua	/^  use {'akinsho\/flutter-tools.nvim', requires = 'nvim-lua\/plenary.nvim', config = function() require("config.lang.flutter") end}$/;"	f
+use {'junegunn/fzf', run 	.nvim/lua/plugins.lua	/^        use {'junegunn\/fzf', run = function()$/;"	f
+vim.lsp.handlers['textDocument/codeAction'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/codeAction'] = function(_, _, actions)$/;"	f
+vim.lsp.handlers['textDocument/declaration'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/declaration'] = function(_, method, result)$/;"	f
+vim.lsp.handlers['textDocument/definition'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/definition'] = function(_, method, result)$/;"	f
+vim.lsp.handlers['textDocument/documentSymbol'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/documentSymbol'] = function(_, _, result, _, bufn)$/;"	f
+vim.lsp.handlers['textDocument/implementation'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/implementation'] = function(_, method, result)$/;"	f
+vim.lsp.handlers['textDocument/references'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/references'] = function(_, _, result)$/;"	f
+vim.lsp.handlers['textDocument/symbol'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/symbol'] = function(_, _, result, _, bufn)$/;"	f
+vim.lsp.handlers['textDocument/typeDefinition'] 	.nvim/lua/config/lsp.lua	/^    vim.lsp.handlers['textDocument\/typeDefinition'] = function(_, method, result)$/;"	f

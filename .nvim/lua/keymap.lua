@@ -90,7 +90,8 @@ map("t","<A-d>","<C-\\><C-n>:FloatermKill<CR>")
 
   -- UndoTree
 map("n", "<C-z>",":UndotreeToggle<CR>")
-
+--- Debuggert
+map("n","<leader>dl",":DapUIToggle<CR>")
 -- bufferline
 map("n","<leader>b]",":BufferLineCycleNext<CR>")
 map("n","<leader>b[",":BufferLineCyclePrev<CR>")
@@ -104,7 +105,6 @@ map("n","<leader>fb","<cmd>lua require('telescope.builtin').buffers()<CR>")
 map("n","<leader>fh","<cmd>lua require('telescope.builtin').help_tags{}<CR>")
 map("n","<leader>ft","<cmd>lua require('trouble.providers.telescope').open_with_trouble<CR>")
 map("n","<leader>fs","<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols<CR>")
-map("t", "<C-n>", [[<C-\><C-n>]])
 
 
 -- Git 

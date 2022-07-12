@@ -17,8 +17,10 @@ local border = {
       {"▏", "FloatBorder"},
 }
 local servers = {
-  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer'
+  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer',
 }
+
+
 
 local lua_setting = {
     Lua = {
@@ -187,7 +189,7 @@ local on_attach = function (client, bufnr)
       }
     },bufnr)
     lspsaga.setup()
-    vim.api.nvim_command('au User LspDiagnosticsChanged lua require("lsp-status/redraw").redraw()')
+    -- vim.api.nvim_command('au User LspDiagnosticsChanged lua require("lsp-status/redraw").redraw()')
 
     vim.lsp.handlers['textDocument/codeAction'] = function(_, _, actions)
         require('lsputil.codeAction').code_action_handler(nil, actions, nil, nil, nil)
@@ -307,6 +309,7 @@ end
 
 
 installer.settings({
+  automatic_installation = true,
     ui = {
         icons = {
             server_installed = "✓",
@@ -344,7 +347,7 @@ installer.on_server_ready(function(server)
     end
 
     if #vim.lsp.buf_get_clients() > 0 then
-      require('lsp-status').status()
+      -- require('lsp-status').status()
     end
 
     -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
