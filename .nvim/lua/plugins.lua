@@ -319,7 +319,7 @@ return require('packer').startup(function(use)
     'williamboman/nvim-lsp-installer',
     ft = {
       "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
-      "toml", "json", "python", "dart"
+      "toml", "json", "python", "dart","v","vhdl","verilog"
     }
   }
   use { "neovim/nvim-lspconfig",

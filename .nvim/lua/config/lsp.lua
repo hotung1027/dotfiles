@@ -17,7 +17,7 @@ local border = {
       {"▏", "FloatBorder"},
 }
 local servers = {
-  "clangd", "hls", "sumneko_lua","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer',
+  "clangd", "hls", "lua_ls","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer',"svls","verible"
 }
 
 
@@ -340,7 +340,7 @@ installer.on_server_ready(function(server)
       handlers = handlers,
     }
 
-    if server.name == "sumneko_lua" then
+    if server.name == "lua_ls" then
       opts.settings = lua_setting
     elseif server.name ==  'hls' then
       opts.settings = haskell_setting
