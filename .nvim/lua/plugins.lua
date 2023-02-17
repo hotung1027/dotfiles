@@ -197,7 +197,9 @@ return require('packer').startup(function(use)
     requires = "nvim-lua/plenary.nvim"
   }
   -- align
-  use { 'junegunn/vim-easy-align', cmd = 'EasyAlign' }
+  use { 'junegunn/vim-easy-align', cmd = 'EasyAlign',
+      config = function() require('config.align')  end,
+  }
 
   -- speed up neovim!
   use {
