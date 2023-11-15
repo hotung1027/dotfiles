@@ -1,5 +1,6 @@
 local parser_configs = require('nvim-treesitter.parsers').get_parser_configs()
-require('nvim-treesitter.install').compilers = {"gcc-11"}
+require('nvim-treesitter.install').compilers = {"clang","gcc"}
+require('nvim-treesitter.install').prefer_git = true
 parser_configs.norg = {
     install_info = {
         url = "https://github.com/nvim-neorg/tree-sitter-norg",
@@ -36,11 +37,13 @@ require'nvim-treesitter.configs'.setup {
         "go",
         "json",
         "lua",
+        "vim",
+        "vimdoc",
         "comment"},
         sync_install = true,
-        ignore_install = {},
+        ignore_install = {"javascript"},
     highlight = {
-        enable = false,
+        enable = true,
         disable = {},
         additional_vim_regex_hightlighting = true,
     },
@@ -123,6 +126,13 @@ require'nvim-treesitter.configs'.setup {
             ["<leader>dF"] = "@class.outer",
         },
       },
+      autotag = {
+      enable = true,
+    },
+    matchup = {
+      enable = true,
+
+    }
 
     },
 }

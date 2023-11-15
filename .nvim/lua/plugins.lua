@@ -13,10 +13,11 @@ return require('packer').startup(function(use)
   -- Packer can manage itself
   use { 'wbthomason/packer.nvim', event = "VimEnter" }
 
-
+-- Plugin management
+  use { 'folke/neodev.nvim' }
   --=================== EDITOR SETUP ================================
   -- More Icons
-  use { 'kyazdani42/nvim-web-devicons', event = "BufRead" }
+  use { 'nvim-tree/nvim-web-devicons', event = "BufRead" }
   -- Use specific branch, dependency and run lua file after load
 
   -- Status line
@@ -33,6 +34,7 @@ return require('packer').startup(function(use)
   -- nvim-bufferline: better buffer line--
   use {
     'akinsho/nvim-bufferline.lua',
+    requires = 'nvim-tree/nvim-web-devicons',
     config = function() require("config.bufferline") end,
     event = "BufRead"
   }
@@ -87,6 +89,10 @@ return require('packer').startup(function(use)
     'alexghergh/nvim-tmux-navigation'
   }
   -- Visual Guide
+  --
+  use {
+  'HiPhish/rainbow-delimiters.nvim'
+  }
   use {
     'lukas-reineke/indent-blankline.nvim',
     config = function() require("config.indent") end,
@@ -169,11 +175,16 @@ return require('packer').startup(function(use)
   use({ "romainl/vim-cool", event = "VimEnter" })
 
   -- Show match number for search
-  use { 'kevinhwang91/nvim-hlslens', branch = 'dev', event = "VimEnter" }
+  use { 'kevinhwang91/nvim-hlslens',
+    config = function() require('hlslens').setup() end,
+    branch = 'dev', event = "VimEnter" }
   -- Super fast buffer jump
   use { 'phaazon/hop.nvim',
     event = "VimEnter",
     config = function() require('config.hop') end }
+  use {
+   "mfussenegger/nvim-treehopper",
+  }
   use { 'ripxorip/aerojump.nvim' }
   -- Better Escape
   use {
@@ -208,7 +219,12 @@ return require('packer').startup(function(use)
       require("filetype").setup({
         -- overrides the filetype or function for filetype
         -- See https://github.com/nathom/filetype.nvim#customization
-        overrides = {}
+                overrides = {
+                    extensions = {
+                        h = "c",
+                        hpp = "cpp",
+          }
+        }
       })
     end
   }
@@ -253,7 +269,7 @@ return require('packer').startup(function(use)
 
   -- notification plugin
   use { 'nvim-lua/popup.nvim' }
-
+  use {'anuvyklack/hydra.nvim' }
   use { "rcarriga/nvim-notify",
     event = "BufEnter",
     require = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary' },
@@ -277,12 +293,19 @@ return require('packer').startup(function(use)
   use { 'lifepillar/vim-colortemplate' }
   use { 'sainnhe/gruvbox-material' }
   use { 'rebelot/kanagawa.nvim' }
-
+  use {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {}
+  }
 
 
 
   -- Load on an autocommand event
-  use { 'andymass/vim-matchup', event = 'VimEnter' }
+  use { 'andymass/vim-matchup',
+    setup = function() vim.g.matchup_matchparen_offscreen = {method = "popup"} end,
+    event = 'VimEnter' }
 
   -- ====================== Completion =================================================================
 
@@ -301,7 +324,7 @@ return require('packer').startup(function(use)
   use { "f3fora/cmp-spell", requires = { "hrsh7th/nvim-cmp" } }
   use { "andersevenrud/cmp-tmux", requires = { "hrsh7th/nvim-cmp" } }
   use { "hrsh7th/cmp-cmdline", requires = { "hrsh7th/nvim-cmp" } }
-  use { "quangnguyen30192/cmp-nvim-tags", requires = { "hrsh7th/nvim-cmp" }, ft = { 'haskell', 'c', 'cpp' } }
+  use { "quangnguyen30192/cmp-nvim-tags", requires = { "hrsh7th/nvim-cmp" }, ft = { 'haskell', 'c', 'cpp' , 'h' , 'hpp'} }
 
   use { 'onsails/lspkind-nvim' }
   use { "hrsh7th/nvim-cmp",
@@ -317,15 +340,21 @@ return require('packer').startup(function(use)
   use { "hrsh7th/cmp-nvim-lsp", after = "nvim-cmp" }
 
   -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
-  use {
+ --[[  use {
     'williamboman/nvim-lsp-installer',
     ft = {
       "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
       "toml", "json", "python", "dart","v","vhdl","verilog"
     }
+  } ]]
+  use {
+    "williamboman/mason.nvim"
+  }
+  use {
+    "williamboman/mason-lspconfig.nvim"
   }
   use { "neovim/nvim-lspconfig",
-    after = { "cmp-nvim-lsp", "nvim-lsp-installer" },
+    after = { "cmp-nvim-lsp", "mason.nvim","mason-lspconfig.nvim" },
     config = function() require('config.lsp') end
   }
 
@@ -366,7 +395,7 @@ return require('packer').startup(function(use)
       config = function() require("config.tags") end
     }
     -- async tags generation
-    use { 'jsfaint/gen_tags.vim' }
+    -- use { 'jsfaint/gen_tags.vim' }
   end
 
   -- Quick Fix Preview
@@ -374,8 +403,10 @@ return require('packer').startup(function(use)
     event = "FileType qf",
     config = function() require('config.bqf') end }
   -- Autoformat tools
-  use { "sbdchd/neoformat", cmd = { "Neoformat" }, config = function() require('config.formatter') end }
-
+  -- use { "sbdchd/neoformat", cmd = { "Neoformat" }, config = function() require('config.formatter') end }
+  use { 'mhartington/formatter.nvim' }
+  -- Linter
+  use {'mfussenegger/nvim-lint'}
   -- luasnip snippet
   use { 'L3MON4D3/LuaSnip' }
   use { 'saadparwaiz1/cmp_luasnip' }
@@ -384,7 +415,7 @@ return require('packer').startup(function(use)
   use {
     'nvim-treesitter/nvim-treesitter',
     run = ':TSUpdate',
-    ft = { "cpp", "toml", "rust", "go", "json", "lua", "fish", "c", 'haskell', 'python', 'dart' },
+    ft = { "cpp", "toml", "rust", "go", "json", "lua", "fish", "c", 'h', 'hpp', 'haskell', 'python', 'dart' },
     config = function() require('config.treesitter') end,
     module = "nvim-treesitter",
   }
@@ -402,6 +433,9 @@ return require('packer').startup(function(use)
     config = function() require('config.autopairs') end
   }
 
+  use {
+    "machakann/vim-sandwich"
+  }
   -- Select text object
   use { 'gcmt/wildfire.vim', event = "BufRead" }
 
@@ -473,7 +507,7 @@ return require('packer').startup(function(use)
 
   -- C/CPP
   use { 'rhysd/vim-clang-format', ft = { 'cpp', 'c', 'h', 'hpp' } }
-
+  use {'p00f/clangd_extensions.nvim' }
   -- Haskell
   use { 'neovimhaskell/nvim-hs.vim' }
 

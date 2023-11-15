@@ -1,10 +1,14 @@
+
+-- local installer_present, installer = pcall(require, "nvim-lsp-installer")
+local installer_present,installer = pcall(require, "mason")
+local server_config_present,server_config = pcall(require, "mason-lspconfig")
 local lspconfig_present, _ = pcall(require, "lspconfig")
-local installer_present, installer = pcall(require, "nvim-lsp-installer")
 local lspsaga = require("lspsaga")
-if not (lspconfig_present or installer_present) then
+if not (lspconfig_present or installer_present or server_config_present) then
   vim.notify("Fail to setup LSP", vim.log.levels.ERROR, {title= 'plugins'})
   return
 end
+
 
 local border = {
       {"🭽", "FloatBorder"},
@@ -17,7 +21,7 @@ local border = {
       {"▏", "FloatBorder"},
 }
 local servers = {
-  "clangd", "hls", "lua_ls","metals","efm","jedi_language_server","pylsp","pyright","julials", "dartls",'rust_analyzer',"svls","verible"
+  "clangd", "lua_ls","efm","jedi_language_server","pylsp","pyright","julials",'rust_analyzer',
 }
 
 
@@ -35,6 +39,12 @@ local lua_setting = {
         },
         telemetry = {enable = false}
     }
+}
+
+local clangd_setting = {
+  clangd = {
+    filetypes = {"c","cpp","h","hpp","objc","objcpp","cuda","proto"}
+  }
 }
 
 local haskell_setting = {
@@ -180,7 +190,8 @@ local on_attach = function (client, bufnr)
     if client.config.flags then
       client.config.flags.allow_incremental_sync = true
     end
-
+    require("clangd_extensions.inlay_hints").setup_autocmd()
+    require("clangd_extensions.inlay_hints").set_inlay_hints()
     require'lsp_signature'.on_attach({
       bind = true,
       hint_prefix = " ",
@@ -308,52 +319,45 @@ end
 
 
 
-installer.settings({
-  automatic_installation = true,
+installer.setup({
     ui = {
         icons = {
             server_installed = "✓",
             server_pending = "➜",
             server_uninstalled = "✗"
         }
-    },
-    log_level = vim.log.levels.INFO,
-    max_concurrent_installers = 4,
+    }
 })
+server_config.setup( {
+    ensure_installed = servers,
+  })
+ 
 
-for _, lang in pairs(servers) do
-    local ok, server = installer.get_server(lang)
-    if ok then
-        if not server:is_installed() then
-            print("Installing " .. lang)
-            server:install()
-        end
-    end
-end
-
-installer.on_server_ready(function(server)
+server_config.setup_handlers({
+  function(server_name)
     local opts = {
       on_attach = on_attach,
       capabilities = capabilities,
-      -- capabilities = capabilities,
       root_dir = vim.loop.cwd,
       handlers = handlers,
     }
 
-    if server.name == "lua_ls" then
-      opts.settings = lua_setting
-    elseif server.name ==  'hls' then
+    if server_name == "lua_ls" then
+            opts.settings = lua_setting
+    elseif server_name == "clangd" then
+      opts.settings = clangd_setting
+    elseif server_name ==  'hls' then
       opts.settings = haskell_setting
     end
 
     if #vim.lsp.buf_get_clients() > 0 then
       -- require('lsp-status').status()
     end
-
     -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
-    server:setup(opts)
-    vim.cmd [[ do User LspAttachBuffers ]]
-end)
+    require("lspconfig")[server_name].setup(opts)
+    vim.cmd([[do User LspAttachBuffer]])
+  end,
+})
 
 
 local signs = {Error = " ", Warn = " ", Hint = " ", Info = " "}

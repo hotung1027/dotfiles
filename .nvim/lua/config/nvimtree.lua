@@ -1,12 +1,10 @@
-local ok, tree_c = pcall(require, "nvim-tree.config")
+local ok, api = pcall(require, "nvim-tree.api")
 if not ok then
-    vim.notify(tree_c, vim.log.levels.ERROR)
+    vim.notify(api, vim.log.levels.ERROR)
     return
 end
 
-local tree_cb = tree_c.nvim_tree_callback
-
-vim.cmd([[autocmd BufEnter * ++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]])
+-- vim.cmd([[autocmd BufEnter * ++nested if winnr('$') == 1 && bufname() == 'NvimTree_' . tabpagenr() | quit | endif]])
 vim.g.nvim_tree_git_hl = 1
 vim.g.nvim_tree_highlight_opened_files = 1
 vim.g.nvim_tree_root_folder_modifier = ":t"
@@ -42,17 +40,117 @@ vim.g.nvim_tree_icons = {
     }
 }
 
+local function edit_or_open()
+  local node = api.tree.get_node_under_cursor()
+
+  if node.nodes ~= nil then
+    -- expand or collapse folder
+    api.node.open.edit()
+  else
+    -- open file
+    api.node.open.edit()
+    -- Close the tree if file was opened
+    api.tree.close()
+  end
+end
+
+-- open as vsplit on current node
+local function vsplit_preview()
+  local node = api.tree.get_node_under_cursor()
+
+  if node.nodes ~= nil then
+    -- expand or collapse folder
+    api.node.open.edit()
+  else
+    -- open file as vsplit
+    api.node.open.vertical()
+  end
+
+  -- Finally refocus on tree if it was lost
+  api.tree.focus()
+end 
+
+
+--[[ local function change_on_attach(bufnr)
+    api.config.mappings.default_on_attach(bufnr)
+    local function opts(desc)
+      return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+    end
+  local mappings = {
+    -- BEGIN_DEFAULT_ON_ATTACH
+    ["<C-]>"] = { api.tree.change_root_to_node, "CD" },
+    ["<C-e>"] = { api.node.open.replace_tree_buffer, "Open: In Place" },
+    ["<C-k>"] = { api.node.show_info_popup, "Info" },
+    ["<C-r>"] = { api.fs.rename_sub, "Rename: Omit Filename" },
+    ["<C-t>"] = { api.node.open.tab, "Open: New Tab" },
+    ["<C-v>"] = { api.node.open.vertical, "Open: Vertical Split" },
+    ["<C-x>"] = { api.node.open.horizontal, "Open: Horizontal Split" },
+    ["<BS>"] = { api.node.navigate.parent_close, "Close Directory" },
+    ["<CR>"] = { api.node.open.edit, "Open" },
+    ["<Tab>"] = { api.node.open.preview, "Open Preview" },
+    [">"] = { api.node.navigate.sibling.next, "Next Sibling" },
+    ["<"] = { api.node.navigate.sibling.prev, "Previous Sibling" },
+    ["."] = { api.node.run.cmd, "Run Command" },
+    ["-"] = { api.tree.change_root_to_parent, "Up" },
+    ["a"] = { api.fs.create, "Create" },
+    ["bmv"] = { api.marks.bulk.move, "Move Bookmarked" },
+    ["B"] = { api.tree.toggle_no_buffer_filter, "Toggle No Buffer" },
+    ["c"] = { api.fs.copy.node, "Copy" },
+    ["C"] = { api.tree.toggle_git_clean_filter, "Toggle Git Clean" },
+    ["[c"] = { api.node.navigate.git.prev, "Prev Git" },
+    ["]c"] = { api.node.navigate.git.next, "Next Git" },
+    ["d"] = { api.fs.remove, "Delete" },
+    ["D"] = { api.fs.trash, "Trash" },
+    ["E"] = { api.tree.expand_all, "Expand All" },
+    ["e"] = { api.fs.rename_basename, "Rename: Basename" },
+    ["]e"] = { api.node.navigate.diagnostics.next, "Next Diagnostic" },
+    ["[e"] = { api.node.navigate.diagnostics.prev, "Prev Diagnostic" },
+    ["F"] = { api.live_filter.clear, "Clean Filter" },
+    ["f"] = { api.live_filter.start, "Filter" },
+    ["g?"] = { api.tree.toggle_help, "Help" },
+    ["gy"] = { api.fs.copy.absolute_path, "Copy Absolute Path" },
+    ["H"] = { api.tree.toggle_hidden_filter, "Toggle Dotfiles" },
+    ["I"] = { api.tree.toggle_gitignore_filter, "Toggle Git Ignore" },
+    ["J"] = { api.node.navigate.sibling.last, "Last Sibling" },
+    ["K"] = { api.node.navigate.sibling.first, "First Sibling" },
+    ["m"] = { api.marks.toggle, "Toggle Bookmark" },
+    ["o"] = { api.node.open.edit, "Open" },
+    ["O"] = { api.node.open.no_window_picker, "Open: No Window Picker" },
+    ["p"] = { api.fs.paste, "Paste" },
+    ["P"] = { api.node.navigate.parent, "Parent Directory" },
+    ["q"] = { api.tree.close, "Close" },
+    ["r"] = { api.fs.rename, "Rename" },
+    ["R"] = { api.tree.reload, "Refresh" },
+    ["s"] = { api.node.run.system, "Run System" },
+    ["S"] = { api.tree.search_node, "Search" },
+    ["U"] = { api.tree.toggle_custom_filter, "Toggle Hidden" },
+    ["W"] = { api.tree.collapse_all, "Collapse" },
+    ["x"] = { api.fs.cut, "Cut" },
+    ["y"] = { api.fs.copy.filename, "Copy Name" },
+    ["Y"] = { api.fs.copy.relative_path, "Copy Relative Path" },
+    ["<2-LeftMouse>"] = { api.node.open.edit, "Open" },
+    ["<2-RightMouse>"] = { api.tree.change_root_to_node, "CD" },
+    -- END_DEFAULT_ON_ATTACH
+
+    -- Mappings migrated from view.mappings.list
+    ["l"] = { edit_or_open, "Edit Or Open" },
+    ["L"] = {vsplit_preview, "Vsplit Preview"},
+    ["v"] = { api.node.open.vertical, "Open: Vertical Split" },
+    ["C"] = { api.tree.change_root_to_node, "CD" },
+    ["<CR>"] = { api.node.open.tab_drop, "Open" },
+  }
+
+  for keys, mapping in pairs(mappings) do
+    vim.keymap.set("n", keys, mapping[1], opts(mapping[2]))
+  end
+end ]]
 -- following options are the default
 require'nvim-tree'.setup {
     auto_reload_on_write = true,
     disable_netrw = true,
     hijack_netrw = true,
-    open_on_setup = false,
-    ignore_ft_on_setup = {'startify', 'dashboard'},
-    open_on_tab = false,
     hijack_cursor = true,
     update_cwd = true,
-    update_to_buf_dir = {enable = true, auto_open = true},
     diagnostics = {
         enable = false,
         icons = {hint = "", info = "", warning = "", error = ""}
@@ -87,44 +185,49 @@ require'nvim-tree'.setup {
 
     view = {
         width = 25,
-        -- height = 30,
         side = 'left',
-        mappings = {
-            custom_only = true,
-            list = {
-                {key = {"<CR>", "<2-LeftMouse>"}, cb = tree_cb("edit")},
-                {key = {"<2-RightMouse>", "<C-]>"}, cb = tree_cb("cd")},
-                {key = "<C-v>", cb = tree_cb("vsplit")},
-                {key = "<C-x>", cb = tree_cb("split")},
-                {key = "<C-t>", cb = tree_cb("tabnew")},
-                {key = "<", cb = tree_cb("prev_sibling")},
-                {key = ">", cb = tree_cb("next_sibling")},
-                {key = "P", cb = tree_cb("parent_node")},
-                {key = "<BS>", cb = tree_cb("close_node")},
-                {key = "<S-CR>", cb = tree_cb("close_node")},
-                {key = "<Tab>", cb = tree_cb("preview")},
-                {key = "K", cb = tree_cb("first_sibling")},
-                {key = "J", cb = tree_cb("last_sibling")},
-                {key = "I", cb = tree_cb("toggle_ignored")},
-                {key = "H", cb = tree_cb("toggle_dotfiles")},
-                {key = "R", cb = tree_cb("refresh")},
-                {key = "a", cb = tree_cb("create")},
-                {key = "d", cb = tree_cb("remove")},
-                {key = "r", cb = tree_cb("rename")},
-                {key = "<C-r>", cb = tree_cb("full_rename")},
-                {key = "x", cb = tree_cb("cut")},
-                {key = "c", cb = tree_cb("copy")},
-                {key = "p", cb = tree_cb("paste")},
-                {key = "y", cb = tree_cb("copy_name")},
-                {key = "Y", cb = tree_cb("copy_path")},
-                {key = "gy", cb = tree_cb("copy_absolute_path")},
-                {key = "[c", cb = tree_cb("prev_git_item")},
-                {key = "]c", cb = tree_cb("next_git_item")},
-                {key = "-", cb = tree_cb("dir_up")},
-                {key = "o", cb = tree_cb("system_open")},
-                {key = "q", cb = tree_cb("close")},
-                {key = "?", cb = tree_cb("toggle_help")}
-            }
-        }
-    }
+    },
+    on_attach = change_on_attach,
 }
+
+
+-- auto show hydra on nvimtree focus
+local function change_root_to_global_cwd()
+  local global_cwd = vim.fn.getcwd()
+  -- local global_cwd = vim.fn.getcwd(-1, -1)
+  api.tree.change_root(global_cwd)
+end
+
+
+
+
+--[[ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
+  pattern = 'NvimTree*',
+  callback = function()
+    local view = require('nvim-tree.view')
+
+    if not view.is_visible() then
+      api.tree.open()
+    end
+  end,
+}) ]]
+
+
+vim.api.nvim_create_autocmd("BufEnter", {
+  nested = true,
+  callback = function()
+
+    -- Only 1 window with nvim-tree left: we probably closed a file buffer
+    if #vim.api.nvim_list_wins() == 1 and api.tree.is_tree_buf() then
+      -- Required to let the close event complete. An error is thrown without this.
+      vim.defer_fn(function()
+        -- close nvim-tree: will go to the last hidden buffer used before closing
+        api.tree.toggle({find_file = true, focus = true})
+        -- re-open nivm-tree
+        api.tree.toggle({find_file = true, focus = true})
+        -- nvim-tree is still the active window. Go to the previous window.
+        vim.cmd("wincmd p")
+      end, 0)
+    end
+  end
+})

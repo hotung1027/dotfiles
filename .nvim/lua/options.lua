@@ -71,7 +71,7 @@ opt.colorcolumn = '100'
 opt.lazyredraw = true
 opt.signcolumn = "yes:1"
 opt.mouse = 'a'
-
+opt.pumheight = 10
 opt.foldmethod = 'expr'
 opt.foldlevel = 99
 opt.foldenable = true

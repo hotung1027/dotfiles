@@ -7,8 +7,8 @@ if not ok then return end
 telescope.setup({
   defaults = {
     vimgrep_arguments = {
-      "rg", "--color=never", "--no-heading", "--with-filename",
-      "--line-number", "--column", "--smart-case"
+      "rg","--hidden", "--color=never", "--no-heading", "--with-filename",
+      "--line-number", "--column", "--smart-case","!.git"
     },
     prompt_prefix = "  ",
     selection_caret = "  ",
@@ -69,5 +69,5 @@ telescope.setup({
   }
 })
 
-telescope.extensions.dap.configurations()
+-- telescope.extensions.dap.configurations()
 telescope.load_extension('flutter')
