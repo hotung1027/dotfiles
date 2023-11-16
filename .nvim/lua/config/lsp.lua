@@ -41,11 +41,7 @@ local lua_setting = {
     }
 }
 
-local clangd_setting = {
-  clangd = {
-    filetypes = {"c","cpp","h","hpp","objc","objcpp","cuda","proto"}
-  }
-}
+
 
 local haskell_setting = {
   haskell = {
@@ -69,7 +65,7 @@ local lsp_publish_diagnostics_options = {
 require'lspconfig'.julials.setup{}
 
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 capabilities.textDocument.completion.completionItem.documentationFormat = {
     "markdown",
    "plaintext"
@@ -284,10 +280,10 @@ local on_attach = function (client, bufnr)
                    '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 --
     -- Set some keybinds conditional on server capabilities
-    if client.resolved_capabilities.document_formatting then
+    if client.server_capabilities.documentFormattingProvider then
         buf_set_keymap("n", "<space>m", "<cmd>lua vim.lsp.buf.formatting()<CR>",
                        opts)
-    elseif client.resolved_capabilities.document_range_formatting then
+    elseif client.server_capabilities.document_range_formatting then
         buf_set_keymap("n", "<space>m",
                        "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     end
@@ -295,7 +291,7 @@ local on_attach = function (client, bufnr)
     vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false,scope = "cursor"})]]
 
     vim.cmd([[
-      autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil,1000)
+      autocmd BufWritePre <buffer> lua vim.lsp.buf.format({aysnc = false, timeout_ms = 1000})
     ]])
 
 
@@ -344,8 +340,6 @@ server_config.setup_handlers({
 
     if server_name == "lua_ls" then
             opts.settings = lua_setting
-    elseif server_name == "clangd" then
-      opts.settings = clangd_setting
     elseif server_name ==  'hls' then
       opts.settings = haskell_setting
     end

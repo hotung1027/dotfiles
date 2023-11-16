@@ -325,7 +325,7 @@ return require('packer').startup(function(use)
   use { "andersevenrud/cmp-tmux", requires = { "hrsh7th/nvim-cmp" } }
   use { "hrsh7th/cmp-cmdline", requires = { "hrsh7th/nvim-cmp" } }
   use { "quangnguyen30192/cmp-nvim-tags", requires = { "hrsh7th/nvim-cmp" }, ft = { 'haskell', 'c', 'cpp' , 'h' , 'hpp'} }
-
+  use { "kdheepak/cmp-latex-symbols" ,requries = {   "hrsh7th/nvim-cmp",  }  }
   use { 'onsails/lspkind-nvim' }
   use { "hrsh7th/nvim-cmp",
     after = "lspkind-nvim",
