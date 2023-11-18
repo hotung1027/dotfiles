@@ -1,4 +1,4 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.qq
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -23,18 +23,18 @@ ZSH_COLORIZE_STYLE="colorful"
 
 # set chroma fall back for less tool
 export LESSOPEN='| p() { chroma --fail "$1" || cat "$1"; }; p "%s"'
-
+export UE_HOME="$HOME/UnrealEngine"
 export JAVA_HOME="/usr/local/lib/jdk-11.0.11+9"
 export LOCAL="$HOME/.local"
 export JULIA_HOME="$HOME/.juliavm/julia-current"
-export ROCM_HOME="/opt/rocm"
 export KITTY_HOME="$HOME/.kitty"
 export KITTY_CONFIG_DIRECTORY="$HOME/.kitty.conf"
 export DENO_INSTALL="$HOME/.deno"
 export SURF_HOME="$HOME/.local/share/surf"
 export YARN_HOME="$HOME/.yarn"
 export CUDA_HOME="/usr/local/cuda"
-export PATH="$CUDA_HOME/bin:$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
+export DPCPP_HOME="$HOME/sycl_workspace"
+export PATH="$UE_HOME/Engine/Binary/Linux:$DPCPP_HOME/llvm/build/bin:$CUDA_HOME/bin:$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
 source $HOME/.cargo/env
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -46,7 +46,7 @@ export GVM_DIR="$HOME/.gvm"
 source "$GVM_DIR/scripts/gvm"
 
 
-export LD_LIBRARY_PATH="$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -188,17 +188,21 @@ export ENABLE_JITPROFILING=1
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/randyt/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/randyt/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/randyt/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/randyt/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "/home/randyt/mambaforge/etc/profile.d/conda.sh" ]; then
+        . "/home/randyt/mambaforge/etc/profile.d/conda.sh"
     else
-        export PATH="/home/randyt/miniconda3/bin:$PATH"
+        export PATH="/home/randyt/mambaforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
+
+if [ -f "/home/randyt/mambaforge/etc/profile.d/mamba.sh" ]; then
+    . "/home/randyt/mambaforge/etc/profile.d/mamba.sh"
+fi
 # <<< conda initialize <<<
 [ -f "/home/randyt/.ghcup/env" ] && source "/home/randyt/.ghcup/env" # ghcup-env
 
@@ -208,3 +212,12 @@ unset __conda_setup
 export PATH="$PATH:$HOME/.rvm/bin"
 
 [[ -s "/home/randyt/.gvm/scripts/gvm" ]] && source "/home/randyt/.gvm/scripts/gvm"
+
+# >>> juliaup initialize >>>
+
+# !! Contents within this block are managed by juliaup !!
+
+path=('/home/randyt/.juliaup/bin' $path)
+export PATH
+
+# <<< juliaup initialize <<<
