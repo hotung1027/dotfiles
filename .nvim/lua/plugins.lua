@@ -25,11 +25,11 @@ return require('lazy').setup(
     {
       'glepnir/galaxyline.nvim',
       branch = 'main',
-      after = "nvim-web-devicons",
+      dependencies = "nvim-web-devicons",
       config = function() require("config.statusline") end
     },
     -- Add indent object for vim (ful for languages like Python)
-    { "michaeljsmith/vim-indent-object", event = "VimEnter" },
+    { "michaeljsmith/vim-indent-object", event = "BufEnter" },
 
 
     -- nvim-bufferline: better buffer line--
@@ -37,7 +37,7 @@ return require('lazy').setup(
       'akinsho/nvim-bufferline.lua',
       dependencies = 'nvim-tree/nvim-web-devicons',
       config = function() require("config.bufferline") end,
-      event = "BufRead"
+      event = "BufEnter"
     },
     -- more symbols
     {
@@ -45,7 +45,7 @@ return require('lazy').setup(
       config = function() require("config.symbols") end,
       cmd = "SymbolsOutline"
     },
-    { "chrisbra/unicode.vim",            event = "VimEnter" },
+    { "chrisbra/unicode.vim",            event = "BufEnter" },
     -- show color at words
     {
       'RRethy/vim-hexokinase',
@@ -97,7 +97,7 @@ return require('lazy').setup(
     {
       'lukas-reineke/indent-blankline.nvim',
       config = function() require("config.indent") end,
-      event = 'BufRead'
+      event = 'BufEnter'
     },
 
     -- Comment plugin
@@ -117,51 +117,75 @@ return require('lazy').setup(
     },
     {
       'nvim-telescope/telescope-fzf-native.nvim',
-      build = 'make',
-      config = function() require('telescope').load_extension('fzf') end,
+
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+      build =
+      'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
+
     },
     {
-      'tzachar/fuzzy.nvim', dependencies = { 'nvim-telescope/telescope-fzf-native.nvim' }
+      'tzachar/fuzzy.nvim', dependencies = { 'nvim-telescope/telescope-fzf-native.nvim', 'nvim-telescope/telescope.nvim' }
     },
     {
       'gbrlsnchs/telescope-lsp-handlers.nvim',
-      config = function() require('telescope').load_extension('lsp_handlers') end
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+      config = function() require("telescope").load_extension('lsp_handlers') end,
+    },
+    {
+      'cljoly/telescope-repo.nvim',
 
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+      config = function() require("telescope").load_extension('repo') end,
     },
     {
-      'cljoly/telescope-repo.nvim'
-    },
-    {
-      'nvim-telescope/telescope-project.nvim'
+      'nvim-telescope/telescope-project.nvim',
+      config = function() require("telescope").load_extension('project') end,
+
+      dependencies = { 'nvim-telescope/telescope.nvim' },
     },
     {
       'nvim-telescope/telescope-frecency.nvim',
-      config = function() require('telescope').load_extension('frecency') end,
-      dependencies = { 'tami5/sqlite.lua' },
+      dependencies = { 'tami5/sqlite.lua', 'nvim-telescope/telescope.nvim' },
+      config = function() require("telescope").load_extension('frecency') end,
+
     },
     -- search emoji and other symbols
-    { 'nvim-telescope/telescope-symbols.nvim' },
+    {
+      'nvim-telescope/telescope-symbols.nvim',
+
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+    },
     {
       'luc-tielen/telescope_hoogle',
-      config = function() require('telescope').load_extension('hoogle') end
 
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+
+      config = function() require('telescope').load_extension('hoogle') end,
     },
     {
       'crispgm/telescope-heading.nvim',
+
       config = function() require('telescope').load_extension('heading') end,
+      dependencies = { 'nvim-telescope/telescope.nvim' },
     },
     {
       'nvim-telescope/telescope-hop.nvim',
-      config = function() require('telescope').load_extension('hop') end
+
+      config = function() require('telescope').load_extension('hop') end,
+      dependencies = { 'nvim-telescope/telescope.nvim' },
     },
     {
       'camgraff/telescope-tmux.nvim',
-      dependencies = { 'norcalli/nvim-terminal.lua' },
-      config = function() require('telescope').load_extension('tmux') end
+      dependencies = { 'norcalli/nvim-terminal.lua', 'nvim-telescope/telescope.nvim' },
+
+      config = function() require('telescope').load_extension('tmux') end,
     },
     {
       'benfowler/telescope-luasnip.nvim',
-      config = function() require('telescope').load_extension('luasnip') end
+
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+      config = function() require('telescope').load_extension('luasnip') end,
+
     },
     -- Fuzzy Finder
     --         { 'amirrezaask/fuzzy.nvim', requires={'nvim-lua/plenary.nvim'}, , module = 'fuzzy_nvim'},
@@ -174,10 +198,10 @@ return require('lazy').setup(
 
     -- File search, tag search and more
 
-    { "Yggdroot/LeaderF",                     cmd = "Leaderf",   build = ":LeaderfInstallCExtension" },
+    { "Yggdroot/LeaderF", cmd = "Leaderf",   build = ":LeaderfInstallCExtension" },
 
     -- Clear highlight search automatically for you
-    { "romainl/vim-cool",                     event = "VimEnter" },
+    { "romainl/vim-cool", event = "VimEnter" },
 
     -- Show match number for search
     {
@@ -288,10 +312,9 @@ return require('lazy').setup(
     {
       "rcarriga/nvim-notify",
       event = "BufEnter",
-      require = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary' },
+      dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
       config = function()
         require('config.notify')
-        require('telescope').load_extension("notify")
       end
     },
 
@@ -335,7 +358,7 @@ return require('lazy').setup(
     { "hrsh7th/cmp-buffer",                   dependencies = { "hrsh7th/nvim-cmp" }, },
     { "tzachar/cmp-fuzzy-buffer",             dependencies = { "hrsh7th/nvim-cmp", 'tzachar/fuzzy.nvim' }, },
     { "lukas-reineke/cmp-rg",                 dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "tzachar/cmp-tabnine",                  install = { "./install.sh" },                                dependencies = { "hrsh7th/nvim-cmp" }, },
+    { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  dependencies = { "hrsh7th/nvim-cmp" }, },
     { "lukas-reineke/cmp-under-comparator",   dependencies = { "hrsh7th/nvim-cmp" }, },
     { "ray-x/cmp-treesitter",                 dependencies = { "hrsh7th/nvim-cmp" }, },
     { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { "hrsh7th/nvim-cmp" }, },
@@ -348,7 +371,7 @@ return require('lazy').setup(
     { 'onsails/lspkind-nvim' },
     {
       "hrsh7th/nvim-cmp",
-      after = "lspkind-nvim",
+      dependencies = "lspkind-nvim",
       config = function() require('config.nvim-cmp') end
     },
 
@@ -357,7 +380,7 @@ return require('lazy').setup(
     --     {'prabirshrestha/vim-lsp'},
     --    {'mattn/vim-lsp-settings'},
     --    {'dmitmel/cmp-vim-lsp'},
-    { "hrsh7th/cmp-nvim-lsp", after = "nvim-cmp" },
+    { "hrsh7th/cmp-nvim-lsp", dependencies = "nvim-cmp" },
 
     -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
     --[[   {
@@ -375,7 +398,7 @@ return require('lazy').setup(
     },
     {
       "neovim/nvim-lspconfig",
-      after = { "cmp-nvim-lsp", "mason.nvim", "mason-lspconfig.nvim" },
+      dependencies = { "cmp-nvim-lsp", "mason.nvim", "mason-lspconfig.nvim" },
       config = function() require('config.lsp') end
     },
 
@@ -445,11 +468,10 @@ return require('lazy').setup(
     },
     {
       'nvim-treesitter/nvim-treesitter-refactor',
-      require = { 'nvim-treesitter/nvim-treesitter-refractor' },
     },
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
     -- You can specify multiple plugins in a single call
-    { 'tjdevries/colorbuddy.vim',                   after = 'nvim-treesitter' },
+    { 'tjdevries/colorbuddy.vim',                   dependencies = 'nvim-treesitter' },
 
 
     -- auto pairs
@@ -465,7 +487,7 @@ return require('lazy').setup(
     { 'gcmt/wildfire.vim',    event = "BufRead" },
 
     -- surrounding select text with given text
-    { "tpope/vim-surround",   after = "wildfire.vim" },
+    { "tpope/vim-surround",   dependencies = "wildfire.vim" },
 
     -- Automatic insertion and deletion of a pair of characters
     { "Raimondi/delimitMate", event = "InsertEnter" },
@@ -497,7 +519,7 @@ return require('lazy').setup(
     -- ====================== Debuggers ======================
     {
       'mfussenegger/nvim-dap',
-      module = 'dap',
+      main = 'dap',
       module_pattern = "dap_",
       config = function()
         require("config.dap_config.dap")
@@ -505,16 +527,18 @@ return require('lazy').setup(
     },
     {
       'nvim-telescope/telescope-dap.nvim',
-      config = function() require('telescope').load_extension('dap') end
+      dependencies = { 'nvim-telescope/telescope.nvim' },
     },
 
 
     {
       'rcarriga/nvim-dap-ui',
       config = function() require('config.dap_config.dapui') end,
-      module = "dapui",
+      dependencies = { 'nvim-telescope/telescope.nvim' },
+
+      main = "dapui",
     },
-    { "sakhnik/nvim-gdb",           build = { "bash install.sh" },   opt = true, },
+    { "sakhnik/nvim-gdb",           build = { "bash install.sh" },   lazy = true, },
 
     -- ======================== buildner =====================
     { 'skywind3000/asynctasks.vim' },
@@ -523,7 +547,7 @@ return require('lazy').setup(
 
     -- ===================== Build Tools ==================================
 
-    { 'tpope/vim-dispatch',         opt = true,                      cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
+    { 'tpope/vim-dispatch',         lazy = true,                     cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
 
 
 
@@ -575,7 +599,7 @@ return require('lazy').setup(
 
     -- ======================= GIT ================================
     -- Better git commit experience
-    { "rhysd/committia.vim",   opt = true },
+    { "rhysd/committia.vim",   lazy = true },
     -- git information
     {
       'lewis6991/gitsigns.nvim',
