@@ -60,15 +60,15 @@ map("i", "<C-c>", "<ESC>zzi")
 -- nnn
 map('n', '<Leader>o', ':NnnPicker %:p:h<CR>')
 --aerojump to
-vim.cmd([[
-nmap <Leader>as <Plug>(AerojumpSpace)
-nmap <Leader>ab <Plug>(AerojumpBolt)
-nmap <Leader>aa <Plug>(AerojumpFromCursorBolt)
-nmap <Leader>ad <Plug>(AerojumpDefault)
-]])
+-- vim.cmd([[
+-- nmap <Leader>as <Plug>(AerojumpSpace)
+-- nmap <Leader>ab <Plug>(AerojumpBolt)
+-- nmap <Leader>aa <Plug>(AerojumpFromCursorBolt)
+-- nmap <Leader>ad <Plug>(AerojumpDefault)
+-- ]])
 -- searchbox
-map('n', '<leader>s', ":lua require('searchbox').incsearch()<CR>")
-map('x', '<Leader>s', "<ESC>:lua require('searchbox').insearch({visual_mode = true})<CR>")
+-- map('n', '<leader>s', ":lua require('searchbox').incsearch()<CR>")
+-- map('x', '<Leader>s', "<ESC>:lua require('searchbox').insearch({visual_mode = true})<CR>")
 -- EasyAlign
 map("v", "<leader>e", ":EasyAlign<CR>")
 
@@ -122,15 +122,39 @@ map("n", "<leader>ff", "<cmd>lua find_files_from_project_git_root()<CR>")
 map("n", "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<CR>")
 map("n", "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<CR>")
 map("n", "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags{}<CR>")
-map("n", "<leader>ft", "<cmd>lua require('trouble.providers.telescope').open_with_trouble()<CR>")
+map("n", "<leader>ft", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>")
 map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<CR>")
 map("n", "<leader>fw", "<cmd>lua require('telescope.builtin').grep_string()<CR>")
 map("n", "<leader>fj", "<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>")
+-- Treesitter External Plugins
+map("n", "[c", "<cmd>lua require('treesitter-context').go_to_context()<CR>")
+map("n", "<A-l>", '<cmd>STSSwapCurrentNodeNextNormal<cr>')
+map("n", "<A-h>", '<cmd>STSSwapCurrentNodePrevNormal<cr>')
+map("n", "<A-k>", '<cmd>STSSwapUpNormal<cr>')
+map("n", "<A-j>", '<cmd>STSSwapDownNormal<cr>')
+
+-- Visual Selection from Normal Mode
+map("n", "vaa", '<cmd>STSSelectMasterNode<cr>')
+map("n", "vii", '<cmd>STSSelectCurrentNode<cr>')
+
+-- Select Nodes in Visual Mode
+map("x", "L", '<cmd>STSSelectNextSiblingNode<cr>')
+map("x", "H", '<cmd>STSSelectPrevSiblingNode<cr>')
+map("x", "K", '<cmd>STSSelectParentNode<cr>')
+map("x", "J", '<cmd>STSSelectChildNode<cr>')
+
+-- Swapping Nodes in Visual Mode
+map("x", "<A-j>", '<cmd>STSSwapNextVisual<cr>')
+map("x", "<A-k>", '<cmd>STSSwapPrevVisual<cr>')
 
 
+-- Treesitter Hop
+
+map("n", "m", "<cmd>lua require('tsht').nodes()<CR>")
+map("x", "m", "<cmd>lua require('tsht').nodes()<CR>)")
 -- Git
-map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
-map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns prev_hunk<CR>'")
+--[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
+map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns mrev_hunk<CR>'") ]]
 
 map("n", "<leader>hs", "<cmd>Gitsigns stage_hunk<CR>")
 map("n", "<leader>hs", "<cmd>Gitsigns stage_hunk<CR>")

@@ -45,7 +45,7 @@ return require('lazy').setup(
       config = function() require("config.symbols") end,
       cmd = "SymbolsOutline"
     },
-    { "chrisbra/unicode.vim",            event = "BufEnter" },
+    --[[ { "chrisbra/unicode.vim",            event = "BufEnter" }, ]]
     -- show color at words
     {
       'RRethy/vim-hexokinase',
@@ -82,10 +82,10 @@ return require('lazy').setup(
       end,
       cmd = { 'NnnPicker', 'NnnExplorer' },
     },
-    {
-      'VonHeikemen/searchbox.nvim',
-      dependencies = { 'MunifTanjim/nui.nvim' },
-    },
+    -- {
+    --   'VonHeikemen/searchbox.nvim',
+    --   dependencies = { 'MunifTanjim/nui.nvim' },
+    -- },
     {
       'alexghergh/nvim-tmux-navigation'
     },
@@ -198,10 +198,10 @@ return require('lazy').setup(
 
     -- File search, tag search and more
 
-    { "Yggdroot/LeaderF", cmd = "Leaderf",   build = ":LeaderfInstallCExtension" },
+    -- { "Yggdroot/LeaderF", cmd = "Leaderf",   build = ":LeaderfInstallCExtension" },
 
     -- Clear highlight search automatically for you
-    { "romainl/vim-cool", event = "VimEnter" },
+    { "romainl/vim-cool",       event = "VimEnter" },
 
     -- Show match number for search
     {
@@ -219,7 +219,7 @@ return require('lazy').setup(
     {
       "mfussenegger/nvim-treehopper",
     },
-    { 'ripxorip/aerojump.nvim' },
+    -- { 'ripxorip/aerojump.nvim' },
     -- Better Escape
     {
       "max397574/better-escape.nvim",
@@ -308,7 +308,7 @@ return require('lazy').setup(
 
     -- notification plugin
     { 'nvim-lua/popup.nvim' },
-    { 'anuvyklack/hydra.nvim' },
+    -- { 'anuvyklack/hydra.nvim' },
     {
       "rcarriga/nvim-notify",
       event = "BufEnter",
@@ -325,21 +325,23 @@ return require('lazy').setup(
       config = function() require('config.which-key') end
     },
 
-    { "tyru/open-browser.vim",       event = "VimEnter" },
+    { "tyru/open-browser.vim", event = "VimEnter" },
 
 
     -- Neovim Color Theme
-    { 'lifepillar/vim-gruvbox8' },
-    { 'lifepillar/vim-colortemplate' },
-    { 'sainnhe/gruvbox-material' },
-    { 'rebelot/kanagawa.nvim' },
+    -- { 'lifepillar/vim-gruvbox8' },
+    -- { 'lifepillar/vim-colortemplate' },
+    -- { 'sainnhe/gruvbox-material' },
+    -- { 'rebelot/kanagawa.nvim' },
     {
       "folke/tokyonight.nvim",
       lazy = false,
       priority = 1000,
       opts = {},
     },
-
+    {
+      'folke/twilight.nvim',
+    },
 
 
     -- Load on an autocommand event
@@ -347,7 +349,7 @@ return require('lazy').setup(
       'andymass/vim-matchup',
       init = function() vim.g.matchup_matchparen_offscreen = { method = "popup" } end,
       event = 'VimEnter'
-    },
+    }, 
 
     -- ====================== Completion =================================================================
 
@@ -464,12 +466,15 @@ return require('lazy').setup(
       build = ':TSUpdate',
       ft = { "cpp", "toml", "rust", "go", "json", "lua", "fish", "c", 'h', 'hpp', 'haskell', 'python', 'dart' },
       config = function() require('config.treesitter') end,
-      module = "nvim-treesitter",
     },
     {
       'nvim-treesitter/nvim-treesitter-refactor',
     },
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
+    { 'nvim-treesitter/nvim-treesitter-context' },
+    {'theHamsta/nvim-treesitter-pairs'},
+    {'ziontee113/syntax-tree-surfer'},
+
     -- You can specify multiple plugins in a single call
     { 'tjdevries/colorbuddy.vim',                   dependencies = 'nvim-treesitter' },
 
