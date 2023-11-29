@@ -1,4 +1,3 @@
-
 local opt = vim.opt
 
 opt.encoding = 'utf-8'
@@ -51,7 +50,7 @@ opt.splitright = true
 opt.splitbelow = true
 opt.showmode = false
 opt.showcmd = true
-
+opt.syntax = "on"
 -- auto completion on command
 opt.wildmenu = true
 
@@ -61,7 +60,7 @@ opt.smartcase = true
 
 vim.cmd("set shortmess+=cwm")
 opt.inccommand = 'split'
-opt.completeopt = {"menuone", "noselect", "menu"}
+opt.completeopt = { "menuone", "noselect", "menu" }
 opt.ttyfast = true
 opt.lazyredraw = true
 opt.visualbell = true
@@ -72,30 +71,33 @@ opt.lazyredraw = true
 opt.signcolumn = "yes:1"
 opt.mouse = 'a'
 opt.pumheight = 10
-opt.foldmethod = 'expr'
-opt.foldlevel = 99
+opt.foldlevel = 3
 opt.foldenable = true
 opt.formatoptions = 'qj'
-opt.foldexpr = 'nvim_treesitter#foldexpr()'
-
 opt.hidden = true
 
 -- Changed home directory here
 local backup_dir = vim.fn.stdpath("cache") .. "/backup"
 local backup_stat = pcall(os.execute, "mkdir -p " .. backup_dir)
 if backup_stat then
-    opt.backupdir = backup_dir
-    opt.directory = backup_dir
+  opt.backupdir = backup_dir
+  opt.directory = backup_dir
 end
 
 local undo_dir = vim.fn.stdpath("cache") .. "/undo"
 local undo_stat = pcall(os.execute, "mkdir -p " .. undo_dir)
 local has_persist = vim.fn.has("persistent_undo")
 if undo_stat and has_persist == 1 then
-    opt.undofile = true
-    opt.undodir = undo_dir
+  opt.undofile = true
+  opt.undodir = undo_dir
 end
-
+vim.api.nvim_create_autocmd({'BufEnter','BufAdd','BufNew','BufNewFile','BufWinEnter'}, {
+  group = vim.api.nvim_create_augroup('TS_FOLD_WORKAROUND', {}),
+  callback = function()
+    vim.opt.foldmethod     = 'expr'
+    vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+  end
+})
 vim.api.nvim_command('autocmd TermOpen term://* startinsert')
-vim.cmd [[set guifont=Notomono\ Nerd\ Font,\ Book:h14]]
-vim.cmd [[filetype plugin indent on]]
+vim.cmd [[filetype plugin indent  on]]
+vim.cmd [[syntax on]]
