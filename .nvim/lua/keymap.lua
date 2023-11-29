@@ -97,14 +97,35 @@ map("n", "<leader>b]", ":BufferLineCycleNext<CR>")
 map("n", "<leader>b[", ":BufferLineCyclePrev<CR>")
 -- Vista
 map("n", "<leader>tl", ":Vista!!<CR>")
--- lua require('telescope.builtin').
+-- lua require('telescope.builtin')
+--
+function find_files_from_project_git_root()
+  local function is_git_repo()
+    vim.fn.system("git rev-parse --is-inside-work-tree")
+    return vim.v.shell_error == 0
+  end
+  local function get_git_root()
+    local dot_git_path = vim.fn.finddir(".git", ".;")
+    return vim.fn.fnamemodify(dot_git_path, ":h")
+  end
+  local opts = {}
+  if is_git_repo() then
+    opts = {
+      cwd = get_git_root(),
+    }
+  end
+  require("telescope.builtin").find_files(opts)
+end
+
 map("n", "<leader>tt", ":Telescope<CR>")
-map("n", "<leader>ff", "<cmd>lua require('telescope.builtin').find_files()<CR>")
+map("n", "<leader>ff", "<cmd>lua find_files_from_project_git_root()<CR>")
 map("n", "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<CR>")
 map("n", "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<CR>")
 map("n", "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags{}<CR>")
-map("n", "<leader>ft", "<cmd>lua require('trouble.providers.telescope').open_with_trouble<CR>")
-map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_dynamic_workspace_symbols<CR>")
+map("n", "<leader>ft", "<cmd>lua require('trouble.providers.telescope').open_with_trouble()<CR>")
+map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<CR>")
+map("n", "<leader>fw", "<cmd>lua require('telescope.builtin').grep_string()<CR>")
+map("n", "<leader>fj", "<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>")
 
 
 -- Git
