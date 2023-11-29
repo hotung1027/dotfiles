@@ -150,8 +150,8 @@ map("x", "<A-k>", '<cmd>STSSwapPrevVisual<cr>')
 
 -- Treesitter Hop
 
-map("n", "m", "<cmd>lua require('tsht').nodes()<CR>")
-map("x", "m", "<cmd>lua require('tsht').nodes()<CR>)")
+map("x", "m", "<cmd>lua require('tsht').nodes()<CR>")
+map("n", "m", "<cmd>HopPattern<CR>")
 -- Git
 --[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
 map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns mrev_hunk<CR>'") ]]

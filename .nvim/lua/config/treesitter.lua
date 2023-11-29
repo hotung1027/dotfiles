@@ -137,12 +137,12 @@ require 'nvim-treesitter.configs'.setup {
     }
 
   },
-    pairs = {
+  pairs = {
     enable = true,
     disable = {},
-    highlight_pair_events = {}, -- e.g. {"CursorMoved"}, -- when to highlight the pairs, use {} to deactivate highlighting
-    highlight_self = false, -- whether to highlight also the part of the pair under cursor (or only the partner)
-    goto_right_end = false, -- whether to go to the end of the right partner or the beginning
+    highlight_pair_events = {},                                   -- e.g. {"CursorMoved"}, -- when to highlight the pairs, use {} to deactivate highlighting
+    highlight_self = false,                                       -- whether to highlight also the part of the pair under cursor (or only the partner)
+    goto_right_end = false,                                       -- whether to go to the end of the right partner or the beginning
     fallback_cmd_normal = "call matchit#Match_wrapper('',1,'n')", -- What command to issue when we can't find a pair (e.g. "normal! %")
     keymaps = {
       goto_partner = "<leader>%",
@@ -150,40 +150,41 @@ require 'nvim-treesitter.configs'.setup {
     },
     delete_balanced = {
       only_on_first_char = false, -- whether to trigger balanced delete when on first character of a pair
-      fallback_cmd_normal = nil, -- fallback command when no pair found, can be nil
-      longest_partner = false, -- whether to delete the longest or the shortest pair when multiple found.
-                               -- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
+      fallback_cmd_normal = nil,  -- fallback command when no pair found, can be nil
+      longest_partner = false,    -- whether to delete the longest or the shortest pair when multiple found.
+      -- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
     }
   },
 }
 
 sts.setup({
-	highlight_group = "STS_highlight",
-	disable_no_instance_found_report = false,
-	default_desired_types = {
-		"function",
-		"arrow_function",
-		"function_definition",
-		"if_statement",
-		"else_clause",
-		"else_statement",
-		"elseif_statement",
-		"for_statement",
-		"while_statement",
-		"switch_statement",
-	},
-	left_hand_side = "fdsawervcxqtzb",
-	right_hand_side = "jkl;oiu.,mpy/n",
-	icon_dictionary = {
-		["if_statement"] = "",
-		["else_clause"] = "",
-		["else_statement"] = "",
-		["elseif_statement"] = "",
-		["for_statement"] = "ﭜ",
-		["while_statement"] = "ﯩ",
-		["switch_statement"] = "ﳟ",
-		["function"] = "",
-		["function_definition"] = "",
-		["variable_declaration"] = "",
-	},
+  highlight_group = "STS_highlight",
+  disable_no_instance_found_report = false,
+  default_desired_types = {
+    "function",
+    "arrow_function",
+    "function_definition",
+    "if_statement",
+    "else_clause",
+    "else_statement",
+    "elseif_statement",
+    "for_statement",
+    "while_statement",
+    "switch_statement",
+  },
+  left_hand_side = "fdsawervcxqtzb",
+  right_hand_side = "jkl;oiu.,mpy/n",
+  icon_dictionary = {
+    ["if_statement"] = "",
+    ["else_clause"] = "",
+    ["else_statement"] = "",
+    ["elseif_statement"] = "",
+    ["for_statement"] = "ﭜ",
+    ["while_statement"] = "ﯩ",
+    ["switch_statement"] = "ﳟ",
+    ["function"] = "",
+    ["function_definition"] = "",
+    ["variable_declaration"] = "",
+  },
 })
+require("tsht").config.hint_keys = { "h", "j", "f", "d", "n", "v", "s", "l", "a" }
