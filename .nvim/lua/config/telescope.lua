@@ -8,7 +8,7 @@ telescope.setup({
   defaults = {
     vimgrep_arguments = {
       "rg", "--hidden", "--color=never", "--no-heading", "--with-filename",
-      "--line-number", "--column", "--smart-case", "--trim", "--glob", "!**/.git/*"
+      "--line-number", "--column", "--smart-case", "--trim", "--glob", "!**/.git/**"
     },
     prompt_prefix = "  ",
     selection_caret = "  ",
