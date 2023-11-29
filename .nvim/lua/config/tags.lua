@@ -7,8 +7,8 @@ vim.g.vista_ctags_executable = "ctags"
 
 vim.cmd([[
 let g:vista_executive_for = {
-\ 'cpp' : ['nvim_lsp','ctags'],
-\ 'c' : ['nvim_lsp','ctags'],
+\ 'cpp' : 'ctags',
+\ 'c' : 'ctags',
 \ }
 ]])
 
@@ -24,7 +24,12 @@ vim.cmd([[let g:vista#renderer#enable_kind = 1]])
 vim.g.vista_update_on_text_changed = 1
 vim.cmd([[
   let g:vista#renderer#icons ={
-  \ "function" : "\uf794",
-  \ "variable" : "\uf71b",
+  \ "function" : "𝑓",
+  \ "variable" : "𝕏",
+  \ "number" : "𝓝",
+  \ "string" :"𝚜"
   \ }
+]])
+vim.cmd([[
+  let g:vista_fzf_preview = ['left:50%']
 ]])
