@@ -325,14 +325,14 @@ return require('lazy').setup(
       config = function() require('config.which-key') end
     },
 
-    { "tyru/open-browser.vim", event = "VimEnter" },
+    { "tyru/open-browser.vim",       event = "VimEnter" },
 
 
     -- Neovim Color Theme
-    -- { 'lifepillar/vim-gruvbox8' },
-    -- { 'lifepillar/vim-colortemplate' },
-    -- { 'sainnhe/gruvbox-material' },
-    -- { 'rebelot/kanagawa.nvim' },
+    { 'lifepillar/vim-gruvbox8' },
+    { 'lifepillar/vim-colortemplate' },
+    { 'sainnhe/gruvbox-material' },
+    { 'rebelot/kanagawa.nvim' },
     {
       "folke/tokyonight.nvim",
       lazy = false,
@@ -345,11 +345,6 @@ return require('lazy').setup(
 
 
     -- Load on an autocommand event
-    {
-      'andymass/vim-matchup',
-      init = function() vim.g.matchup_matchparen_offscreen = { method = "popup" } end,
-      event = 'VimEnter'
-    }, 
 
     -- ====================== Completion =================================================================
 
@@ -472,8 +467,9 @@ return require('lazy').setup(
     },
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
     { 'nvim-treesitter/nvim-treesitter-context' },
-    {'theHamsta/nvim-treesitter-pairs'},
-    {'ziontee113/syntax-tree-surfer'},
+    { 'theHamsta/nvim-treesitter-pairs' },
+    { 'RRethy/nvim-treesitter-endwise' },
+    { 'ziontee113/syntax-tree-surfer' },
 
     -- You can specify multiple plugins in a single call
     { 'tjdevries/colorbuddy.vim',                   dependencies = 'nvim-treesitter' },
@@ -497,10 +493,14 @@ return require('lazy').setup(
     -- Automatic insertion and deletion of a pair of characters
     { "Raimondi/delimitMate", event = "InsertEnter" },
 
+    {
+      'andymass/vim-matchup',
+      init = function() vim.g.matchup_matchparen_offscreen = { method = "popup" } end,
+    },
 
     -- Additional powerful text object for vim, this plugin should be studied
     -- carefully to  its full power
-    { "wellle/targets.vim",   event = "VimEnter" },
+    { "wellle/targets.vim",         event = "VimEnter" },
     --  {
     -- "nvim-neorg/neorg",
     -- config = function()
