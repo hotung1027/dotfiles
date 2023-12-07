@@ -153,8 +153,8 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 2, max_item_count = 5 },
-    { name = 'nvim_lsp',    priority = 1, max_item_count = 5 },
+    { name = 'cmp_tabnine', priority = 3, max_item_count = 5 },
+    { name = 'nvim_lsp',    priority = 1 },
     { name = 'luasnip',     priority = 2, max_item_count = 5 },
     { name = 'treesitter',  priority = 3, max_item_count = 5 },
     { name = "tags",        priority = 5, max_item_count = 10 },
@@ -170,15 +170,15 @@ cmp.setup({
       max_item_count = 5,
     },
 
-    { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 99,             max_item_count = 5,                                                                                                     keyword_length = 2 },
-    { name = 'fuzzy_buffer',             priority = 4,                              max_item_count = 3 },
-    { name = 'rg',                       priority = 5,                              max_item_count = 5,           option = { additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 3, context_after = 3 }, keyword_length = 3 },
-    { name = 'path',                     priority = 3,                              trigger_characters = { '/' }, max_item_count = 8 },
-    { name = 'spell',                    priority = 3,                              max_item_count = 5 },
-    { name = 'tmux',                     priority = 4,                              max_item_count = 3 },
+    { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 2,                 max_item_count = 5,                                                                                                     keyword_length = 2 },
+    { name = 'fuzzy_buffer',             priority = 4,                                 max_item_count = 3 },
+    { name = 'rg',                       priority = 5,                                 max_item_count = 5,           option = { additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 3, context_after = 3 }, keyword_length = 3 },
+    { name = 'path',                     priority = 3,                                 trigger_characters = { '/' }, max_item_count = 8 },
+    { name = 'spell',                    priority = 3,                                 max_item_count = 5 },
+    { name = 'tmux',                     priority = 4,                                 max_item_count = 3 },
     { name = 'nvim_lsp_document_symbol', priority = 12 },
     { name = 'nvim_lsp_signature_help',  priority = 12 },
-    { name = "latex_symbols",            trigger_characters = { '\\' },             option = { strategy = 0 },    priority = 10 },
+    { name = "latex_symbols",            trigger_characters = { '\\' },                option = { strategy = 0 },    priority = 10 },
   },
 
   sorting = {

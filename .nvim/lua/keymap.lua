@@ -15,7 +15,6 @@ map("x", "H", "^")
 map("n", "W", "5w")
 map("n", "B", "5b")
 
-map("n", "<C-z>", "u")
 
 map("n", "<", "<<")
 map("n", ">", ">>")
@@ -119,13 +118,14 @@ end
 
 map("n", "<leader>tt", ":Telescope<CR>")
 map("n", "<leader>ff", "<cmd>lua find_files_from_project_git_root()<CR>")
-map("n", "<leader>fg", "<cmd>lua require('telescope.builtin').live_grep()<CR>")
+map("n", "<leader>fg", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
 map("n", "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<CR>")
-map("n", "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags{}<CR>")
+map("n", "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<CR>")
 map("n", "<leader>ft", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>")
 map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<CR>")
 map("n", "<leader>fw", "<cmd>lua require('telescope.builtin').grep_string()<CR>")
 map("n", "<leader>fj", "<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>")
+map("n", "<leader>fq", "<cmd>lua require('telescope.builtin').quickfixhistory()<CR>")
 -- Treesitter External Plugins
 map("n", "[c", "<cmd>lua require('treesitter-context').go_to_context()<CR>")
 map("n", "<A-l>", '<cmd>STSSwapCurrentNodeNextNormal<cr>')
@@ -149,8 +149,19 @@ map("x", "<A-k>", '<cmd>STSSwapPrevVisual<cr>')
 
 
 -- Treesitter Hop
+function hop_pattern_with_call_back()
+  local search_text = vim.fn['getreg']('/')
+  local hop = require('hop')
+  if search_text ~= nil then
+    hop.hint_patterns({}, search_text)
+  else
+    hop.hint_char2()
+  end
+end
 
-map("n", "m", "<cmd>HopPattern<CR>")
+map('n', '<C-f>', "<cmd>lua hop_pattern_with_call_back()<cr>")
+
+map("n", "m", "<cmd>HopWord<CR>")
 map("x", "m", "<cmd>lua require('tsht').nodes()<CR>")
 -- Git
 --[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
