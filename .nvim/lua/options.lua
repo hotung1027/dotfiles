@@ -71,8 +71,8 @@ opt.lazyredraw = true
 opt.signcolumn = "yes:1"
 opt.mouse = 'a'
 opt.pumheight = 10
-opt.foldlevel = 3
-opt.foldenable = true
+opt.foldlevel = 0
+opt.foldenable = false
 opt.formatoptions = 'qj'
 opt.hidden = true
 
@@ -91,11 +91,11 @@ if undo_stat and has_persist == 1 then
   opt.undofile = true
   opt.undodir = undo_dir
 end
-vim.api.nvim_create_autocmd({'BufEnter','BufAdd','BufNew','BufNewFile','BufWinEnter'}, {
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufAdd', 'BufNew', 'BufNewFile', 'BufWinEnter' }, {
   group = vim.api.nvim_create_augroup('TS_FOLD_WORKAROUND', {}),
   callback = function()
-    vim.opt.foldmethod     = 'expr'
-    vim.opt.foldexpr       = 'nvim_treesitter#foldexpr()'
+    vim.opt.foldmethod = 'expr'
+    vim.opt.foldexpr   = 'nvim_treesitter#foldexpr()'
   end
 })
 vim.api.nvim_command('autocmd TermOpen term://* startinsert')

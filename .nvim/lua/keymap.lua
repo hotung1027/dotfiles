@@ -1,16 +1,14 @@
 local map = require('utils').map
 vim.g.mapleader = ";"
+-- map('n', 'J', '5j')
+-- map('x', 'J', '5j')
+-- map('n', 'K', '5k')
+-- map('x', 'K', '5k')
 
-
-map('n', 'J', '5j')
-map('x', 'J', '5j')
-map('n', 'K', '5k')
-map('x', 'K', '5k')
-
-map("n", "L", "g_")
-map("n", "H", "^")
-map("x", "L", "g_")
-map("x", "H", "^")
+-- map("n", "L", "g_")
+-- map("n", "H", "^")
+-- map("x", "L", "g_")
+-- map("x", "H", "^")
 
 map("n", "W", "5w")
 map("n", "B", "5b")
@@ -126,6 +124,8 @@ map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_workspace_symb
 map("n", "<leader>fw", "<cmd>lua require('telescope.builtin').grep_string()<CR>")
 map("n", "<leader>fj", "<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>")
 map("n", "<leader>fq", "<cmd>lua require('telescope.builtin').quickfixhistory()<CR>")
+map("n", "<leader>fd", "<cmd>DevdocsOpenFloat<CR>")
+
 -- Treesitter External Plugins
 map("n", "[c", "<cmd>lua require('treesitter-context').go_to_context()<CR>")
 map("n", "<A-l>", '<cmd>STSSwapCurrentNodeNextNormal<cr>')

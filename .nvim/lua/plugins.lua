@@ -1,8 +1,6 @@
 -- This file can be loaded by calling `lua require('plugins')` from your init.vim
 local utils = require("utils")
-
 local fn = vim.fn
-
 local map = require('utils').map
 
 -- Only required if you have packer configured as `opt`
@@ -61,7 +59,7 @@ return require('lazy').setup(
     {
       'vimlab/split-term.vim'
     },
-    -- Document Explorer
+    -- File Explorer
     {
       'kyazdani42/nvim-tree.lua',
       config = function() require("config.nvimtree") end,
@@ -186,6 +184,13 @@ return require('lazy').setup(
       dependencies = { 'nvim-telescope/telescope.nvim' },
       config = function() require('telescope').load_extension('luasnip') end,
 
+    },
+    {
+      "nvim-telescope/telescope-live-grep-args.nvim",
+      version = "^1.0.0",
+      config = function()
+        require("telescope").load_extension("live_grep_args")
+      end
     },
     -- Fuzzy Finder
     --         { 'amirrezaask/fuzzy.nvim', requires={'nvim-lua/plenary.nvim'}, , module = 'fuzzy_nvim'},
@@ -435,6 +440,13 @@ return require('lazy').setup(
       cmd = "Vista",
       config = function() require("config.tags") end
     },
+    -- {
+    --   'simrat39/symbols-outline.nvim',
+    --   config = function()
+    --     require('symbols-outline').setup()
+    --   end,
+    --
+    -- },
     -- async tags generation
     --  { 'jsfaint/gen_tags.vim' },
 
@@ -466,7 +478,13 @@ return require('lazy').setup(
       'nvim-treesitter/nvim-treesitter-refactor',
     },
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
-    { 'nvim-treesitter/nvim-treesitter-context' },
+    {
+      'nvim-treesitter/nvim-treesitter-context',
+      config = function()
+        vim.cmd("TSContextEnable")
+      end,
+      event = "VimEnter",
+    },
     { 'theHamsta/nvim-treesitter-pairs' },
     { 'RRethy/nvim-treesitter-endwise' },
     { 'ziontee113/syntax-tree-surfer' },
@@ -495,7 +513,7 @@ return require('lazy').setup(
 
     {
       'andymass/vim-matchup',
-      init = function() vim.g.matchup_matchparen_offscreen = { method = "popup" } end,
+      init = function() vim.g.matchup_matchparen_offscreen = { method = "status" } end,
     },
 
     -- Additional powerful text object for vim, this plugin should be studied
@@ -639,7 +657,31 @@ return require('lazy').setup(
       cmd = "Neogit"
     },
 
+    -- Document Searching
+    {
+      "luckasRanarison/nvim-devdocs",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-telescope/telescope.nvim",
+        "nvim-treesitter/nvim-treesitter",
+      },
+      config = function()
+        require('nvim-devdocs').setup({
+          filetypes = {
+            cpp = { "eigen3", "cpp", "point_cloud_library" },
+            rust = "rust",
+            lua = "lua",
+            python = { "python-3.11", "pytorch", "numpy-1.23", "scikit-image", "scikit-learn" }
+          },
+          previewer_cmd = "glow",
+          cmd_args = { "-s", "dark", "-w", "50" },
+          picker_cmd = true,
+          picker_cmd_args = { "-s", "dark", "-w", "50" },
 
+        })
+      end,
+
+    },
     -- Mark Down Plugins
     -- Another markdown plugin
     { "plasticboy/vim-markdown",          ft = { "markdown" }, },
