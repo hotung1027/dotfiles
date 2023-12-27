@@ -207,7 +207,14 @@ return require('lazy').setup(
 
     -- Clear highlight search automatically for you
     { "romainl/vim-cool",       event = "VimEnter" },
-
+    {
+      "m-demare/hlargs.nvim",
+      opts = {
+        extras = {
+          named_parameters = true,
+        }
+      }
+    },
     -- Show match number for search
     {
       'kevinhwang91/nvim-hlslens',
@@ -290,13 +297,29 @@ return require('lazy').setup(
     -- Session management plugin
 
     -- Session management
+    -- {
+    --   "rmagatti/auto-session",
+    --   config = function()
+    --     require('auto-session').setup {
+    --       log_level = 'info',
+    --       auto_session_enabled = true,
+    --     }
+    --   end
+    -- },
     {
-      "rmagatti/auto-session",
+      "Shatur/neovim-session-manager",
       config = function()
-        require('auto-session').setup {
-          log_level = 'info',
-          auto_session_enabled = true,
-        }
+        local config = require('session_manager.config')
+        require('session_manager').setup({
+          autoload_mode = config.AutoloadMode.LastSession, -- Define what to do when Neovim is started without arguments. Possible values: Disabled, CurrentDir, LastSession
+          autosave_last_session = true,                    -- Automatically save last session on exit and on session switch.
+          autosave_ignore_not_normal = true,               -- Plugin will not save a session when no buffers are opened, or all of them aren't writable or listed.
+          autosave_ignore_dirs = {},                       -- A list of directories where the session will not be autosaved.
+          autosave_ignore_filetypes = {                    -- All buffers of these file types will be closed before the session is saved.
+            'gitcommit',
+            'gitrebase',
+          },
+        })
       end
     },
     {
@@ -674,9 +697,9 @@ return require('lazy').setup(
             python = { "python-3.11", "pytorch", "numpy-1.23", "scikit-image", "scikit-learn" }
           },
           previewer_cmd = "glow",
-          cmd_args = { "-s", "dark", "-w", "50" },
+          cmd_args = { "-s", "dracula", "-w", "50" },
           picker_cmd = true,
-          picker_cmd_args = { "-s", "dark", "-w", "50" },
+          picker_cmd_args = { "-s", "dracula", "-w", "50" },
 
         })
       end,
