@@ -9,13 +9,13 @@ local brackets = { { '(', ')' }, { '[', ']', }, { '{', '}' } }
 npairs.setup({
   check_ts = true,
   ts_config = {
-    lua = { 'string' },   -- it will not add pair on that treesitter node
+    lua = { 'string' }, -- it will not add pair on that treesitter node
   },
   fast_wrap = {
     map = '<M-e>',
     chars = { '{', '[', '(', '"', "'" },
     pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], '%s+', ':'),
-    offset = 0,   -- Offset from pattern match
+    offset = 0, -- Offset from pattern match
     end_key = '$',
     keys = 'qwertyuiopzxcvbnmasdfghjkl',
     check_comma = true,

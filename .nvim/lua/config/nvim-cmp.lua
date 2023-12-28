@@ -13,8 +13,8 @@ end
 local tabnine = require('cmp_tabnine.config')
 
 tabnine:setup({
-  max_lines = 1000,
-  max_num_results = 20,
+  max_lines = 5000,
+  max_item_count = 10,
   sort = true,
   run_on_every_keystroke = true,
   snippet_placeholder = '..',
@@ -23,7 +23,7 @@ tabnine:setup({
     -- uncomment to ignore in lua:
     -- lua = true
   },
-  show_prediction_strength = false
+  show_prediction_strength = true,
 })
 local cmp_kinds = {
   Text = '  ',
@@ -86,7 +86,9 @@ cmp.setup({
       col_offset = -3,
       side_padding = 0,
     },
+    documentation = cmp.config.window.bordered(),
   },
+
   formatting = {
     fields = { "kind", "abbr", "menu" },
     format = function(entry, vim_item)
@@ -112,17 +114,35 @@ cmp.setup({
           kind.kind = kind.kind .. ' ' .. '[ML]'
         end
       end
-      if strings[2] == "Variable" then
+      if strings[2] == "Variable" or strings[2] == "Text" then
         kind.menu = provider[entry.source.name] or ("[" .. (entry.source.name or "") .. "]")
       else
-        kind.menu = "  (" .. (strings[2] or "") .. ")"
+        kind.menu = (provider[entry.source.name]) or (
+          "  (" .. (strings[2] or entry.source.name or "") .. ")")
       end
       return kind
     end,
   },
+
   mapping = {
-    ['<C-p>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), { 'i', 'c' }),
-    ['<C-n>'] = cmp.mapping(cmp.mapping.scroll_docs(4), { 'i', 'c' }),
+    ['<C-p>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip and luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ['<C-n>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip and luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
     ['<C-e>'] = cmp.mapping({
       i = cmp.mapping.abort(),
       c = cmp.mapping.close(),
@@ -153,11 +173,11 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 3, max_item_count = 5 },
-    { name = 'nvim_lsp',    priority = 1 },
-    { name = 'luasnip',     priority = 2, max_item_count = 5 },
-    { name = 'treesitter',  priority = 3, max_item_count = 5 },
-    { name = "tags",        priority = 5, max_item_count = 10 },
+    { name = 'cmp_tabnine', priority = 10 },
+    { name = 'nvim_lsp',    priority = 99 },
+    { name = 'luasnip',     priority = 99, },
+    { name = 'treesitter',  priority = 5, },
+    { name = "tags",        priority = 5, },
     {
       name = "ctags",
       -- default values
@@ -167,29 +187,63 @@ cmp.setup({
         trigger_characters_ft = {},
       },
       priority = 5,
-      max_item_count = 5,
     },
 
-    { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 2,                 max_item_count = 5,                                                                                                     keyword_length = 2 },
-    { name = 'fuzzy_buffer',             priority = 4,                                 max_item_count = 3 },
-    { name = 'rg',                       priority = 5,                                 max_item_count = 5,           option = { additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 3, context_after = 3 }, keyword_length = 3 },
-    { name = 'path',                     priority = 3,                                 trigger_characters = { '/' }, max_item_count = 8 },
-    { name = 'spell',                    priority = 3,                                 max_item_count = 5 },
-    { name = 'tmux',                     priority = 4,                                 max_item_count = 3 },
-    { name = 'nvim_lsp_document_symbol', priority = 12 },
-    { name = 'nvim_lsp_signature_help',  priority = 12 },
-    { name = "latex_symbols",            trigger_characters = { '\\' },                option = { strategy = 0 },    priority = 10 },
+    -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
+    {
+      name = 'fuzzy_buffer',
+      priority = 5,
+      options = {
+        get_bufnrs = function()
+          local bufs = {}
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
+            if buftype ~= 'nofile' and buftype ~= 'prompt' then
+              local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+              if byte_size < 10 * 1024 * 1024 then
+                bufs[#bufs + 1] = buf
+              end
+            end
+          end
+          return bufs
+        end
+      },
+      fuzzy_extra_arg = { case_mode = 1 },
+      min_match_length = 3,
+
+      max_matches = 5,
+    },
+    {
+      name = 'rg',
+      priority = 5,
+      option = {
+        additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 3, context_after = 3 },
+      keyword_length = 3,
+      max_item_count = 3,
+    },
+    { name = 'path',                     priority = 3, },
+    { name = 'spell',                    priority = 3, },
+    { name = 'tmux',                     priority = 4, },
+    { name = 'nvim_lsp_document_symbol', priority = 99 },
+    { name = 'nvim_lsp_signature_help',  priority = 99 },
+    { name = "latex_symbols",            trigger_characters = { '\\' }, option = { strategy = 0 }, priority = 10 },
+    { name = "crates" }
+  },
+  performance = {
+    max_view_entries = 20,
   },
 
   sorting = {
+    priority_weight = 5,
     comparators = {
-      require('cmp_fuzzy_buffer').compare,
-      require('cmp_tabnine.compare'),
       require("clangd_extensions.cmp_scores"),
-      cmp.config.compare.exact,
-      cmp.config.compare.score,
+      require('cmp_tabnine.compare'),
+      require('cmp_fuzzy_buffer.compare'),
       require "cmp-under-comparator".under,
       cmp.config.compare.offset,
+      cmp.config.compare.exact,
+      cmp.config.compare.score,
+      cmp.config.compare.recently_used,
       cmp.config.compare.kind,
       cmp.config.compare.sort_text,
       cmp.config.compare.length,
@@ -206,23 +260,25 @@ cmp.setup({
 })
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline({ '/', '?' }, {
+cmp.setup.cmdline({ '/', '?', ':' }, {
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
     { name = 'cmdline' },
+    { name = 'path' },
     { name = 'fuzzy_buffer' },
     { name = 'nvim_lsp_document_symbol' },
     { name = "nvim-lsp_signature_help" }
   })
 })
 
-cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
-  source = cmp.config.sources({
-    { name = 'cmdline' },
-    { name = 'path' },
-  })
-})
+-- cmp.setup.cmdline({ ':' }, {
+--   mapping = cmp.mapping.preset.cmdline(),
+--   source = cmp.config.sources({
+--     { name = 'cmdline' },
+--     { name = 'path' },
+--   })
+-- })
+
 local handlers = require('nvim-autopairs.completion.handlers')
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({
   filetypes = {

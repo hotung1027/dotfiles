@@ -8,7 +8,6 @@ if not (lspconfig_present or installer_present or server_config_present) then
   return
 end
 
-
 local border = {
   { "🭽", "FloatBorder" },
   { "▔", "FloatBorder" },
@@ -40,7 +39,25 @@ local lua_setting = {
   }
 }
 
+local rust_setting = {
+  ['rust_analyzer'] = {
+    cargo = {
+      features = "all",
+    },
+    inlayHints = {
+      closureCaptureHints = {
+        enable = true,
+      },
+    },
 
+    diagnostics = {
+      enable = true,
+    },
+
+  },
+  -- fileypes = { 'rust', "toml" },
+  -- root_dir = require("lspconfig/util").root_pattern("Cargo.toml"),
+}
 
 local haskell_setting = {
   haskell = {
@@ -65,7 +82,11 @@ local lsp_publish_diagnostics_options = {
 require 'lspconfig'.julials.setup {}
 
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
+local capabilities = vim.tbl_deep_extend("force",
+  vim.lsp.protocol.make_client_capabilities(),
+  require('cmp_nvim_lsp').default_capabilities()
+)
+
 capabilities.textDocument.completion.completionItem.documentationFormat = {
   "markdown",
   "plaintext"
@@ -195,6 +216,28 @@ local on_attach = function(client, bufnr)
     }
   }, bufnr)
   lspsaga.setup()
+
+  require("lsp_signature").on_attach({
+    hint_prefix = "👍 ",
+    floating_window_off_x = 5,                         -- adjust float windows x position.
+    floating_window_off_y = function()                 -- adjust float windows y position. e.g. set to -2 can make floating window move up 2 lines
+      local linenr = vim.api.nvim_win_get_cursor(0)[1] -- buf line number
+      local pumheight = vim.o.pumheight
+      local winline = vim.fn.winline()                 -- line number in the window
+      local winheight = vim.fn.winheight(0)
+
+      -- window top
+      if winline - 1 < pumheight then
+        return pumheight
+      end
+
+      -- window bottom
+      if winheight - winline < pumheight then
+        return -pumheight
+      end
+      return 0
+    end,
+  }, bufnr)
   -- vim.api.nvim_command('au User LspDiagnosticsChanged lua require("lsp-status/redraw").redraw()')
 
   vim.lsp.handlers['textDocument/codeAction'] = function(_, _, actions)
@@ -228,10 +271,40 @@ local on_attach = function(client, bufnr)
   vim.lsp.handlers['textDocument/symbol'] = function(_, _, result, _, bufn)
     require('lsputil.symbols').workspace_handler(nil, result, { bufnr = bufn }, nil)
   end
-
+  vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
+    vim.lsp.diagnostic.on_publish_diagnostics,
+    {
+      underline = true,
+      virtual_text = {
+        spacing = 5,
+        severity_limit = 'Warning',
+      },
+      update_in_insert = true,
+    }
+  )
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
   -- Mappings.
   local opts = { noremap = true, silent = true }
+  function show_documentation()
+    local filetype = vim.bo.filetype
+    if vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
+      require('crates').show_popup()
+    else
+      vim.lsp.buf.signature_help()
+    end
+  end
+
+  function siwtch_to_source_header()
+    local filetype = vim.bo.filetype
+
+    if vim.tbl_contains({ 'c', 'cpp', 'h', 'hpp' }, filetype) then
+      vim.cmd [[ClangdSwitchSourceHeader]]
+    elseif vim.tbl_contains({ 'rust' }, filetype) then
+      vim.cmd [[RustOpenCargo]]
+    elseif vim.fn.expand('%:t') == 'Cargo.toml' then
+      vim.cmd [[b main.rs]]
+    end
+  end
 
   buf_set_keymap("n", "<F2>", "<cmd>Lspsaga rename<cr>", opts)
   -- buf_set_keymap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
@@ -242,7 +315,9 @@ local on_attach = function(client, bufnr)
   buf_set_keymap('n', '<leader>gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   buf_set_keymap('n', '<leader>gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
   buf_set_keymap('n', '<leader>gf', "<Cmd>lua require('lspsaga.provider').lsp_finder()<CR>", opts)
-  buf_set_keymap('n', '<leader>h', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', 'K', "<cmd>lua show_documentation()<CR>", opts)
+  buf_set_keymap("n", "<leader>gh", "<cmd>lua siwtch_to_source_header()<CR>", opts)
+
   buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
   buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
 
@@ -311,18 +386,24 @@ server_config.setup_handlers({
       root_dir = vim.loop.cwd,
       handlers = handlers,
     }
-
+    local run_custom_extern_settings = false
     if server_name == "lua_ls" then
       opts.settings = lua_setting
     elseif server_name == 'hls' then
       opts.settings = haskell_setting
+    elseif server_name == "rust_analyzer" then
+      opts.settings = rust_setting
+      require("rust-tools").setup({ server = opts })
+      run_custom_extern_settings = true
     end
 
     if #vim.lsp.buf_get_clients() > 0 then
       -- require('lsp-status').status()
     end
     -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
-    require("lspconfig")[server_name].setup(opts)
+    if not run_custom_extern_settings then
+      require("lspconfig")[server_name].setup(opts)
+    end
     vim.cmd([[do User LspAttachBuffer]])
   end,
 })

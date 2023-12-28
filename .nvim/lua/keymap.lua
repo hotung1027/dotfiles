@@ -93,10 +93,10 @@ map("n", "<leader>dl", ":DapUIToggle<CR>")
 map("n", "<leader>b]", ":BufferLineCycleNext<CR>")
 map("n", "<leader>b[", ":BufferLineCyclePrev<CR>")
 -- Vista
-map("n", "<leader>tl", ":Vista!!<CR>")
+map("n", "<leader>tl", ":SymbolsOutline<CR>")
 -- lua require('telescope.builtin')
 --
-function find_files_from_project_git_root()
+local function find_files_from_project_git_root()
   local function is_git_repo()
     vim.fn.system("git rev-parse --is-inside-work-tree")
     return vim.v.shell_error == 0
@@ -114,16 +114,29 @@ function find_files_from_project_git_root()
   require("telescope.builtin").find_files(opts)
 end
 
-map("n", "<leader>tt", ":Telescope<CR>")
-map("n", "<leader>ff", "<cmd>lua find_files_from_project_git_root()<CR>")
-map("n", "<leader>fg", "<cmd>lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
-map("n", "<leader>fb", "<cmd>lua require('telescope.builtin').buffers()<CR>")
-map("n", "<leader>fh", "<cmd>lua require('telescope.builtin').help_tags()<CR>")
-map("n", "<leader>ft", "<cmd>lua require('telescope.builtin').lsp_document_symbols()<CR>")
-map("n", "<leader>fs", "<cmd>lua require('telescope.builtin').lsp_workspace_symbols()<CR>")
-map("n", "<leader>fw", "<cmd>lua require('telescope.builtin').grep_string()<CR>")
-map("n", "<leader>fj", "<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<CR>")
-map("n", "<leader>fq", "<cmd>lua require('telescope.builtin').quickfixhistory()<CR>")
+map("n", "<leader>tt",
+  function()
+    require("telescope.builtin").builtin({
+      preview = { timeout = 10, hide_on_startup = true,
+      }
+    })
+  end, {})
+map("n", "<leader>fg", require('telescope').extensions.live_grep_args.live_grep_args, {})
+map("n", "<leader>ff", find_files_from_project_git_root, {})
+map("n", "<leader>fb",
+  function()
+    require('telescope.builtin').buffers({
+      preview = { timeout = 10, hide_on_startup = true,
+      }
+    })
+  end, {})
+map("n", "<leader>fh", require('telescope.builtin').help_tags, {})
+map("n", "<leader>ft", require('telescope.builtin').lsp_document_symbols, {})
+map("n", "<leader>fs", require('telescope.builtin').lsp_dynamic_workspace_symbols, {})
+map("n", "<leader>fw", require('telescope.builtin').grep_string, {})
+map("n", "<leader>fj", require('telescope.builtin').current_buffer_fuzzy_find, {})
+map("n", "<leader>jj", require('telescope.builtin').jumplist, {})
+map("n", "<leader>fq", require('telescope.builtin').quickfixhistory, {})
 map("n", "<leader>fd", "<cmd>DevdocsOpenFloat<CR>")
 
 -- Treesitter External Plugins
@@ -137,19 +150,19 @@ map("n", "<A-j>", '<cmd>STSSwapDownNormal<cr>')
 map("n", "vaa", '<cmd>STSSelectMasterNode<cr>')
 map("n", "vii", '<cmd>STSSelectCurrentNode<cr>')
 
--- Select Nodes in Visual Mode
-map("x", "L", '<cmd>STSSelectNextSiblingNode<cr>')
-map("x", "H", '<cmd>STSSelectPrevSiblingNode<cr>')
-map("x", "K", '<cmd>STSSelectParentNode<cr>')
-map("x", "J", '<cmd>STSSelectChildNode<cr>')
-
--- Swapping Nodes in Visual Mode
-map("x", "<A-j>", '<cmd>STSSwapNextVisual<cr>')
-map("x", "<A-k>", '<cmd>STSSwapPrevVisual<cr>')
+-- -- Select Nodes in Visual Mode
+-- map("x", "L", '<cmd>STSSelectNextSiblingNode<cr>')
+-- map("x", "H", '<cmd>STSSelectPrevSiblingNode<cr>')
+-- map("x", "K", '<cmd>STSSelectParentNode<cr>')
+-- map("x", "J", '<cmd>STSSelectChildNode<cr>')
+--
+-- -- Swapping Nodes in Visual Mode
+-- map("x", "<A-j>", '<cmd>STSSwapNextVisual<cr>')
+-- map("x", "<A-k>", '<cmd>STSSwapPrevVisual<cr>')
 
 
 -- Treesitter Hop
-function hop_pattern_with_call_back()
+local function hop_pattern_with_call_back()
   local search_text = vim.fn['getreg']('/')
   local hop = require('hop')
   if search_text ~= nil then
@@ -159,10 +172,10 @@ function hop_pattern_with_call_back()
   end
 end
 
-map('n', '<C-f>', "<cmd>lua hop_pattern_with_call_back()<cr>")
+map('n', '<C-f>', hop_pattern_with_call_back, {})
 
 map("n", "m", "<cmd>HopWord<CR>")
-map("x", "m", "<cmd>lua require('tsht').nodes()<CR>")
+map("x", "m", require('tsht').nodes, {})
 -- Git
 --[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
 map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns mrev_hunk<CR>'") ]]
