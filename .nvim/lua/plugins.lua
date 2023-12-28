@@ -246,8 +246,31 @@ return require('lazy').setup(
     },
 
     -- mulit cursor
-    { 'mg979/vim-visual-multi', event = "InsertEnter", branch = 'master' },
-
+    -- { 'mg979/vim-visual-multi', event = "InsertEnter", branch = 'master' },
+    {
+      "smoka7/multicursors.nvim",
+      config = function()
+        require('multicursors').setup {
+          hint_config = {
+            border = 'rounded',
+            position = 'bottom',
+          },
+          generate_hints = {
+            normal = true,
+            insert = true,
+            extend = true,
+            config = {
+              column_count = 1,
+            },
+          },
+          -- normal_keys = {
+          --   ['<C-I>'] = {
+          --     method = require('multicursors').new_under_cursor,
+          --   }
+          -- }
+        }
+      end
+    },
     {
       'famiu/nvim-reload',
       cmd = { "Reload", "Restart" },
@@ -292,7 +315,7 @@ return require('lazy').setup(
 
 
     -- Undo Histroy
-    { "mbbill/undotree",        cmd = "UndotreeToggle" },
+    { "mbbill/undotree",      cmd = "UndotreeToggle" },
 
     -- Session management plugin
 
@@ -336,7 +359,7 @@ return require('lazy').setup(
 
     -- notification plugin
     { 'nvim-lua/popup.nvim' },
-    -- { 'anuvyklack/hydra.nvim' },
+    { 'anuvyklack/hydra.nvim' },
     {
       "rcarriga/nvim-notify",
       event = "BufEnter",
@@ -405,7 +428,7 @@ return require('lazy').setup(
     --     {'prabirshrestha/vim-lsp'},
     --    {'mattn/vim-lsp-settings'},
     --    {'dmitmel/cmp-vim-lsp'},
-    { "hrsh7th/cmp-nvim-lsp", dependencies = "nvim-cmp" },
+    { "hrsh7th/cmp-nvim-lsp",         dependencies = "nvim-cmp" },
 
     -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
     --[[   {
@@ -426,7 +449,7 @@ return require('lazy').setup(
       dependencies = { "cmp-nvim-lsp", "mason.nvim", "mason-lspconfig.nvim" },
       config = function() require('config.lsp') end
     },
-
+    { "jay-babu/mason-nvim-dap.nvim", config = function() require('mason-nvim-dap').setup() end },
 
 
     -- Gramma Check
@@ -602,6 +625,24 @@ return require('lazy').setup(
     -- C/CPP
     { 'rhysd/vim-clang-format',     ft = { 'cpp', 'c', 'h', 'hpp' }, },
     { 'p00f/clangd_extensions.nvim' },
+    -- Rust
+    { "rust-lang/rust.vim",         ft = { 'rust' },                 config = function() vim.g.rustfmt_autorsave = 1 end },
+    {
+      "simrat39/rust-tools.nvim",
+      ft = { 'rust' },
+      config = function()
+        require('rust-tools').setup()
+      end
+    },
+    {
+      'saecki/crates.nvim',
+      ft = { "rust", "toml" },
+      config = function(_, opts)
+        local crates = require('crates')
+        crates.setup(opts)
+        crates.show()
+      end
+    },
     -- Haskell
     { 'neovimhaskell/nvim-hs.vim' },
 
@@ -641,11 +682,11 @@ return require('lazy').setup(
     -- Since tmux is only available on Linux and Mac, we only enable these plugins
     -- for Linux and Mac
     -- .tmux.conf syntax highlighting and setting check
-    { "tmux-plugins/vim-tmux", ft = { "tmux" }, },
+    { "tmux-plugins/vim-tmux",    ft = { "tmux" }, },
 
     -- ======================= GIT ================================
     -- Better git commit experience
-    { "rhysd/committia.vim",   lazy = true },
+    { "rhysd/committia.vim",      lazy = true },
     -- git information
     {
       'lewis6991/gitsigns.nvim',

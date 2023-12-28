@@ -128,3 +128,38 @@ vim.api.nvim_create_autocmd({ 'VimEnter' }, {
     require('session_manager').load_current_dir_session()
   end
 })
+local prefetch = vim.api.nvim_create_augroup("prefetch", { clear = true })
+
+vim.api.nvim_create_autocmd('BufRead', {
+  group = prefetch,
+  pattern = '*.py',
+  callback = function()
+    require('cmp_tabnine'):prefetch(vim.fn.expand('%:p'))
+  end
+})
+
+local nvim_cmp = vim.api.nvim_create_augroup("nvim-cmp", { clear = true })
+-- vim.api.nvim_create_autocmd(
+--   { "TextChangedI", "TextChangedP" },
+--   {
+--     group = nvim_cmp,
+--
+--     pattern = "*",
+--     callback = function()
+--       local line = vim.api.nvim_get_current_line()
+--       local cursor = vim.api.nvim_win_get_cursor(0)[2]
+--
+--       local current = string.sub(line, cursor, cursor + 1)
+--       if current == "." or current == "," or current == " " then
+--         require('cmp').close()
+--       end
+--
+--       local before_line = string.sub(line, 1, cursor + 1)
+--       local after_line = string.sub(line, cursor + 1, -1)
+--       if not string.match(before_line, '^%s+$') then
+--         if after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") then
+--           require('cmp').complete()
+--         end
+--       end
+--     end
+--   })
