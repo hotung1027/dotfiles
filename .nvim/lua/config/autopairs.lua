@@ -145,7 +145,12 @@ npairs.add_rules({
       :with_del(cond.none())
 }
 )
+npairs.add_rules({
+  Rule('function', 'end', { "lua" })
+      :with_pair(function() return false end)
+      :with_move(cond.none())
 
+})
 
 npairs.add_rules({
   endwise('then$', 'end', 'lua', 'if_statement')
