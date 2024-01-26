@@ -56,9 +56,6 @@ return require('lazy').setup(
         }
       end
     },
-    {
-      'vimlab/split-term.vim'
-    },
     -- File Explorer
     {
       'kyazdani42/nvim-tree.lua',
@@ -104,7 +101,34 @@ return require('lazy').setup(
       config = function() require("config.comment") end,
     },
     -- Float Terminal
-    { 'voldikss/vim-floaterm' },
+    {
+      'akinsho/toggleterm.nvim',
+      version = "*",
+      config = true,
+      opts = {
+        open_mapping = [[c-\]],
+        hide_numbers = true,
+        autochdir = true,
+        start_in_insert = true,
+        insert_mappings = true,
+        terminal_mappings = true,
+        persist_size = true,
+        persist_mode = true,
+        direction = 'horizontal',
+        lose_on_exit = true,
+        auto_scroll = true,
+        float_opts = {
+          border = 'double'
+
+        },
+        winbar = {
+          enabled = true,
+          name_formatter = function(term) --  term: Terminal
+            return term.name
+          end
+        },
+      }
+    },
     ---- === Searching =======
     { 'nvim-lua/plenary.nvim' },
     {
@@ -212,7 +236,10 @@ return require('lazy').setup(
       opts = {
         extras = {
           named_parameters = true,
-        }
+        },
+        config = function()
+          require('hlargs').setup()
+        end
       }
     },
     -- Show match number for search
@@ -341,6 +368,10 @@ return require('lazy').setup(
           autosave_ignore_filetypes = {                    -- All buffers of these file types will be closed before the session is saved.
             'gitcommit',
             'gitrebase',
+            'TOGGLETERM',
+            'term',
+            'trouble'
+
           },
         })
       end

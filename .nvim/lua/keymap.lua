@@ -77,12 +77,59 @@ map('n', 'gor', ':GoRun<CR>')
 map("n", "<leader>fl", ":NvimTreeToggle<CR>")
 map("n", "<leader>fr", ":NvimTreeRefresh<CR>")
 
--- FloatTerm
-map("n", "<A-d>`", "<cmd>:FloatermNew --cwd=<root> --wintype=split --height=0.3 --position=botright<CR>")
-map("n", "<A-d>t", "<cmd>:FloatermNew --cwd=<root> --position=bottom<CR>")
-map("n", "<A-d>g", "<cmd>:FloatermNew --cwd=<root> --height=0.8 --width=0.8 --position=center --autoclose=0 lazygit<CR>")
+-- Terminal
+local Terminal = require('toggleterm.terminal').Terminal
+local add_term = function(args)
+  local tabinfo = vim.fn.tabpagebuflist()
+  local termbuf_cnt = 0
+  for _, id in pairs(tabinfo) do
+    local i, _ = string.find(vim.fn.bufname(id), "term://")
+    if i ~= nil then
+      termbuf_cnt = termbuf_cnt + 1
+    end
+  end
+  vim.cmd("ToggleTerm" .. termbuf_cnt + 1)
+end
+local cycle_term = function(step)
+  local terms        = require('toggleterm.terminal').get_all()
+  local current_term = require('toggleterm.terminal').get_focused_id()
+  local index        = 0
+  if current_term == nil or terms == nil then
+    return
+  else
+    for i, v in ipairs(terms) do
+      if v.id == current_term then
+        index = i
+        break
+      end
+    end
+  end
+  local next_index = (index + step - 1) % (#terms) + 1
+  terms[next_index]:focus()
+end
 
-map("t", "<A-d>", "<C-\\><C-n>:FloatermKill<CR>")
+local lazygit = Terminal:new({
+  direction = "float",
+  float_opts = {
+    border = "double",
+  },
+  on_open = function(term)
+    vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
+  end,
+  cmd = "lazygit",
+  hidden = true,
+})
+
+local function _lazygit_toggle()
+  lazygit:toggle()
+end
+
+map("n", "<leader>tn", add_term)
+-- map("n", "<leader>t]", function() cycle_term(1) end)
+-- map("n", "<leader>t[", function() cycle_term(-1) end)
+
+map("n", "<leader>lg", _lazygit_toggle, { noremap = true, silent = true })
+map("n", "<leader>ng", [[<CMD>Neogit<CR>]])
 
 
 -- UndoTree
@@ -95,6 +142,7 @@ map("n", "<leader>b[", ":BufferLineCyclePrev<CR>")
 -- Vista
 map("n", "<leader>tl", ":SymbolsOutline<CR>")
 -- lua require('telescope.builtin')
+--
 --
 local function find_files_from_project_git_root()
   local function is_git_repo()
@@ -151,8 +199,8 @@ map("n", "vaa", '<cmd>STSSelectMasterNode<cr>')
 map("n", "vii", '<cmd>STSSelectCurrentNode<cr>')
 
 -- -- Select Nodes in Visual Mode
--- map("x", "L", '<cmd>STSSelectNextSiblingNode<cr>')
--- map("x", "H", '<cmd>STSSelectPrevSiblingNode<cr>')
+map("x", "L", '<cmd>STSSelectNextSiblingNode<cr>')
+map("x", "H", '<cmd>STSSelectPrevSiblingNode<cr>')
 -- map("x", "K", '<cmd>STSSelectParentNode<cr>')
 -- map("x", "J", '<cmd>STSSelectChildNode<cr>')
 --
@@ -190,5 +238,3 @@ map("n", "<leader>hp", "<cmd>Gitsigns preview_hunk<CR>")
 map("n", "<leader>hb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
 map("n", "<leader>hS", "<cmd>Gitsigns stage_buffer<CR>")
 map("n", "<leader>hU", "<cmd>Gitsigns reset_buffer_index<CR>")
-map("n", "<LEADER>ng", [[<CMD>Neogit<CR>]])
-map("n", "<LEADER>lg", [[<CMD>LazygitToggle<CR>]])
