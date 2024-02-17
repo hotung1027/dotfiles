@@ -23,6 +23,7 @@ tabnine:setup({
     -- uncomment to ignore in lua:
     -- lua = true
   },
+  min_percent = 50,
   show_prediction_strength = true,
 })
 local cmp_kinds = {
