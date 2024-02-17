@@ -1,7 +1,9 @@
 -- local installer_present, installer = pcall(require, "nvim-lsp-installer")
 local installer_present, installer = pcall(require, "mason")
+-- local server_config_present, server_config = pcall(require, "lspconfig")
 local server_config_present, server_config = pcall(require, "mason-lspconfig")
-local lspconfig_present, _ = pcall(require, "lspconfig")
+
+local lspconfig_present, lspconfig = pcall(require, "lspconfig")
 local lspsaga = require("lspsaga")
 if not (lspconfig_present or installer_present or server_config_present) then
   vim.notify("Fail to setup LSP", vim.log.levels.ERROR, { title = 'plugins' })
@@ -19,10 +21,25 @@ local border = {
   { "▏", "FloatBorder" },
 }
 local servers = {
-  "clangd", "lua_ls", "jedi_language_server", "pylsp", "pyright", "julials", 'rust_analyzer',
+  "clangd", "lua_ls", "pyright", "julials", 'rust_analyzer',
 }
 
+local function get_python_path(workspace)
+  -- Use activated virtualenv.
+  if vim.env.VIRTUAL_ENV then
+    return path.join(vim.env.VIRTUAL_ENV, 'bin', 'python')
+  end
 
+  -- Find and use virtualenv from pipenv in workspace directory.
+  local match = vim.fn.glob(path.join(workspace, 'Pipfile'))
+  if match ~= '' then
+    local venv = vim.fn.trim(vim.fn.system('PIPENV_PIPFILE=' .. match .. ' pipenv --venv'))
+    return path.join(venv, 'bin', 'python')
+  end
+
+  -- Fallback to system Python.
+  return vim.fn.exepath('python3') or vim.fn.exepath('python') or 'python'
+end
 
 local lua_setting = {
   Lua = {
@@ -39,6 +56,10 @@ local lua_setting = {
   }
 }
 
+local mojo_setting = {
+
+  cmd = { "mojo-lsp-server" }
+}
 local rust_setting = {
   ['rust_analyzer'] = {
     cargo = {
@@ -80,7 +101,7 @@ local lsp_publish_diagnostics_options = {
 }
 
 require 'lspconfig'.julials.setup {}
-
+require 'lspconfig'.mojo.setup {}
 
 local capabilities = vim.tbl_deep_extend("force",
   vim.lsp.protocol.make_client_capabilities(),
@@ -373,6 +394,7 @@ installer.setup({
     }
   }
 })
+
 server_config.setup({
   ensure_installed = servers,
 })
@@ -395,7 +417,13 @@ server_config.setup_handlers({
       opts.settings = rust_setting
       require("rust-tools").setup({ server = opts })
       run_custom_extern_settings = true
+    elseif server_name == "pyright" then
+      opts["on_init"] =
+          function(client)
+            client.config.settings.python.pythonPath = get_python_path(client.config.root_dir)
+          end
     end
+
 
     if #vim.lsp.buf_get_clients() > 0 then
       -- require('lsp-status').status()

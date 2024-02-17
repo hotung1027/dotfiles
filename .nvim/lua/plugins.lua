@@ -273,31 +273,31 @@ return require('lazy').setup(
     },
 
     -- mulit cursor
-    -- { 'mg979/vim-visual-multi', event = "InsertEnter", branch = 'master' },
-    {
-      "smoka7/multicursors.nvim",
-      config = function()
-        require('multicursors').setup {
-          hint_config = {
-            border = 'rounded',
-            position = 'bottom',
-          },
-          generate_hints = {
-            normal = true,
-            insert = true,
-            extend = true,
-            config = {
-              column_count = 1,
-            },
-          },
-          -- normal_keys = {
-          --   ['<C-I>'] = {
-          --     method = require('multicursors').new_under_cursor,
-          --   }
-          -- }
-        }
-      end
-    },
+    { 'mg979/vim-visual-multi', event = "InsertEnter", branch = 'master' },
+    -- {
+    --   "smoka7/multicursors.nvim",
+    --   config = function()
+    --     require('multicursors').setup {
+    --       hint_config = {
+    --         border = 'rounded',
+    --         position = 'bottom',
+    --       },
+    --       generate_hints = {
+    --         normal = true,
+    --         insert = true,
+    --         extend = true,
+    --         config = {
+    --           column_count = 1,
+    --         },
+    --       },
+    --       -- normal_keys = {
+    --       --   ['<C-I>'] = {
+    --       --     method = require('multicursors').new_under_cursor,
+    --       --   }
+    --       -- }
+    --     }
+    --   end
+    -- },
     {
       'famiu/nvim-reload',
       cmd = { "Reload", "Restart" },
@@ -342,7 +342,7 @@ return require('lazy').setup(
 
 
     -- Undo Histroy
-    { "mbbill/undotree",      cmd = "UndotreeToggle" },
+    { "mbbill/undotree",        cmd = "UndotreeToggle" },
 
     -- Session management plugin
 
@@ -462,13 +462,13 @@ return require('lazy').setup(
     { "hrsh7th/cmp-nvim-lsp",         dependencies = "nvim-cmp" },
 
     -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
-    --[[   {
-    'williamboman/nvim-lsp-installer',
-    ft = {
-      "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
-      "toml", "json", "python", "dart","v","vhdl","verilog"
+    {
+      'williamboman/nvim-lsp-installer',
+      ft = {
+        "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
+        "toml", "json", "python", "dart", "v", "vhdl", "verilog", "mojo"
+      },
     },
-  }, ]]
     {
       "williamboman/mason.nvim"
     },
@@ -695,8 +695,22 @@ return require('lazy').setup(
       config = function() require("config.lang.flutter") end
     },
 
+    ------ Mojo
+    {
+      'czheo/mojo.vim',
+      ft = { "mojo" },
+      init = function()
+        vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+          pattern = { "*.🔥" },
+          callback = function()
+            if vim.bo.filetype ~= "mojo" then
+              vim.bo.filetype = "mojo"
+            end
+          end,
+        })
+      end,
 
-
+    },
 
 
 
