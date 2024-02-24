@@ -1,6 +1,9 @@
-local cmp = require 'cmp'
-local luasnip = require 'luasnip'
+local cmp           = require 'cmp'
+local luasnip       = require 'luasnip'
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+local neogen        = require 'neogen'
+neogen.setup({ snippet_engine = "luasnip" })
+
 local has_words_before = function()
   unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -12,20 +15,31 @@ end
 
 local tabnine = require('cmp_tabnine.config')
 
+-- require('tabnine').setup({
+--   disable_auto_comment = true,
+--   accept_keymap = "<C-TAB>",
+--   dismiss_keymap = "<C-e>",
+--   debounce_ms = 800,
+--   suggestion_color = { gui = "#808080", cterm = 244 },
+--   exclude_filetypes = { "TelescopePrompt", "NvimTree", "Vista", "Terminal" },
+--   log_file_path = nil, -- absolute path to Tabnine log file
+-- })
+
+
+
 tabnine:setup({
-  max_lines = 5000,
-  max_item_count = 10,
+  max_lines = 50000,
+  max_num_results = 20,
   sort = true,
   run_on_every_keystroke = true,
   snippet_placeholder = '..',
   ignored_file_types = {
-    -- default is not to ignore
-    -- uncomment to ignore in lua:
-    -- lua = true
+    TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
   },
-  min_percent = 50,
+  min_percent = 0,
   show_prediction_strength = true,
 })
+
 local cmp_kinds = {
   Text = '  ',
   Method = '  ',
@@ -93,35 +107,37 @@ cmp.setup({
   formatting = {
     fields = { "kind", "abbr", "menu" },
     format = function(entry, vim_item)
-      local kind = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
-      local strings = vim.split(kind.kind, "%s", { trimempty = true })
+      local vim_item = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
+      local strings = vim.split(vim_item.kind, "%s", { trimempty = true })
       if vim.tbl_contains({ 'path' }, entry.source.name) then
         local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
         if icon then
-          kind.kind = icon
-          kind.kind_hl_group = hl_group
+          vim_item.kind = icon
+          vim_item.kind_hl_group = hl_group
         end
       else
-        kind.kind = " " .. (strings[1] or cmp_kinds[vim_item.kind]) .. " "
+        vim_item.kind = " " .. (strings[1] or cmp_kinds[vim_item.kind]) .. " "
       end
       if entry.source.name == "cmp_tabnine" then
         local detail = (entry.completion_item.labelDetails or {}).detail
-        kind.kind = ""
+        vim_item.kind = ""
         if detail and detail:find('.*%%.*') then
-          kind.kind = kind.kind .. ' ' .. detail
+          vim_item.kind = vim_item.kind .. ' ' .. detail
         end
 
         if (entry.completion_item.data or {}).multiline then
-          kind.kind = kind.kind .. ' ' .. '[ML]'
+          vim_item.kind = vim_item.kind .. ' ' .. '[ML]'
         end
       end
       if strings[2] == "Variable" or strings[2] == "Text" then
-        kind.menu = provider[entry.source.name] or ("[" .. (entry.source.name or "") .. "]")
+        vim_item.menu = provider[entry.source.name] or ("[" .. (entry.source.name or "") .. "]")
       else
-        kind.menu = (provider[entry.source.name]) or (
+        vim_item.menu = (provider[entry.source.name]) or (
           "  (" .. (strings[2] or entry.source.name or "") .. ")")
       end
-      return kind
+      local maxwidth = 80
+      vim_item.abbr = string.sub(vim_item.abbr, 1, maxwidth)
+      return vim_item
     end,
   },
 
@@ -131,6 +147,8 @@ cmp.setup({
         cmp.select_prev_item()
       elseif luasnip and luasnip.jumpable(-1) then
         luasnip.jump(-1)
+      elseif neogen.jumpable(1) then
+        neogen.jump_prev()
       else
         fallback()
       end
@@ -140,6 +158,8 @@ cmp.setup({
         cmp.select_next_item()
       elseif luasnip and luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
+      elseif neogen.jumpable() then
+        neogen.jump_next()
       else
         fallback()
       end
@@ -148,15 +168,31 @@ cmp.setup({
       i = cmp.mapping.abort(),
       c = cmp.mapping.close(),
     }),
-    ["<CR>"] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Replace,
-      select = false,
-    },
+    ["<CR>"] = cmp.mapping({
+      i = function(fallback)
+        if cmp.visible() and cmp.get_active_entry() then
+          cmp.confirm {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = false,
+          }
+        else
+          fallback()
+        end
+      end,
+      s = cmp.mapping.confirm({ select = false }),
+      c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
+
+
+    }),
+
+
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip and luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
+      elseif neogen.jumpable() then
+        neogen.jump_next()
       else
         fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
       end
@@ -167,6 +203,8 @@ cmp.setup({
         cmp.select_prev_item()
       elseif luasnip and luasnip.jumpable(-1) then
         luasnip.jump(-1)
+      elseif neogen.jumpable(1) then
+        neogen.jump_prev()
       else
         fallback()
       end
@@ -174,11 +212,11 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 10 },
-    { name = 'nvim_lsp',    priority = 99 },
-    { name = 'luasnip',     priority = 99, },
-    { name = 'treesitter',  priority = 5, },
-    { name = "tags",        priority = 5, },
+    { name = 'cmp_tabnine', priority = 50, keyword_length = 0, },
+    { name = 'nvim_lsp',    priority = 20, max_item_count = 10, },
+    { name = 'luasnip',     priority = 25, },
+    { name = 'treesitter',  priority = 5,  max_item_count = 20, },
+    { name = "tags",        priority = 5,  max_item_count = 20, },
     {
       name = "ctags",
       -- default values
@@ -190,7 +228,7 @@ cmp.setup({
       priority = 5,
     },
 
-    -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
+
     {
       name = 'fuzzy_buffer',
       priority = 5,
@@ -211,7 +249,7 @@ cmp.setup({
       },
       fuzzy_extra_arg = { case_mode = 1 },
       min_match_length = 3,
-
+      max_item_count = 20,
       max_matches = 5,
     },
     {
@@ -222,23 +260,27 @@ cmp.setup({
       keyword_length = 3,
       max_item_count = 3,
     },
-    { name = 'path',                     priority = 3, },
-    { name = 'spell',                    priority = 3, },
-    { name = 'tmux',                     priority = 4, },
-    { name = 'nvim_lsp_document_symbol', priority = 99 },
-    { name = 'nvim_lsp_signature_help',  priority = 99 },
-    { name = "latex_symbols",            trigger_characters = { '\\' }, option = { strategy = 0 }, priority = 10 },
-    { name = "crates" }
+    { name = 'path',          priority = 3, },
+    { name = 'spell',         priority = 3, },
+    { name = 'tmux',          priority = 4, },
+    -- { name = 'nvim_lsp_document_symbol', priority = 10, max_item_count = 10, },
+    -- { name = 'nvim_lsp_signature_help',  priority = 10, max_item_count = 10, },
+    -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
+    { name = "latex_symbols", priority = 10, keyword_length = 2, trigger_characters = { '\\' }, option = { strategy = 0 } },
+    { name = "crates",        priority = 50 }
   },
   performance = {
+    debonce = 1000,
+    -- throttle = 50,
+    fetching_timeout = 500,
+    async_budet = 500,
     max_view_entries = 20,
   },
 
   sorting = {
-    priority_weight = 5,
     comparators = {
-      require("clangd_extensions.cmp_scores"),
       require('cmp_tabnine.compare'),
+      require("clangd_extensions.cmp_scores"),
       require('cmp_fuzzy_buffer.compare'),
       require "cmp-under-comparator".under,
       cmp.config.compare.score,
@@ -250,15 +292,18 @@ cmp.setup({
       cmp.config.compare.length,
       cmp.config.compare.order,
     },
+    priority_weight = 5,
   },
   completion = {
-    keyword_length = 1,
+    -- autocomplete =false ,
+    keyword_length = 0,
     completeopt = "menu,noselect"
   },
   experimental = {
     ghost_text = true
   },
 })
+
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?', ':' }, {
@@ -272,13 +317,8 @@ cmp.setup.cmdline({ '/', '?', ':' }, {
   })
 })
 
--- cmp.setup.cmdline({ ':' }, {
---   mapping = cmp.mapping.preset.cmdline(),
---   source = cmp.config.sources({
---     { name = 'cmdline' },
---     { name = 'path' },
---   })
--- })
+-- config autopairs
+
 
 local handlers = require('nvim-autopairs.completion.handlers')
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({
@@ -313,7 +353,7 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({
 })
 )
 
---[[ cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket" ]]
+-- [[ cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket" ]]
 
 vim.cmd([[
 " gray
@@ -333,6 +373,7 @@ highlight! CmpItemKindKeyword guibg=NONE guifg=#D4D4D4
 highlight! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
 highlight! CmpItemKindUnit guibg=NONE guifg=#D4D4D4
 ]])
+vim.api.nvim_set_hl(0, "CmpItemKindTabNine", { fg = "#6CC644" })
 -- Customization for Pmenu
 vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#282C34", fg = "NONE" })
 vim.api.nvim_set_hl(0, "Pmenu", { fg = "#C5CDD9", bg = "#22252A" })

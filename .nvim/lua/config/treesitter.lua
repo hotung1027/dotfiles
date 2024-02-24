@@ -1,5 +1,4 @@
 local parser_configs = require('nvim-treesitter.parsers').get_parser_configs()
-local sts = require('syntax-tree-surfer')
 require('nvim-treesitter.install').compilers = { "clang", "gcc" }
 require('nvim-treesitter.install').prefer_git = true
 parser_configs.norg = {
@@ -42,7 +41,9 @@ require 'nvim-treesitter.configs'.setup {
     "lua",
     "vim",
     "vimdoc",
-    "comment" },
+    "comment",
+    "pkl",
+  },
   sync_install = false,
   auto_install = true,
   ignore_install = { "javascript" },
@@ -51,6 +52,7 @@ require 'nvim-treesitter.configs'.setup {
     disable = {},
     additional_vim_regex_hightlighting = false,
   },
+
   incremental_selection = {
     enable = true,
 
@@ -72,10 +74,8 @@ require 'nvim-treesitter.configs'.setup {
   textobjects = {
     select = {
       enable = true,
-
       -- Automatically jump forward to textobj, similar to targets.vim
       lookahead = true,
-
       -- keymaps = {
       --   -- You can use the capture groups defined in textobjects.scm
       --   ["af"] = "@function.outer",
@@ -105,35 +105,39 @@ require 'nvim-treesitter.configs'.setup {
     move = {
       enable = true,
       set_jumps = true, -- whether to set jumps in the jumplist
-      -- goto_next_start = {
-      --   ["]m"] = "@function.outer",
-      --   ["]]"] = "@class.outer",
-      -- },
-      -- goto_next_end = {
-      --   ["]M"] = "@function.outer",
-      --   ["]["] = "@class.outer",
-      -- },
-      -- goto_previous_start = {
-      --   ["[m"] = "@function.outer",
-      --   ["[["] = "@class.outer",
-      -- },
-      -- goto_previous_end = {
-      --   ["[M"] = "@function.outer",
-      --   ["[]"] = "@class.outer",
-      -- },
+      goto_next_start = {
+        ["]m"] = "@function.outer",
+        ["]]"] = "@class.outer",
+      },
+      goto_next_end = {
+        ["]M"] = "@function.outer",
+        ["]["] = "@class.outer",
+      },
+      goto_previous_start = {
+        ["[m"] = "@function.outer",
+        ["[["] = "@class.outer",
+      },
+      goto_previous_end = {
+        ["[M"] = "@function.outer",
+        ["[]"] = "@class.outer",
+      },
     },
     lsp_interop = {
       enable = true,
       border = 'none',
-      -- peek_definition_code = {
-      --   ["<leader>df"] = "@function.outer",
-      --   ["<leader>dF"] = "@class.outer",
-      -- },
+      floating_preview_opts = {},
+      peek_definition_code = {
+        ["<leader>df"] = "@function.outer",
+        ["<leader>dF"] = "@class.outer",
+      },
     },
   },
   autotag = {
     enable = true,
-
+    enable_rename = true,
+    enable_close = true,
+    enable_close_on_slash = true,
+    filetypes = {},
   },
   matchup = {
     enable = true,
@@ -159,41 +163,42 @@ require 'nvim-treesitter.configs'.setup {
       -- E.g. whether to delete the angle bracket or whole tag in  <pair> </pair>
     }
   },
+  node_movement = { enable = true,
+    keymaps = {
+      move_up = "<a-k>",
+      move_down = "<a-j>",
+      move_left = "<a-h>",
+      move_right = "<a-l>",
+      swap_left = "<c-a-h>", -- will only swap when one of "swappable_textobjects" is selected
+      swap_right = "<c-a-l>",
+      select_current_node = "<leader><Cr>",
+    },
+    swappable_textobjects = { '@function.inner', '@function.outer', '@parameter.inner', '@statement.outer', '@statement.inner' },
+    allow_switch_parents = true, -- more craziness by switching parents while staying on the same level, false prevents you from accidentally jumping out of a function
+    allow_next_parent = true,    -- more craziness by going up one level if next node does not have children
+  },
+
 }
--- require('treesitter-context').setup(
---   {
---     enable = true,
---
---   }
--- )
-sts.setup({
-  highlight_group = "STS_highlight",
-  disable_no_instance_found_report = false,
-  default_desired_types = {
-    "function",
-    "arrow_function",
-    "function_definition",
-    "if_statement",
-    "else_clause",
-    "else_statement",
-    "elseif_statement",
-    "for_statement",
-    "while_statement",
-    "switch_statement",
-  },
-  left_hand_side = "fdsawervcxqtzb",
-  right_hand_side = "jkl;oiu.,mpy/n",
-  icon_dictionary = {
-    ["if_statement"] = "",
-    ["else_clause"] = "",
-    ["else_statement"] = "",
-    ["elseif_statement"] = "",
-    ["for_statement"] = "ﭜ",
-    ["while_statement"] = "ﯩ",
-    ["switch_statement"] = "ﳟ",
-    ["function"] = "",
-    ["function_definition"] = "",
-    ["variable_declaration"] = "",
-  },
+require('ts_context_commentstring').setup({
+  eanble_autocmd = false,
 })
-require("tsht").config.hint_keys = { "h", "j", "f", "d", "n", "v", "s", "l", "a" }
+require('Comment').setup {
+  pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+}
+
+require('treesitter-context').setup(
+  {
+    enable = true,            -- Enable this plugin (Can be enabled/disabled later via commands)
+    max_lines = 0,            -- How many lines the window should span. Values <= 0 mean no limit.
+    min_window_height = 0,    -- Minimum editor window height to enable context. Values <= 0 mean no limit.
+    line_numbers = true,
+    multiline_threshold = 20, -- Maximum number of lines to show for a single context
+    trim_scope = 'outer',     -- Which context lines to discard if `max_lines` is exceeded. Choices: 'inner', 'outer'
+    mode = 'cursor',          -- Line used to calculate context. Choices: 'cursor', 'topline'
+    -- Separator between context and content. Should be a single character string, like '-'.
+    -- When separator is set, the context will only show up when there are at least 2 lines above cursorline.
+    separator = nil,
+    zindex = 20,     -- The Z-index of the context window
+    on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching  }
+  }
+)

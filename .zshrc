@@ -34,7 +34,13 @@ export SURF_HOME="$HOME/.local/share/surf"
 export YARN_HOME="$HOME/.yarn"
 export CUDA_HOME="/usr/local/cuda"
 export DPCPP_HOME="$HOME/sycl_workspace"
-export PATH="$UE_HOME/Engine/Binary/Linux:$DPCPP_HOME/llvm/build/bin:$CUDA_HOME/bin:$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
+
+# VULKAN SDK
+export VULKAN_SDK="$HOME/VulkanSDK/1.3.216/macOS"
+export VK_ICD_FILENAMES=$VULKAN_SDK/etc/vulkan/icd.d/MoltenVK_icd.json
+export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
+
+export PATH="$VULKAN_SKD/bin:$UE_HOME/Engine/Binary/Linux:$DPCPP_HOME/llvm/build/bin:$CUDA_HOME/bin:$YARN_HOME/bin:$SURF_HOME/:$DENO_INSTALL/bin:$KITTY_HOME/kitty/launcher:$JAVA_HOME/bin:$LOCAL/bin:$JULIA_HOME/bin:$ROCM_HOME/bin:$ROCM_HOME/rocprofiler/bin:$ROCM_HOME/opencl/bin:$PATH"
 source $HOME/.cargo/env
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -46,7 +52,7 @@ export GVM_DIR="$HOME/.gvm"
 source "$GVM_DIR/scripts/gvm"
 
 
-export LD_LIBRARY_PATH="$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$VULKAN_SDK/lib:$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -119,7 +125,7 @@ export FZF_COMPLETION_TRIGGER='?'
 # export FZF_DEFAULT_OPTS='--algo=v2'
 # Options to fzf command
 export FZF_COMPLETION_OPTS='--border --info=inline'
-
+export FZF_BASE="/opt/homebrew/bin/fzf"
 export RG_PREFIX="rg --column --line-number --no-heading --color=always --smart-case "
 export INITIAL_QUERY=""
 export FZF_DEFAULT_COMMAND="$RG_PREFIX '$INITIAL_QUERY' fzf --bind 'change:reload:$RG_PREFIX {q} || true' --ansi --phony --query '$INITIAL_QUERY'"

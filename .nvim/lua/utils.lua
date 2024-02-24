@@ -37,6 +37,69 @@ M.executable = function(name)
   return false
 end
 
+function M.exists(list, val)
+  local set = {}
+  for _, l in ipairs(list) do
+    set[l] = true
+  end
+  return set[val]
+end
+
+function M.log(msg, hl, name)
+  name = name or "Neovim"
+  hl = hl or "Todo"
+  vim.api.nvim_echo({ { name .. ": ", hl }, { msg } }, true, {})
+end
+
+function M.warn(msg, name)
+  vim.notify(msg, vim.log.levels.WARN, { title = name })
+end
+
+function M.error(msg, name)
+  vim.notify(msg, vim.log.levels.ERROR, { title = name })
+end
+
+function M.info(msg, name)
+  vim.notify(msg, vim.log.levels.INFO, { title = name })
+end
+
+function M.is_empty(s)
+  return s == nil or s == ""
+end
+
+function M.get_buf_option(opt)
+  local status_ok, buf_option = pcall(vim.api.nvim_buf_get_option, 0, opt)
+  if not status_ok then
+    return nil
+  else
+    return buf_option
+  end
+end
+
+function M.quit()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local modified = vim.api.nvim_buf_get_option(bufnr, "modified")
+  if modified then
+    vim.ui.input({
+      prompt = "You have unsaved changes. Quit anyway? (y/n) ",
+    }, function(input)
+      if input == "y" then
+        vim.cmd "q!"
+      end
+    end)
+  else
+    vim.cmd "q!"
+  end
+end
+
+function M.get_repo_name()
+  if
+      #vim.api.nvim_list_tabpages() > 1 and vim.fn.trim(vim.fn.system "git rev-parse --is-inside-work-tree") == "true"
+  then
+    return vim.fn.trim(vim.fn.system "basename `git rev-parse --show-toplevel`")
+  end
+  return ""
+end
 
 M.log_err = function(msg, title)
   vim.notify(msg, vim.log.levels.ERROR, { title = title })
@@ -60,6 +123,8 @@ local function setup_plugins_before_loaded()
     vim.g.did_load_filetypes = 1
   end
 end
+
+
 
 M.load_plugins = function()
   -- detecting plugin manager
@@ -86,6 +151,10 @@ M.load_plugins = function()
   local ok, error = pcall(require, 'plugins')
   if not ok then
     M.log_err("Load plugins: " .. error, "load plugins")
+  end
+  local ok, err = pcall(require, "impatient")
+  if not ok then
+    M.log_err("Load Cached plugins: " .. error, "load plugins")
   end
 
   vim.cmd([[autocmd BufWritePost plugins.lua source <afile> ]])

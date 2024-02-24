@@ -2,21 +2,60 @@
 local utils = require("utils")
 local fn = vim.fn
 local map = require('utils').map
-
+vim.cmd([[packadd termdebug]])
 -- Only required if you have packer configured as `opt`
-
+local function tabnine_build_path()
+  if vim.loop.os_uname().sysname == "Windows_NT" then
+    return "pwsh.exe -file .\\dl_binaries.ps1"
+  else
+    return "./dl_binaries.sh"
+  end
+end
 
 return require('lazy').setup(
   {
     --================ NVIM PACKAGE MANAGER ==================================
     -- Packer can manage itself
-    { 'wbthomason/packer.nvim',      event = "VimEnter" },
+    { 'wbthomason/packer.nvim',  event = "VimEnter" },
+    { 'lewis6991/impatient.nvim' },
+    {
+      "camspiers/luarocks",
+      dependencies = {
+        "rcarriga/nvim-notify", -- Optional dependency
+      },
+      opts = {
+        rocks = { "openssl", "lua-http-parser" } -- Specify LuaRocks packages to install
+      },
+    },
+    -- { 'nvim-neorocks/rocks.nvim' },
+    -- ============  Mini Nvim ==============================
+    -- Modules with default settings
+    {
+      'echasnovski/mini.nvim',
+      version = 'false',
+      config = function()
+        local modules = {
+          'mini.starter',
+          'mini.bufremove',
+
+        }
+        for _, module in ipairs(modules) do
+          require(module).setup()
+        end
+      end
+    },
+
+    { 'echasnovski/mini.surround',   version = '*',    opts = { search_method = 'cover_or_nearest' } },
 
     -- Plugin management
     { 'folke/neodev.nvim' },
     --=================== EDITOR SETUP ================================
     -- More Icons
     { 'nvim-tree/nvim-web-devicons', event = "BufRead" },
+    {
+      "ahmedkhalf/project.nvim",
+      config = function() require('project_nvim').setup() end
+    },
     --  specific branch, dependency and build lua file after load
 
     -- Status line
@@ -37,6 +76,7 @@ return require('lazy').setup(
       config = function() require("config.bufferline") end,
       event = "BufEnter"
     },
+    { 'ThePrimeagen/harpoon' },
     -- more symbols
     {
       'simrat39/symbols-outline.nvim',
@@ -84,6 +124,7 @@ return require('lazy').setup(
     {
       'alexghergh/nvim-tmux-navigation'
     },
+    -- { 'otavioschwanck/tmux-awesome-manager.nvim',   config = function() require("config.term") end },
     -- Visual Guide
     --
     {
@@ -100,6 +141,7 @@ return require('lazy').setup(
       "numToStr/Comment.nvim",
       config = function() require("config.comment") end,
     },
+    { "JoosepAlviste/nvim-ts-context-commentstring" },
     -- Float Terminal
     {
       'akinsho/toggleterm.nvim',
@@ -131,6 +173,7 @@ return require('lazy').setup(
     },
     ---- === Searching =======
     { 'nvim-lua/plenary.nvim' },
+    { 'nvim-pack/nvim-spectre' },
     {
       'nvim-telescope/telescope.nvim',
       dependencies = { 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim' },
@@ -185,6 +228,11 @@ return require('lazy').setup(
       config = function() require('telescope').load_extension('hoogle') end,
     },
     {
+      'nvim-telescope/telescope-arecibo.nvim',
+      opts = { rocks = { 'openssl', 'lua-http-parser' } },
+      -- rocks = { 'openssl', 'lua-http-parser' }
+    },
+    {
       'crispgm/telescope-heading.nvim',
 
       config = function() require('telescope').load_extension('heading') end,
@@ -236,11 +284,11 @@ return require('lazy').setup(
       opts = {
         extras = {
           named_parameters = true,
-        },
-        config = function()
-          require('hlargs').setup()
-        end
-      }
+        }
+      },
+      config = function()
+        require('hlargs').setup()
+      end
     },
     -- Show match number for search
     {
@@ -255,11 +303,6 @@ return require('lazy').setup(
       event = "VimEnter",
       config = function() require('config.hop') end
     },
-    {
-      "mfussenegger/nvim-treehopper",
-    },
-    -- { 'ripxorip/aerojump.nvim' },
-    -- Better Escape
     {
       "max397574/better-escape.nvim",
       config = function()
@@ -391,6 +434,7 @@ return require('lazy').setup(
     -- notification plugin
     { 'nvim-lua/popup.nvim' },
     { 'anuvyklack/hydra.nvim' },
+    { 'doums/suit.nvim',      config = true },
     {
       "rcarriga/nvim-notify",
       event = "BufEnter",
@@ -403,7 +447,7 @@ return require('lazy').setup(
     -- showing keybindings
     {
       "folke/which-key.nvim",
-      event = "VimEnter",
+      event = "VeryLazy",
       config = function() require('config.which-key') end
     },
 
@@ -438,6 +482,7 @@ return require('lazy').setup(
     { "tzachar/cmp-fuzzy-buffer",             dependencies = { "hrsh7th/nvim-cmp", 'tzachar/fuzzy.nvim' }, },
     { "lukas-reineke/cmp-rg",                 dependencies = { "hrsh7th/nvim-cmp" }, },
     { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  dependencies = { "hrsh7th/nvim-cmp" }, },
+    { 'codota/tabnine-nvim',                  build = tabnine_build_path },
     { "lukas-reineke/cmp-under-comparator",   dependencies = { "hrsh7th/nvim-cmp" }, },
     { "ray-x/cmp-treesitter",                 dependencies = { "hrsh7th/nvim-cmp" }, },
     { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { "hrsh7th/nvim-cmp" }, },
@@ -453,8 +498,15 @@ return require('lazy').setup(
       dependencies = "lspkind-nvim",
       config = function() require('config.nvim-cmp') end
     },
+    -- doc string generation
 
-
+    {
+      "danymat/neogen",
+      dependencies = "nvim-treesitter/nvim-treesitter",
+      config = true,
+      -- Uncomment next line if you want to follow only stable versions
+      version = "*"
+    },
     -- lsp completion sources
     --     {'prabirshrestha/vim-lsp'},
     --    {'mattn/vim-lsp-settings'},
@@ -535,6 +587,7 @@ return require('lazy').setup(
       event = "FileType qf",
       config = function() require('config.bqf') end
     },
+    { 'gabrielpoca/replacer.nvim' },
     -- Autoformat tools
     --  { "sbdchd/neoformat", cmd = { "Neoformat" }, config = function() require('config.formatter') end },
     { 'mhartington/formatter.nvim' },
@@ -548,7 +601,7 @@ return require('lazy').setup(
     {
       'nvim-treesitter/nvim-treesitter',
       build = ':TSUpdate',
-      ft = { "cpp", "toml", "rust", "go", "json", "lua", "fish", "c", 'h', 'hpp', 'haskell', 'python', 'dart' },
+      ft = { "cpp", "toml", "rust", "go", "json", "lua", "fish", "c", 'h', 'hpp', 'haskell', 'python', 'dart', 'pkl' },
       config = function() require('config.treesitter') end,
     },
     {
@@ -564,8 +617,9 @@ return require('lazy').setup(
     },
     { 'theHamsta/nvim-treesitter-pairs' },
     { 'RRethy/nvim-treesitter-endwise' },
-    { 'ziontee113/syntax-tree-surfer' },
-
+    -- { 'ziontee113/syntax-tree-surfer' },
+    { "theHamsta/crazy-node-movement" },
+    { 'apple/pkl-neovim' },
     -- You can specify multiple plugins in a single call
     { 'tjdevries/colorbuddy.vim',                   dependencies = 'nvim-treesitter' },
 
@@ -576,26 +630,24 @@ return require('lazy').setup(
       config = function() require('config.autopairs') end
     },
 
-    {
-      "machakann/vim-sandwich"
-    },
     -- Select text object
     { 'gcmt/wildfire.vim',    event = "BufRead" },
 
     -- surrounding select text with given text
-    { "tpope/vim-surround",   dependencies = "wildfire.vim" },
+    -- { "tpope/vim-surround",   dependencies = "wildfire.vim" },
+    -- {      "machakann/vim-sandwich"    },
 
     -- Automatic insertion and deletion of a pair of characters
     { "Raimondi/delimitMate", event = "InsertEnter" },
 
     {
       'andymass/vim-matchup',
-      init = function() vim.g.matchup_matchparen_offscreen = { method = "status" } end,
+      init = function() vim.g.matchup_matchparen_offscreen = { method = "popup" } end,
     },
 
     -- Additional powerful text object for vim, this plugin should be studied
     -- carefully to  its full power
-    { "wellle/targets.vim",         event = "VimEnter" },
+    { "wellle/targets.vim",             event = "VimEnter" },
     --  {
     -- "nvim-neorg/neorg",
     -- config = function()
@@ -638,32 +690,37 @@ return require('lazy').setup(
 
       main = "dapui",
     },
-    { "sakhnik/nvim-gdb",           build = { "bash install.sh" },   lazy = true, },
+    { "sakhnik/nvim-gdb",               build = { "bash install.sh" }, lazy = true, },
+    { "theHamsta/nvim-dap-virtual-text" },
 
     -- ======================== buildner =====================
     { 'skywind3000/asynctasks.vim' },
     { 'skywind3000/asyncrun.vim' },
-
+    { 'stevearc/overseer.nvim',         opts = {},                     config = function() require("config.task") end },
 
     -- ===================== Build Tools ==================================
 
-    { 'tpope/vim-dispatch',         lazy = true,                     cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
+    { 'tpope/vim-dispatch',             lazy = true,                   cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
 
 
 
     -- =================== Language Specific =============================
 
     -- C/CPP
+    {
+      'Civitasv/cmake-tools.nvim',
+      dependencies = { 'stevearc/overseer.nvim' },
+      opts = {},
+      version = 'b7554dd2aeb436'
+    },
     { 'rhysd/vim-clang-format',     ft = { 'cpp', 'c', 'h', 'hpp' }, },
     { 'p00f/clangd_extensions.nvim' },
     -- Rust
     { "rust-lang/rust.vim",         ft = { 'rust' },                 config = function() vim.g.rustfmt_autorsave = 1 end },
     {
-      "simrat39/rust-tools.nvim",
+      'simrat39/rust-tools.nvim',
+      version = '*', -- Recommended
       ft = { 'rust' },
-      config = function()
-        require('rust-tools').setup()
-      end
     },
     {
       'saecki/crates.nvim',
@@ -713,10 +770,13 @@ return require('lazy').setup(
     },
 
 
+    ---- === Macro =======
+    { 'ecthelionvi/NeoComposer.nvim' },
 
-
-
-
+    -- ===== Docker =================================================================
+    { "kkvh/vim-docker-tools" },
+    { "jamestthompson3/nvim-remote-containers" },
+    { 'jamestthompson3/nvim-remote-containers' },
 
 
 
@@ -727,24 +787,46 @@ return require('lazy').setup(
     -- Since tmux is only available on Linux and Mac, we only enable these plugins
     -- for Linux and Mac
     -- .tmux.conf syntax highlighting and setting check
-    { "tmux-plugins/vim-tmux",    ft = { "tmux" }, },
+    { "tmux-plugins/vim-tmux",                 ft = { "tmux" }, },
 
     -- ======================= GIT ================================
     -- Better git commit experience
-    { "rhysd/committia.vim",      lazy = true },
+    { "rhysd/committia.vim",                   lazy = true },
+    { 'akinsho/git-conflict.nvim',             version = "*",   config = true },
     -- git information
     {
       'lewis6991/gitsigns.nvim',
       dependencies = { 'nvim-lua/plenary.nvim' },
       config = function() require("config.gitsign") end
     },
+    {
+      "wintermute-cell/gitignore.nvim",
+      dependencies = {
+        "nvim-telescope/telescope.nvim" -- optional: for multi-select
+      }
+    },
 
 
     -- Git command inside vim
-    -- { "tpope/vim-fugitive", event = "r InGitRepo" },
+    { "tpope/vim-fugitive",               ft = "Git" },
 
     -- Better git log display
-    { "rbong/vim-flog",                   dependencies = "tpope/vim-fugitive", cmd = { "Flog" }, },
+    {
+      "rbong/vim-flog",
+      lazy = true,
+      cmd = { "Flog", "Flogsplit", "Floggit" },
+      dependencies = {
+        "tpope/vim-fugitive",
+      },
+    },
+    {
+      'tanvirtin/vgit.nvim',
+      dependencies = {
+        'nvim-lua/plenary.nvim'
+      },
+      config = function() require("vgit").setup() end
+    },
+
 
     {
       'TimUntersberger/neogit',
@@ -791,9 +873,16 @@ return require('lazy').setup(
       end,
 
     },
+    -- { 'KabbAmine/zeavim.vim' },
+    {
+      'mrjones2014/dash.nvim',
+      build = 'make install',
+    },
     -- Mark Down Plugins
     -- Another markdown plugin
     { "plasticboy/vim-markdown",          ft = { "markdown" }, },
+    { 'vim-pandoc/vim-pandoc' },
+    { 'vim-pandoc/vim-pandoc-syntax' },
 
     -- Faster footnote generation
     { "vim-pandoc/vim-markdownfootnotes", ft = { "markdown" }, },
