@@ -243,7 +243,7 @@ end
 
 map('n', '<C-f>', hop_pattern_with_call_back, {})
 
-map("n", "m", "<cmd>HopWord<CR>")
+map("n", "<leader>m", "<cmd>HopWord<CR>")
 -- Git
 --[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
 map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns mrev_hunk<CR>'") ]]
