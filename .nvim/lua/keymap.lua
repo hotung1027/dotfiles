@@ -243,7 +243,7 @@ end
 
 map('n', '<C-f>', hop_pattern_with_call_back, {})
 
-map("n", "m", "<cmd>HopWord<CR>")
+map("n", "<leader>m", "<cmd>HopWord<CR>")
 -- Git
 --[[ map("n", "]c", "&diff ? ']c' : '<cmd>Gitsigns next_hunk<CR>'")
 map("n", "[c", "&diff ? '[c' : '<cmd>Gitsigns mrev_hunk<CR>'") ]]
@@ -282,6 +282,7 @@ local function normal_keymap()
     j = { require('telescope.builtin').current_buffer_fuzzy_find, "buffer" },
     q = { require('telescope.builtin').quickfixhistory, "Quick Fix" },
     r = { "<cmd>OverseerRun<CR>", "Task Runner" },
+    d = { "<cmd>TodoTelescope<CR>", "TODO Telescope" }
 
   }
 

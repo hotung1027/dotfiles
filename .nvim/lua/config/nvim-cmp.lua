@@ -270,8 +270,8 @@ cmp.setup({
     { name = "crates",        priority = 50 }
   },
   performance = {
-    debonce = 1000,
-    -- throttle = 50,
+    debonce = 2000,
+    throttle = 50,
     fetching_timeout = 500,
     async_budet = 500,
     max_view_entries = 20,

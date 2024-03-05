@@ -142,6 +142,12 @@ return require('lazy').setup(
       config = function() require("config.comment") end,
     },
     { "JoosepAlviste/nvim-ts-context-commentstring" },
+    ---- TO-DO Highlight
+    {
+      "folke/todo-comments.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      opts = {}
+    },
     -- Float Terminal
     {
       'akinsho/toggleterm.nvim',
@@ -578,7 +584,17 @@ return require('lazy').setup(
     -- },
     -- async tags generation
     --  { 'jsfaint/gen_tags.vim' },
-
+    -- Code ;Refactoring
+    {
+      "ThePrimeagen/refactoring.nvim",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-treesitter/nvim-treesitter",
+      },
+      config = function()
+        require("refactoring").setup()
+      end,
+    },
 
 
     -- Quick Fix Preview
@@ -631,14 +647,14 @@ return require('lazy').setup(
     },
 
     -- Select text object
-    { 'gcmt/wildfire.vim',    event = "BufRead" },
+    { 'gcmt/wildfire.vim',     event = "BufRead" },
 
     -- surrounding select text with given text
-    -- { "tpope/vim-surround",   dependencies = "wildfire.vim" },
-    -- {      "machakann/vim-sandwich"    },
+    { "tpope/vim-surround",    dependencies = "wildfire.vim" },
+    { "machakann/vim-sandwich" },
 
     -- Automatic insertion and deletion of a pair of characters
-    { "Raimondi/delimitMate", event = "InsertEnter" },
+    { "Raimondi/delimitMate",  event = "InsertEnter" },
 
     {
       'andymass/vim-matchup',
@@ -711,7 +727,8 @@ return require('lazy').setup(
       'Civitasv/cmake-tools.nvim',
       dependencies = { 'stevearc/overseer.nvim' },
       opts = {},
-      version = 'b7554dd2aeb436'
+      version = '*',
+      commit = 'aba5b805082b3c1027ac4f5051b84c61989c34c8',
     },
     { 'rhysd/vim-clang-format',     ft = { 'cpp', 'c', 'h', 'hpp' }, },
     { 'p00f/clangd_extensions.nvim' },
@@ -873,11 +890,12 @@ return require('lazy').setup(
       end,
 
     },
-    -- { 'KabbAmine/zeavim.vim' },
-    {
-      'mrjones2014/dash.nvim',
-      build = 'make install',
-    },
+    { 'KabbAmine/zeavim.vim' },
+
+    -- {
+    --   'mrjones2014/dash.nvim',
+    --   build = 'make install',
+    -- },
     -- Mark Down Plugins
     -- Another markdown plugin
     { "plasticboy/vim-markdown",          ft = { "markdown" }, },
