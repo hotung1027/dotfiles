@@ -282,6 +282,7 @@ local function normal_keymap()
     j = { require('telescope.builtin').current_buffer_fuzzy_find, "buffer" },
     q = { require('telescope.builtin').quickfixhistory, "Quick Fix" },
     r = { "<cmd>OverseerRun<CR>", "Task Runner" },
+    d = { "<cmd>TodoTelescope<CR>", "TODO Telescope" }
 
   }
 
