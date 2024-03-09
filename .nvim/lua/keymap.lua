@@ -299,15 +299,15 @@ local function normal_keymap()
     -- ["t"] = { "<cmd>ToggleTerm<CR>", "Terminal" },
 
 
-    -- b = {
-    --   name = "Buffer",
-    --   c = { "<Cmd>BDelete this<Cr>", "Close Buffer" },
-    --   f = { "<Cmd>bdelete!<Cr>", "Force Close Buffer" },
-    --   D = { "<Cmd>BWipeout other<Cr>", "Delete All Buffers" },
-    --   b = { "<Cmd>BufferLinePick<Cr>", "Pick a Buffer" },
-    --   p = { "<Cmd>BufferLinePickClose<Cr>", "Pick & Close a Buffer" },
-    --   m = { "<Cmd>JABSOpen<Cr>", "Menu" },
-    -- },
+    b = {
+      name = "Buffer",
+      q = { "<Cmd>BDelete this<Cr>", "Close Buffer" },
+      Q = { "<Cmd>bdelete!<Cr>", "Force Close Buffer" },
+      -- D = { "<Cmd>BWipeout other<Cr>", "Delete All Buffers" },
+      p = { "<Cmd>BufferLinePick<Cr>", "Pick a Buffer" },
+      d = { "<Cmd>BufferLinePickClose<Cr>", "Pick & Close a Buffer" },
+      -- m = { "<Cmd>JABSOpen<Cr>", "Menu" },
+    },
 
     c = {
       name = "Code",
