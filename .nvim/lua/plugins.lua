@@ -808,7 +808,7 @@ return require('lazy').setup(
 
 
     -- Git command inside vim
-    { "tpope/vim-fugitive",               ft = "Git" },
+    { "tpope/vim-fugitive",          ft = "Git" },
 
     -- Better git log display
     {
@@ -880,10 +880,20 @@ return require('lazy').setup(
     },
     -- Mark Down Plugins
     -- Another markdown plugin
-    { "plasticboy/vim-markdown",          ft = { "markdown" }, },
+    { "plasticboy/vim-markdown",     ft = { "markdown" }, },
     { 'vim-pandoc/vim-pandoc' },
     { 'vim-pandoc/vim-pandoc-syntax' },
-
+    {
+      "jalvesaq/cmp-zotcite",
+      config = function()
+        require 'cmp_zotcite'.setup({
+          filetypes = { "pandoc", "markdown", "rmd", "quarto", "tex" }
+        })
+      end
+    },
+    {
+      "micangl/cmp-vimtex",
+    },
     -- Faster footnote generation
     { "vim-pandoc/vim-markdownfootnotes", ft = { "markdown" }, },
     -- Quick notes
@@ -925,7 +935,7 @@ return require('lazy').setup(
       },
     },
     -- Vim tabular plugin for manipulate tabular, required by markdown plugins
-    { "godlygeek/tabular", cmd = { "Tabularize" }, },
+    { "godlygeek/tabular",                cmd = { "Tabularize" }, },
 
   }
 )

@@ -131,6 +131,15 @@ vim.api.nvim_create_autocmd({ 'User' }, {
     require('nvim-tree.api').tree.toggle(false, true)
   end,
 })
+-- local lazy_nvim = vim.api.nvim_create_augroup('lazy_nvim', {})
+vim.api.nvim_create_autocmd({ 'User' }, {
+  pattern = "LazyUpdate",
+  group = sessions,
+  callback = function()
+    vim.cmd("Lazy")
+    vim.cmd("SessionRestore")
+  end,
+})
 -- Auto save session
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   callback = function()
@@ -160,7 +169,8 @@ vim.api.nvim_create_autocmd('BufRead', {
 })
 
 local nvim_cmp = vim.api.nvim_create_augroup("nvim-cmp", { clear = true })
-vim.api.nvim_create_autocmd({ 'CursorHoldI', 'TextChangedP' }, {
+
+vim.api.nvim_create_autocmd({ 'CursorHoldI' }, {
   group = nvim_cmp,
   callback = function()
     local cmp = require('cmp')
@@ -168,21 +178,47 @@ vim.api.nvim_create_autocmd({ 'CursorHoldI', 'TextChangedP' }, {
     local cursor = vim.api.nvim_win_get_cursor(0)[2]
 
     --
-    local current = string.sub(current_line, cursor, cursor + 1)
-    if current == "." or current == "," then
-      cmp.close()
+    -- local current = string.sub(current_line, cursor, cursor + 1)
+    -- if current == "." or current == "," then
+    --   cmp.close()
+    -- end
+    -- local has_words_before = function()
+    --   unpack = unpack or table.unpack
+    --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    --   return col ~= 0 and
+    --       vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+    -- end
+
+    local before_line = string.sub(current_line, 1, cursor + 1)
+    -- local after_line = string.sub(current_line, cursor + 1, -1)
+    -- if not string.match(before_line, '^%s+$') then
+    if string.match(before_line, "$") or #before_line == 0 then
+      cmp.complete()
     end
+  end
+
+})
+vim.api.nvim_create_autocmd({ 'TextChangedP' }, {
+  group = nvim_cmp,
+  callback = function()
+    local cmp = require('cmp')
+    local current_line = vim.api.nvim_get_current_line()
+    local cursor = vim.api.nvim_win_get_cursor(0)[2]
+
     local has_words_before = function()
       unpack = unpack or table.unpack
       local line, col = unpack(vim.api.nvim_win_get_cursor(0))
       return col ~= 0 and
           vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
     end
-
+    local current = string.sub(current_line, cursor, cursor + 1)
+    if current == "." or current == "," then
+      cmp.close()
+    end
     local before_line = string.sub(current_line, 1, cursor + 1)
     local after_line = string.sub(current_line, cursor + 1, -1)
     -- if not string.match(before_line, '^%s+$') then
-    if after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") then
+    if after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") or has_words_before() then
       cmp.complete()
     end
   end

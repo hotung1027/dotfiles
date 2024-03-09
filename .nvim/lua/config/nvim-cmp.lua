@@ -16,7 +16,7 @@ end
 local tabnine = require('cmp_tabnine.config')
 
 -- require('tabnine').setup({
---   disable_auto_comment = true,
+--   disable_auto_comment = false,
 --   accept_keymap = "<C-TAB>",
 --   dismiss_keymap = "<C-e>",
 --   debounce_ms = 800,
@@ -29,15 +29,15 @@ local tabnine = require('cmp_tabnine.config')
 
 tabnine:setup({
   max_lines = 50000,
-  max_num_results = 20,
-  sort = true,
+  max_num_results = 100,
+  sort = false,
   run_on_every_keystroke = true,
   snippet_placeholder = '..',
   ignored_file_types = {
     TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
   },
   min_percent = 0,
-  show_prediction_strength = true,
+  show_prediction_strength = false,
 })
 
 local cmp_kinds = {
@@ -214,10 +214,10 @@ cmp.setup({
 
   sources = {
     { name = 'cmp_tabnine', priority = 7,  keyword_length = 0, },
-    { name = 'nvim_lsp',    priority = 5,  max_item_count = 10, },
+    { name = 'nvim_lsp',    priority = 5,  max_item_count = 20, },
     { name = 'luasnip',     priority = 10, },
-    { name = 'treesitter',  priority = 4,  max_item_count = 20, },
-    { name = "tags",        priority = 3,  max_item_count = 20, },
+    { name = 'treesitter',  priority = 5,  max_item_count = 20, },
+    { name = "tags",        priority = 5,  max_item_count = 20, },
     {
       name = "ctags", -- default values
       option = {
@@ -227,12 +227,13 @@ cmp.setup({
       },
       priority = 3,
     },
-    { name = 'cmp_zotcite', priority = 3, trigger_characters = { '@' } },
-    { name = 'vimtex',      priority = 3 },
+    { name = 'cmp_zotcite', priority = 6, trigger_characters = { '@' } },
+    { name = 'vimtex',      priority = 6 },
 
     {
       name = 'buffer',
-      priority = 4,
+      priority = 5,
+      max_item_count = 20,
       option = {
         get_bufnrs = function()
           local bufs = {}
@@ -315,11 +316,11 @@ cmp.setup({
     { name = "crates",        priority = 10 }
   },
   performance = {
-    debonce = 500,
-    throttle = 100,
-    fetching_timeout = 1000,
-    async_budet = 1000,
-    max_view_entries = 100,
+    debonce = 1000,
+    throttle = 50,
+    fetching_timeout = 200,
+    async_budet = 200,
+    max_view_entries = 30,
   },
 
   sorting = {
@@ -337,7 +338,7 @@ cmp.setup({
       cmp.config.compare.length,
       cmp.config.compare.order,
     },
-    priority_weight = 2,
+    priority_weight = 1,
   },
   completion = {
     -- autocomplete = true,
