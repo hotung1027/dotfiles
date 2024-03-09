@@ -359,13 +359,13 @@ local on_attach = function(client, bufnr)
   --
   -- Set some keybinds conditional on server capabilities
   if client.server_capabilities.documentFormattingProvider then
-    buf_set_keymap("n", "<leader>m", "<cmd>lua vim.lsp.buf.format()<CR>",
+    buf_set_keymap("n", "<leader>gm", "<cmd>lua vim.lsp.buf.format()<CR>",
       opts)
     vim.cmd([[
       autocmd BufWritePre <buffer> lua vim.lsp.buf.format({aysnc = false, timeout_ms = 1000})
     ]])
   elseif client.server_capabilities.document_range_formatting then
-    buf_set_keymap("x", "<leader>m",
+    buf_set_keymap("x", "<leader>gm",
       "<cmd>lua vim.lsp.buf.format()<CR>", opts)
   end
   vim.o.updatetime = 250
