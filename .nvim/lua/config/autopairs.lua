@@ -12,7 +12,7 @@ npairs.setup({
     lua = { 'string' }, -- it will not add pair on that treesitter node
   },
   fast_wrap = {
-    map = '<M-e>',
+    map = '<A-e>',
     chars = { '{', '[', '(', '"', "'" },
     pattern = string.gsub([[ [%'%"%)%>%]%)%}%,] ]], '%s+', ':'),
     offset = 0, -- Offset from pattern match
@@ -22,7 +22,7 @@ npairs.setup({
     highlight = 'Search',
     highlight_grey = 'Comment'
   },
-  enable_check_bracket_line = true,
+  enable_check_bracket_line = false,
   ignored_next_char = "[%w%.]",
   diable_filetype = {
     "TelescopePrompt", "guihua"
@@ -107,14 +107,13 @@ npairs.add_rules({
 )
 npairs.add_rules({
   Rule('%', '%', { "lua" })
-      :with_pair(ts_conds.is_ts_node({ 'string', 'comment' }))
-}
-)
-npairs.add_rules({
+      :with_pair(ts_conds.is_ts_node({ 'string', 'comment' })),
   Rule('$', '$', { 'lua' })
       :with_pair(ts_conds.is_not_ts_node({ 'function' }))
+
 }
 )
+
 npairs.add_rules({
   Rule('=', '', { "cpp", "rust", "go", "lua" })
       :with_pair(cond.not_inside_quote())

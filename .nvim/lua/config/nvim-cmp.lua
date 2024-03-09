@@ -83,6 +83,8 @@ local provider = {
   path = "[PATH]",
   spell = "[Grammar]",
   tmux = "[Tmux]",
+  vimtex = "[Tex]",
+  cmp_zotcite = "[Cite]",
   nvim_lsp_document_symbol = "[Symbol]",
   nvim_lsp_signature_help = "[Signature]",
   cmdline = "[CMD]",
@@ -175,6 +177,7 @@ cmp.setup({
             behavior = cmp.ConfirmBehavior.Replace,
             select = false,
           }
+          neogen.jump_next()
         else
           fallback()
         end
@@ -184,8 +187,6 @@ cmp.setup({
 
 
     }),
-
-
     ["<Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -212,14 +213,13 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 5,  keyword_length = 0, },
+    { name = 'cmp_tabnine', priority = 7,  keyword_length = 0, },
     { name = 'nvim_lsp',    priority = 5,  max_item_count = 10, },
     { name = 'luasnip',     priority = 10, },
     { name = 'treesitter',  priority = 4,  max_item_count = 20, },
     { name = "tags",        priority = 3,  max_item_count = 20, },
     {
-      name = "ctags",
-      -- default values
+      name = "ctags", -- default values
       option = {
         executable = "ctags",
         trigger_characters = { "." },
@@ -227,31 +227,76 @@ cmp.setup({
       },
       priority = 3,
     },
-
+    { name = 'cmp_zotcite', priority = 3, trigger_characters = { '@' } },
+    { name = 'vimtex',      priority = 3 },
 
     {
-      name = 'fuzzy_buffer',
-      priority = 3,
-      options = {
+      name = 'buffer',
+      priority = 4,
+      option = {
         get_bufnrs = function()
           local bufs = {}
-          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+          local function check_size_and_editable(buf)
             local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
-            if buftype ~= 'nofile' and buftype ~= 'prompt' then
+            -- if buftype ~= 'nofile' and
+            if buftype ~= 'prompt' or buftype == 'help' then
               local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
               if byte_size < 10 * 1024 * 1024 then
-                bufs[#bufs + 1] = buf
+                return true
               end
             end
           end
-          return bufs
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            if check_size_and_editable(buf) then
+              bufs[buf] = true
+            end
+          end
+          for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if check_size_and_editable(buf) then
+              bufs[buf] = true
+            end
+          end
+          return vim.tbl_keys(bufs)
         end
-      },
-      fuzzy_extra_arg = { case_mode = 1 },
-      min_match_length = 3,
-      max_item_count = 20,
-      -- max_matches = 5,
+      }
     },
+
+    -- {
+    --   name = 'fuzzy_buffer',
+    --   priority = 3,
+    --   options = {
+    --     get_bufnrs = function()
+    --       local bufs = {}
+    --       local function check_size_and_editable(buf)
+    --         local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
+    --         -- if buftype ~= 'nofile' and
+    --         if buftype ~= 'prompt' or buftype == 'help' then
+    --           local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+    --           if byte_size < 10 * 1024 * 1024 then
+    --             return true
+    --           end
+    --         end
+    --       end
+    --       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    --         if check_size_and_editable(buf) then
+    --           bufs[buf] = true
+    --         end
+    --       end
+    --       for _, win in ipairs(vim.api.nvim_list_wins()) do
+    --         local buf = vim.api.nvim_win_get_buf(win)
+    --         if check_size_and_editable(buf) then
+    --           bufs[buf] = true
+    --         end
+    --       end
+    --       return vim.tbl_keys(bufs)
+    --     end
+    --   },
+    --   fuzzy_extra_arg = { case_mode = 2 },
+    --   min_match_length = 3,
+    --   max_matches = 20,
+    -- },
+
     {
       name = 'rg',
       priority = 3,
@@ -270,11 +315,11 @@ cmp.setup({
     { name = "crates",        priority = 10 }
   },
   performance = {
-    debonce = 1000,
-    -- throttle = 50,
-    fetching_timeout = 500,
-    async_budet = 500,
-    max_view_entries = 20,
+    debonce = 500,
+    throttle = 100,
+    fetching_timeout = 1000,
+    async_budet = 1000,
+    max_view_entries = 100,
   },
 
   sorting = {
@@ -292,10 +337,10 @@ cmp.setup({
       cmp.config.compare.length,
       cmp.config.compare.order,
     },
-    priority_weight = 5,
+    priority_weight = 2,
   },
   completion = {
-    -- autocomplete =false ,
+    -- autocomplete = true,
     keyword_length = 0,
     completeopt = "menu,noselect"
   },
@@ -311,7 +356,7 @@ cmp.setup.cmdline({ '/', '?', ':' }, {
   sources = cmp.config.sources({
     { name = 'cmdline',                  priority = 5 },
     { name = 'path',                     priority = 2 },
-    { name = 'fuzzy_buffer',             priority = 3 },
+    { name = 'buffer',                   priority = 3 },
     { name = 'nvim_lsp_document_symbol', priority = 4 },
     { name = "nvim-lsp_signature_help",  priority = 4 }
   })
@@ -342,13 +387,14 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({
         ---@param char string
         ---@param item item completion
         ---@param bufnr buffer number
-        handler = function(char, item, bufnr)
-          -- Your handler function. Inpect with print(vim.inspect{char, item, bufnr})
-        end
+        handler = handlers["*"],
+        -- handler = function(char, item, bufnr)
+        -- Your handler function. Inpect with print(vim.inspect{char, item, bufnr})
+        -- end
       }
     },
     -- Disable for tex
-    tex = false
+    tex = true
   }
 })
 )
