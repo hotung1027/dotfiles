@@ -212,11 +212,11 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 50, keyword_length = 0, },
-    { name = 'nvim_lsp',    priority = 20, max_item_count = 10, },
-    { name = 'luasnip',     priority = 25, },
-    { name = 'treesitter',  priority = 5,  max_item_count = 20, },
-    { name = "tags",        priority = 5,  max_item_count = 20, },
+    { name = 'cmp_tabnine', priority = 5,  keyword_length = 0, },
+    { name = 'nvim_lsp',    priority = 5,  max_item_count = 10, },
+    { name = 'luasnip',     priority = 10, },
+    { name = 'treesitter',  priority = 4,  max_item_count = 20, },
+    { name = "tags",        priority = 3,  max_item_count = 20, },
     {
       name = "ctags",
       -- default values
@@ -225,13 +225,13 @@ cmp.setup({
         trigger_characters = { "." },
         trigger_characters_ft = {},
       },
-      priority = 5,
+      priority = 3,
     },
 
 
     {
       name = 'fuzzy_buffer',
-      priority = 5,
+      priority = 3,
       options = {
         get_bufnrs = function()
           local bufs = {}
@@ -250,24 +250,24 @@ cmp.setup({
       fuzzy_extra_arg = { case_mode = 1 },
       min_match_length = 3,
       max_item_count = 20,
-      max_matches = 5,
+      -- max_matches = 5,
     },
     {
       name = 'rg',
-      priority = 5,
+      priority = 3,
       option = {
-        additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 3, context_after = 3 },
+        additional_arguments = "--smart-case --max-depth 1", debounce = 50, context_before = 1, context_after = 0 },
       keyword_length = 3,
       max_item_count = 3,
     },
     { name = 'path',          priority = 3, },
-    { name = 'spell',         priority = 3, },
+    { name = 'spell',         priority = 2, },
     { name = 'tmux',          priority = 4, },
     -- { name = 'nvim_lsp_document_symbol', priority = 10, max_item_count = 10, },
     -- { name = 'nvim_lsp_signature_help',  priority = 10, max_item_count = 10, },
     -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
     { name = "latex_symbols", priority = 10, keyword_length = 2, trigger_characters = { '\\' }, option = { strategy = 0 } },
-    { name = "crates",        priority = 50 }
+    { name = "crates",        priority = 10 }
   },
   performance = {
     debonce = 1000,
@@ -309,11 +309,11 @@ cmp.setup({
 cmp.setup.cmdline({ '/', '?', ':' }, {
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'cmdline' },
-    { name = 'path' },
-    { name = 'fuzzy_buffer' },
-    { name = 'nvim_lsp_document_symbol' },
-    { name = "nvim-lsp_signature_help" }
+    { name = 'cmdline',                  priority = 5 },
+    { name = 'path',                     priority = 2 },
+    { name = 'fuzzy_buffer',             priority = 3 },
+    { name = 'nvim_lsp_document_symbol', priority = 4 },
+    { name = "nvim-lsp_signature_help",  priority = 4 }
   })
 })
 
