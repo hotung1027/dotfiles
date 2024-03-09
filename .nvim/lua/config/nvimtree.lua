@@ -147,6 +147,7 @@ end ]]
 -- following options are the default
 require 'nvim-tree'.setup {
   auto_reload_on_write = true,
+  reload_on_bufenter = true,
   sync_root_with_cwd = true,
   respect_buf_cwd = true,
 
@@ -204,16 +205,6 @@ end
 
 
 
---[[ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
-  pattern = 'NvimTree*',
-  callback = function()
-    local view = require('nvim-tree.view')
-
-    if not view.is_visible() then
-      api.tree.open()
-    end
-  end,
-}) ]]
 
 
 vim.api.nvim_create_autocmd("BufEnter", {

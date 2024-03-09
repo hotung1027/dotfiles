@@ -115,10 +115,10 @@ telescope.setup({
       search_engine = 'ddg',
       -- debounce while typing, in milliseconds
       debounce = 0,
-      -- map filetype strings to the keywords you've configured for docsets in Dash
+      -- map filetype strings to the keywords you've configured for docsets in Dashwd
       -- setting to false will disable filtering by filetype for that filetype
       -- filetypes not included in this table will not filter the query by filetype
-      -- check src/lua_bindings/dash_config_binding.rs to see all defaults
+      -- check src/lua_bindings/dash_config_binding.rs to see all defaultsa
       -- the values you pass for file_type_keywords are merged with the defaults
       -- to disable filtering for all filetypes,
       -- set file_type_keywords = false
