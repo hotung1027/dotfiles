@@ -825,7 +825,7 @@ return require('lazy').setup(
 
 
     -- Git command inside vim
-    { "tpope/vim-fugitive",          ft = "Git" },
+    { "tpope/vim-fugitive",  ft = "Git" },
 
     -- Better git log display
     {
@@ -892,10 +892,10 @@ return require('lazy').setup(
     },
     { 'KabbAmine/zeavim.vim' },
 
-    -- {
-    --   'mrjones2014/dash.nvim',
-    --   build = 'make install',
-    -- },
+    {
+      'mrjones2014/dash.nvim',
+      build = 'make install',
+    },
     -- Mark Down Plugins
     -- Another markdown plugin
     { "plasticboy/vim-markdown",     ft = { "markdown" }, },
@@ -949,11 +949,60 @@ return require('lazy').setup(
           },
 
         },
+        templates = {
+          subdir = "_templates",
+          date_format = "%Y-%m-%d-%a",
+          time_format = "%H:%M",
+
+        }
 
       },
     },
+    --- Vim/Latex Editing
+    { 'KeitaNakamura/tex-conceal.vim' },
+    { 'lervag/vimtex' },
+    { 'edluffy/hologram.nvim' },
+
     -- Vim tabular plugin for manipulate tabular, required by markdown plugins
     { "godlygeek/tabular",                cmd = { "Tabularize" }, },
+    ---- === Assistant Prompts Clients =======
+    {
+      "huynle/ogpt.nvim",
+      event = "VeryLazy",
+      opts = {
+        default_provider = "ollama",
+        providers = {
+          ollama = {
+            model = "mistral:latest",
+            models = {
+              codellama = "codellama:latest",
+              mistral = "mistral:latest",
 
+            },
+            -- api_host_cmd = "ollama",
+            api_host = "http://127.0.0.1:11444",
+            api_params = {
+              model = "mistral:latest",
+              temperature = 0.8,
+              top_p = 0.9,
+            },
+            api_chat_params = {
+              model = "mistral:latest",
+              frequency_penalty = 0,
+              presence_penalty = 0,
+              temperature = 0.5,
+              top_p = 0.9,
+            },
+          }
+        },
+
+      },
+      dependencies = {
+        "MunifTanjim/nui.nvim",
+        "nvim-lua/plenary.nvim",
+        "nvim-telescope/telescope.nvim"
+      },
+
+    }
   }
 )
