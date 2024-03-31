@@ -30,22 +30,22 @@ return require('lazy').setup(
     -- { 'nvim-neorocks/rocks.nvim' },
     -- ============  Mini Nvim ==============================
     -- Modules with default settings
-    {
-      'echasnovski/mini.nvim',
-      version = 'false',
-      config = function()
-        local modules = {
-          'mini.starter',
-          'mini.bufremove',
+    -- {
+    --   'echasnovski/mini.nvim',
+    --   version = 'false',
+    --   config = function()
+    --     local modules = {
+    --       'mini.starter',
+    --       'mini.bufremove',
+    --
+    --     }
+    --     for _, module in ipairs(modules) do
+    --       require(module).setup()
+    --     end
+    --   end
+    -- },
 
-        }
-        for _, module in ipairs(modules) do
-          require(module).setup()
-        end
-      end
-    },
-
-    { 'echasnovski/mini.surround',   version = '*',    opts = { search_method = 'cover_or_nearest' } },
+    -- { 'echasnovski/mini.surround',   version = '*',    opts = { search_method = 'cover_or_nearest' } },
 
     -- Plugin management
     { 'folke/neodev.nvim' },
@@ -109,7 +109,8 @@ return require('lazy').setup(
       config = function()
         require("nnn").setup({
           picker = {
-            cmd = [[NNN_PLUG="p:preview-tui" ICONLOOKUP=1 tmux new-session nnn -a -Pp]],
+            cmd =
+            [[NNN_PLUG="p:preview-tui" ICONLOOKUP=1 tmux new-session nnn -a -Pp]],
             style = { border = "shadow" },
             session = "shared"
           },
@@ -154,7 +155,7 @@ return require('lazy').setup(
       version = "*",
       config = true,
       opts = {
-        open_mapping = [[c-\]],
+        open_mapping = [[<c-\>]],
         hide_numbers = true,
         autochdir = true,
         start_in_insert = true,
@@ -309,17 +310,17 @@ return require('lazy').setup(
       event = "VimEnter",
       config = function() require('config.hop') end
     },
-    {
-      "max397574/better-escape.nvim",
-      config = function()
-        require("better_escape").setup {
-          mapping = { "jj" },         -- a table with mappings to
-          timeout = vim.o.timeoutlen, -- the time in which the keys must be hit in ms.  option timeoutlen by default
-          clear_empty_lines = true,   -- clear line after escaping if there is only whitespace
-          keys = "<Esc>",             -- keys d for escaping, if it is a function will  the result everytime
-        }
-      end
-    },
+    -- {
+    --   "max397574/better-escape.nvim",
+    --   config = function()
+    --     require("better_escape").setup {
+    --       mapping = { "jj" },         -- a table with mappings to
+    --       timeout = vim.o.timeoutlen, -- the time in which the keys must be hit in ms.  option timeoutlen by default
+    --       clear_empty_lines = true,   -- clear line after escaping if there is only whitespace
+    --       keys = "<Esc>",             -- keys d for escaping, if it is a function will  the result everytime
+    --     }
+    --   end
+    -- },
 
     -- mulit cursor
     { 'mg979/vim-visual-multi', event = "InsertEnter", branch = 'master' },
@@ -376,7 +377,7 @@ return require('lazy').setup(
       end
     },
 
-    { "ggandor/lightspeed.nvim" },
+    -- { "ggandor/lightspeed.nvim" },
 
     {
       'airblade/vim-rooter',
@@ -391,7 +392,7 @@ return require('lazy').setup(
 
 
     -- Undo Histroy
-    { "mbbill/undotree",        cmd = "UndotreeToggle" },
+    { "mbbill/undotree",      cmd = "UndotreeToggle" },
 
     -- Session management plugin
 
@@ -457,7 +458,7 @@ return require('lazy').setup(
       config = function() require('config.which-key') end
     },
 
-    { "tyru/open-browser.vim",       event = "VimEnter" },
+    -- { "tyru/open-browser.vim",       event = "VimEnter" },
 
 
     -- Neovim Color Theme
@@ -561,7 +562,7 @@ return require('lazy').setup(
     },
 
     { 'ray-x/lsp_signature.nvim' },
-    { 'ray-x/guihua.lua',             build = 'cd lua/fzy && make' },
+    -- { 'ray-x/guihua.lua',             build = 'cd lua/fzy && make' },
     { 'onsails/diaglist.nvim' },
     { 'RishabhRd/popfix' },
     { 'RishabhRD/nvim-lsputils' },
@@ -610,7 +611,15 @@ return require('lazy').setup(
     -- Linter
     { 'mfussenegger/nvim-lint' },
     -- luasnip snippet
-    { 'L3MON4D3/LuaSnip' },
+    {
+      'L3MON4D3/LuaSnip',
+      dependencies = { "rafamadriz/friendly-snippets", -- VSCode-like Snippet
+        "evesdropper/luasnip-latex-snippets.nvim"      -- Latex snippet
+      },
+      config = function()
+        require("luasnip.loaders.from_vscode").lazy_load()
+      end
+    },
     { 'saadparwaiz1/cmp_luasnip' },
 
     -- treesitter: support more colorful highlighting
@@ -637,7 +646,7 @@ return require('lazy').setup(
     { "theHamsta/crazy-node-movement" },
     { 'apple/pkl-neovim' },
     -- You can specify multiple plugins in a single call
-    { 'tjdevries/colorbuddy.vim',                   dependencies = 'nvim-treesitter' },
+    { 'tjdevries/colorbuddy.vim',       dependencies = 'nvim-treesitter' },
 
 
     -- auto pairs
@@ -712,11 +721,18 @@ return require('lazy').setup(
     -- ======================== buildner =====================
     { 'skywind3000/asynctasks.vim' },
     { 'skywind3000/asyncrun.vim' },
-    { 'stevearc/overseer.nvim',         opts = {},                     config = function() require("config.task") end },
+    {
+      'stevearc/overseer.nvim',
+      opts = {},
+      config = function()
+        require(
+          "config.task")
+      end
+    },
 
     -- ===================== Build Tools ==================================
 
-    { 'tpope/vim-dispatch',             lazy = true,                   cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
+    { 'tpope/vim-dispatch',         lazy = true,                     cmd = { 'Dispatch', 'Make', 'Focus', 'Start' }, },
 
 
 
@@ -749,7 +765,7 @@ return require('lazy').setup(
       end
     },
     -- Haskell
-    { 'neovimhaskell/nvim-hs.vim' },
+    { 'neovimhaskell/nvim-hs.vim',             ft = "haskell" },
 
     {
       'neovimhaskell/haskell-vim',
@@ -793,7 +809,6 @@ return require('lazy').setup(
     -- ===== Docker =================================================================
     { "kkvh/vim-docker-tools" },
     { "jamestthompson3/nvim-remote-containers" },
-    { 'jamestthompson3/nvim-remote-containers' },
 
 
 
@@ -825,7 +840,7 @@ return require('lazy').setup(
 
 
     -- Git command inside vim
-    { "tpope/vim-fugitive",  ft = "Git" },
+    { "tpope/vim-fugitive",          ft = "Git" },
 
     -- Better git log display
     {
@@ -890,7 +905,7 @@ return require('lazy').setup(
       end,
 
     },
-    { 'KabbAmine/zeavim.vim' },
+    -- { 'KabbAmine/zeavim.vim' },
 
     {
       'mrjones2014/dash.nvim',
@@ -901,34 +916,44 @@ return require('lazy').setup(
     { "plasticboy/vim-markdown",     ft = { "markdown" }, },
     { 'vim-pandoc/vim-pandoc' },
     { 'vim-pandoc/vim-pandoc-syntax' },
-    {
-      "jalvesaq/cmp-zotcite",
-      config = function()
-        require 'cmp_zotcite'.setup({
-          filetypes = { "pandoc", "markdown", "rmd", "quarto", "tex" }
-        })
-      end
-    },
+    -- {
+    --   "jalvesaq/cmp-zotcite",
+    --   config = function()
+    --     require 'cmp_zotcite'.setup({
+    --       filetypes = { "pandoc", "markdown", "rmd", "quarto", "tex" }
+    --     })
+    --   end
+    -- },
     {
       "micangl/cmp-vimtex",
     },
+    -- {
+    --   "iamcco/markdown-preview.nvim",
+    --   cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    --   ft = { "markdown" },
+    --   build = function() vim.fn["mkdp#util#install"]() end,
+    --   config = function()
+    --     vim.g.mkdp_browser = '/Applications/Firefox.app/Contents/MacOS/firefox'
+    --   end
+    -- },
+
     -- Faster footnote generation
     { "vim-pandoc/vim-markdownfootnotes", ft = { "markdown" }, },
     -- Quick notes
-    {
-      "RutaTang/quicknote.nvim",
-      config = function()
-        -- you must call setup to let quicknote.nvim works correctly
-        require("quicknote").setup({})
-      end
-      ,
-      dependencies = { "nvim-lua/plenary.nvim" }
-    },
+    -- {
+    --   "RutaTang/quicknote.nvim",
+    --   config = function()
+    --     -- you must call setup to let quicknote.nvim works correctly
+    --     require("quicknote").setup({})
+    --   end
+    --   ,
+    --   dependencies = { "nvim-lua/plenary.nvim" }
+    -- },
     {
       "epwalsh/obsidian.nvim",
       version = "*", -- recommended, use latest release instead of latest commit
       lazy = true,
-      -- ft = "markdown",
+      ft = "markdown",
       -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
       event = {
         -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
@@ -959,50 +984,50 @@ return require('lazy').setup(
       },
     },
     --- Vim/Latex Editing
-    { 'KeitaNakamura/tex-conceal.vim' },
-    { 'lervag/vimtex' },
-    { 'edluffy/hologram.nvim' },
+    { 'KeitaNakamura/tex-conceal.vim',    ft = "tex" },
+    { 'lervag/vimtex',                    ft = "tex" },
+    { 'edluffy/hologram.nvim',            ft = "tex" },
 
     -- Vim tabular plugin for manipulate tabular, required by markdown plugins
     { "godlygeek/tabular",                cmd = { "Tabularize" }, },
     ---- === Assistant Prompts Clients =======
-    {
-      "huynle/ogpt.nvim",
-      event = "VeryLazy",
-      opts = {
-        default_provider = "ollama",
-        providers = {
-          ollama = {
-            model = "mistral:latest",
-            models = {
-              codellama = "codellama:latest",
-              mistral = "mistral:latest",
-
-            },
-            -- api_host_cmd = "ollama",
-            api_host = "http://127.0.0.1:11444",
-            api_params = {
-              model = "mistral:latest",
-              temperature = 0.8,
-              top_p = 0.9,
-            },
-            api_chat_params = {
-              model = "mistral:latest",
-              frequency_penalty = 0,
-              presence_penalty = 0,
-              temperature = 0.5,
-              top_p = 0.9,
-            },
-          }
-        },
-
-      },
-      dependencies = {
-        "MunifTanjim/nui.nvim",
-        "nvim-lua/plenary.nvim",
-        "nvim-telescope/telescope.nvim"
-      },
-
-    }
+    -- {
+    --   "huynle/ogpt.nvim",
+    --   event = "VeryLazy",
+    --   opts = {
+    --     default_provider = "ollama",
+    --     providers = {
+    --       ollama = {
+    --         model = "mistral:latest",
+    --         models = {
+    --           codellama = "codellama:latest",
+    --           mistral = "mistral:latest",
+    --
+    --         },
+    --         -- api_host_cmd = "ollama",
+    --         api_host = "http://127.0.0.1:11444",
+    --         api_params = {
+    --           model = "mistral:latest",
+    --           temperature = 0.8,
+    --           top_p = 0.9,
+    --         },
+    --         api_chat_params = {
+    --           model = "mistral:latest",
+    --           frequency_penalty = 0,
+    --           presence_penalty = 0,
+    --           temperature = 0.5,
+    --           top_p = 0.9,
+    --         },
+    --       }
+    --     },
+    --
+    --   },
+    --   dependencies = {
+    --     "MunifTanjim/nui.nvim",
+    --     "nvim-lua/plenary.nvim",
+    --     "nvim-telescope/telescope.nvim"
+    --   },
+    --
+    -- }
   }
 )
