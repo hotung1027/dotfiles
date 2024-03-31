@@ -43,6 +43,9 @@ require 'nvim-treesitter.configs'.setup {
     "vimdoc",
     "comment",
     "pkl",
+    "markdown",
+    "markdown_inline",
+    "latex",
   },
   sync_install = false,
   auto_install = true,
@@ -165,12 +168,12 @@ require 'nvim-treesitter.configs'.setup {
   },
   node_movement = { enable = true,
     keymaps = {
-      move_up = "<a-k>",
-      move_down = "<a-j>",
-      move_left = "<a-h>",
-      move_right = "<a-l>",
-      swap_left = "<c-a-h>", -- will only swap when one of "swappable_textobjects" is selected
-      swap_right = "<c-a-l>",
+      move_up = "<A-k>",
+      move_down = "<A-j>",
+      move_left = "<A-h>",
+      move_right = "<A-l>",
+      swap_left = "<C-a-h>", -- will only swap when one of "swappable_textobjects" is selected
+      swap_right = "<C-a-l>",
       select_current_node = "<leader><Cr>",
     },
     swappable_textobjects = { '@function.inner', '@function.outer', '@parameter.inner', '@statement.outer', '@statement.inner' },

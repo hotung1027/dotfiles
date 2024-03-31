@@ -67,7 +67,7 @@ map('n', "<C-l>", ":lua require'nvim-tmux-navigation'.NvimTmuxNavigateRight()<cr
 map("n", "<leader>w", ":wa!<CR>")
 map("n", "<leader>q", ":q<CR>")
 map("n", "<leader>Q", ":qa!<CR>")
-map("n", "<leader>db", require('mini.bufremove').delete)
+-- map("n", "<leader>db", require('mini.bufremove').delete)
 
 map("x", "<C-y>", [["+y]])
 
