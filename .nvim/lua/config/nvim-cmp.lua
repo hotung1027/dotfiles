@@ -170,26 +170,30 @@ cmp.setup({
       i = cmp.mapping.abort(),
       c = cmp.mapping.close(),
     }),
-    ["<CR>"] = cmp.mapping({
-      i = function(fallback)
-        if cmp.visible() and cmp.get_active_entry() then
-          cmp.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = false,
-          }
-          neogen.jump_next()
-        else
-          fallback()
-        end
-      end,
-      s = cmp.mapping.confirm({ select = false }),
-      c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
-
-
-    }),
+    -- ["<CR>"] = cmp.mapping({
+    --   i = function(fallback)
+    --     if cmp.visible() and cmp.get_active_entry() then
+    --       cmp.confirm {
+    --         behavior = cmp.ConfirmBehavior.Replace,
+    --         select = true,
+    --       }
+    --       neogen.jump_next()
+    --     else
+    --       fallback()
+    --     end
+    --   end,
+    --   s = cmp.mapping.confirm({ select = false }),
+    --   c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
+    --
+    --
+    -- }),
     ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
+      if cmp.visible() and cmp.get_active_entry() then
+        cmp.confirm {
+          behavior = cmp.ConfirmBehavior.Replace,
+          select = true,
+        }
+        neogen.jump_next()
       elseif luasnip and luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
       elseif neogen.jumpable() then
@@ -213,11 +217,11 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 7,  keyword_length = 0, },
-    { name = 'nvim_lsp',    priority = 5,  max_item_count = 20, },
-    { name = 'luasnip',     priority = 10, },
-    { name = 'treesitter',  priority = 5,  max_item_count = 20, },
-    { name = "tags",        priority = 5,  max_item_count = 20, },
+    { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
+    { name = 'nvim_lsp',    priority = 5, max_item_count = 20, },
+    { name = 'luasnip',     priority = 5, },
+    { name = 'treesitter',  priority = 4, max_item_count = 20, },
+    { name = "tags",        priority = 5, max_item_count = 20, },
     {
       name = "ctags", -- default values
       option = {
@@ -227,12 +231,12 @@ cmp.setup({
       },
       priority = 3,
     },
-    { name = 'cmp_zotcite', priority = 6, trigger_characters = { '@' } },
-    { name = 'vimtex',      priority = 6 },
+    { name = 'cmp_zotcite', priority = 5, trigger_characters = { '@' } },
+    { name = 'vimtex',      priority = 5 },
 
     {
       name = 'buffer',
-      priority = 5,
+      priority = 4,
       max_item_count = 20,
       option = {
         get_bufnrs = function()
@@ -312,11 +316,11 @@ cmp.setup({
     -- { name = 'nvim_lsp_document_symbol', priority = 10, max_item_count = 10, },
     -- { name = 'nvim_lsp_signature_help',  priority = 10, max_item_count = 10, },
     -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
-    { name = "latex_symbols", priority = 10, keyword_length = 2, trigger_characters = { '\\' }, option = { strategy = 0 } },
-    { name = "crates",        priority = 10 }
+    { name = "latex_symbols", priority = 5, keyword_length = 2, trigger_characters = { '\\' }, option = { strategy = 0 } },
+    { name = "crates",        priority = 6 }
   },
   performance = {
-    debonce = 1000,
+    debonce = 200,
     throttle = 50,
     fetching_timeout = 200,
     async_budet = 200,
