@@ -5,6 +5,12 @@ dap.adapters.dart = {
   command = "node",
   args = { os.getenv('HOME') .. "/.local/share/Dart-Code/out/dist/debug.js", "flutter" }
 }
+dap.adapters.flutter = {
+  type = 'executable',
+  command = 'flutter',
+  args = { 'debug_adapter' }
+}
+
 dap.configurations.dart = {
   {
     type = "dart",
@@ -16,5 +22,5 @@ dap.configurations.dart = {
     cwd = "${workspaceFolder}",
   }
 }
-dap.adapters.dart = dap.adapters.dart
-dap.configurations.dart = dap.configurations.dart
+-- dap.adapters.dart = dap.adapters.dart
+-- dap.configurations.dart = dap.configurations.dart

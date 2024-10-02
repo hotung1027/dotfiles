@@ -9,6 +9,9 @@ if not (lspconfig_present or installer_present or server_config_present) then
   vim.notify("Fail to setup LSP", vim.log.levels.ERROR, { title = 'plugins' })
   return
 end
+M = {}
+
+local installer_path = vim.fn.stdpath('data') .. '/mason/bin/'
 
 local border = {
   { "🭽", "FloatBorder" },
@@ -423,11 +426,10 @@ server_config.setup_handlers({
       opts.settings = haskell_setting
     elseif server_name == "rust_analyzer" then
       opts.settings = rust_setting
-      local dbg_path = require('config.dap_config.dap').installer_path
       require("rust-tools").setup({
         server = opts,
         dap = {
-          adapter = require("rust-tools.dap").get_codelldb_adapter(dbg_path .. 'codelldb', ''),
+          adapter = require("rust-tools.dap").get_codelldb_adapter(installer_path .. 'codelldb', ''),
         },
       })
       run_custom_extern_settings = true
@@ -460,3 +462,8 @@ for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 end
+
+M.capabilities = capabilities
+M.on_attach    = on_attach
+
+return M

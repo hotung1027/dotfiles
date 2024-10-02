@@ -12,6 +12,7 @@ local function tabnine_build_path()
   end
 end
 
+
 return require('lazy').setup(
   {
     --================ NVIM PACKAGE MANAGER ==================================
@@ -537,7 +538,7 @@ return require('lazy').setup(
     {
       "neovim/nvim-lspconfig",
       dependencies = { "cmp-nvim-lsp", "mason.nvim", "mason-lspconfig.nvim" },
-      config = function() require('config.lsp') end
+      -- config = function() require('config.lsp') end
     },
     { "jay-babu/mason-nvim-dap.nvim", config = function() require('mason-nvim-dap').setup() end },
 
@@ -711,7 +712,7 @@ return require('lazy').setup(
     {
       'rcarriga/nvim-dap-ui',
       config = function() require('config.dap_config.dapui') end,
-      dependencies = { 'nvim-telescope/telescope.nvim' },
+      dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-neotest/nvim-nio' },
 
       main = "dapui",
     },
@@ -784,7 +785,9 @@ return require('lazy').setup(
       dependencies = 'nvim-lua/plenary.nvim',
       config = function() require("config.lang.flutter") end
     },
-
+    {
+      "dart-lang/dart-vim-plugin"
+    },
     ------ Mojo
     {
       'czheo/mojo.vim',
@@ -810,21 +813,28 @@ return require('lazy').setup(
     { "kkvh/vim-docker-tools" },
     { "jamestthompson3/nvim-remote-containers" },
 
-
-
-
-
+    -- ==== Remote Development ======================================================
+    {
+      "amitds1997/remote-nvim.nvim",
+      version = "*",                     -- Pin to GitHub releases
+      dependencies = {
+        "nvim-lua/plenary.nvim",         -- For standard functions
+        "MunifTanjim/nui.nvim",          -- To build the plugin UI
+        "nvim-telescope/telescope.nvim", -- For picking b/w different remote methods
+      },
+      config = true,
+    },
 
 
     -- Since tmux is only available on Linux and Mac, we only enable these plugins
     -- for Linux and Mac
     -- .tmux.conf syntax highlighting and setting check
-    { "tmux-plugins/vim-tmux",                 ft = { "tmux" }, },
+    { "tmux-plugins/vim-tmux",     ft = { "tmux" }, },
 
     -- ======================= GIT ================================
     -- Better git commit experience
-    { "rhysd/committia.vim",                   lazy = true },
-    { 'akinsho/git-conflict.nvim',             version = "*",   config = true },
+    { "rhysd/committia.vim",       lazy = true },
+    { 'akinsho/git-conflict.nvim', version = "*",   config = true },
     -- git information
     {
       'lewis6991/gitsigns.nvim',

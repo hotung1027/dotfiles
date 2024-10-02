@@ -350,7 +350,7 @@ cmp.setup({
     completeopt = "menu,noselect"
   },
   experimental = {
-    ghost_text = true
+    ghost_text = false
   },
 })
 

@@ -21,8 +21,8 @@ opt.shiftwidth = 2
 opt.softtabstop = 2
 
 -- Copy indent from current line when starting a new line
--- opt.autoindent=true
-
+opt.autoindent = true
+opt.smartindent = true
 -- A List is an ordered sequence of items.
 opt.list = true
 opt.listchars = "tab:-->,trail:·"
@@ -43,9 +43,12 @@ opt.viewoptions = 'cursor,folds,slash,unix'
 -- lines longer than the width of the window will wrap and displaying continues
 -- on the next line.
 -- ]]
+
+
+
 opt.wrap = true
 opt.tw = 0
-opt.cindent = true
+opt.cindent = false
 opt.splitright = true
 opt.splitbelow = true
 opt.showmode = false
@@ -73,7 +76,9 @@ opt.mouse = 'a'
 opt.pumheight = 10
 opt.foldlevel = 0
 opt.foldenable = false
-opt.formatoptions = 'qj'
+
+vim.cmd([[set formatoptions-=cro]])
+vim.cmd([[set formatoptions+=pqj]])
 opt.hidden = true
 
 -- Changed home directory here
@@ -224,6 +229,21 @@ vim.api.nvim_create_autocmd({ 'TextChangedP' }, {
   end
 })
 --
+local markdown = vim.api.nvim_create_augroup("markdown", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+  group = markdown,
+  callback = function()
+    if (vim.filetype.match({ buf = 0 }) == "markdown") then
+      opt.conceallevel = 2
+      vim.g.tex_conceal = "abdgm"
+      vim.g.tex_conceal_frac = 1
+      -- vim.cmd([[set conceallevel = 2]])
+    else
+      opt.conceallevel = 0
+      -- vim.cmd([[set conceallevel = 0]])
+    end
+  end
+})
 -- vim.api.nvim_create_autocmd(
 --   { "TextChangedI", "TextChangedP" },
 --   {
