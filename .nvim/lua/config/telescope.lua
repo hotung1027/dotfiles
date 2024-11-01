@@ -175,7 +175,7 @@ local extensions = {
   'frecency',
   'macros',
   'arecibo',
-  'dash',
+  -- 'dash',
 }
 for _, extension in pairs(extensions) do
   telescope.load_extension(extension)

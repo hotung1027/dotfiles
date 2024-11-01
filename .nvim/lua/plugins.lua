@@ -398,35 +398,48 @@ return require('lazy').setup(
     -- Session management plugin
 
     -- Session management
-    -- {
-    --   "rmagatti/auto-session",
-    --   config = function()
-    --     require('auto-session').setup {
-    --       log_level = 'info',
-    --       auto_session_enabled = true,
-    --     }
-    --   end
-    -- },
     {
-      "Shatur/neovim-session-manager",
+      "rmagatti/auto-session",
       config = function()
-        local config = require('session_manager.config')
-        require('session_manager').setup({
-          autoload_mode = config.AutoloadMode.LastSession, -- Define what to do when Neovim is started without arguments. Possible values: Disabled, CurrentDir, LastSession
-          autosave_last_session = true,                    -- Automatically save last session on exit and on session switch.
-          autosave_ignore_not_normal = true,               -- Plugin will not save a session when no buffers are opened, or all of them aren't writable or listed.
-          autosave_ignore_dirs = {},                       -- A list of directories where the session will not be autosaved.
-          autosave_ignore_filetypes = {                    -- All buffers of these file types will be closed before the session is saved.
+        require('auto-session').setup {
+          log_level = 'info',
+          enabled = true,
+          bypass_save_filetypes = {
             'gitcommit',
             'gitrebase',
             'TOGGLETERM',
             'term',
-            'trouble'
-
+            'trouble',
+            'NVIMTREE',
           },
-        })
+          cwd_change_handling = true,
+
+          pre_cwd_changed_cmds = {
+            "tabdo NERDTreeClose" -- Close NERDTree before saving session
+          },
+        }
       end
     },
+    -- {
+    --   "Shatur/neovim-session-manager",
+    --   config = function()
+    --     local config = require('session_manager.config')
+    --     require('session_manager').setup({
+    --       autoload_mode = config.AutoloadMode.LastSession, -- Define what to do when Neovim is started without arguments. Possible values: Disabled, CurrentDir, LastSession
+    --       autosave_last_session = true,                    -- Automatically save last session on exit and on session switch.
+    --       autosave_ignore_not_normal = true,               -- Plugin will not save a session when no buffers are opened, or all of them aren't writable or listed.
+    --       autosave_ignore_dirs = {},                       -- A list of directories where the session will not be autosaved.
+    --       autosave_ignore_filetypes = {                    -- All buffers of these file types will be closed before the session is saved.
+    --         'gitcommit',
+    --         'gitrebase',
+    --         'TOGGLETERM',
+    --         'term',
+    --         'trouble'
+    --
+    --       },
+    --     })
+    --   end
+    -- },
     {
       'rmagatti/session-lens',
       dependencies = { 'rmagatti/auto-session', 'nvim-telescope/telescope.nvim' },
@@ -559,6 +572,7 @@ return require('lazy').setup(
     },
     {
       'folke/trouble.nvim',
+      version = "v3.6.0",
       config = function() require('config.trouble') end
     },
 
@@ -917,10 +931,10 @@ return require('lazy').setup(
     },
     -- { 'KabbAmine/zeavim.vim' },
 
-    {
-      'mrjones2014/dash.nvim',
-      build = 'make install',
-    },
+    -- {
+    --   'mrjones2014/dash.nvim',
+    --   build = 'make install',
+    -- },
     -- Mark Down Plugins
     -- Another markdown plugin
     { "plasticboy/vim-markdown",     ft = { "markdown" }, },

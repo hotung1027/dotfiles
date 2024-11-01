@@ -24,8 +24,9 @@ local border = {
   { "▏", "FloatBorder" },
 }
 local servers = {
-  "clangd", "lua_ls", "pyright", "julials", 'rust_analyzer',
+  "clangd", "lua_ls", "ruff", "ruff_lsp", "pyright", "jedi_language_server", "julials", 'rust_analyzer',
 }
+
 
 local function get_python_path(workspace)
   -- Use activated virtualenv.

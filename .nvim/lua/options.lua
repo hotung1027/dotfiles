@@ -77,6 +77,7 @@ opt.pumheight = 10
 opt.foldlevel = 0
 opt.foldenable = false
 
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.cmd([[set formatoptions-=cro]])
 vim.cmd([[set formatoptions+=pqj]])
 opt.hidden = true
@@ -137,14 +138,13 @@ vim.api.nvim_create_autocmd({ 'User' }, {
   end,
 })
 -- local lazy_nvim = vim.api.nvim_create_augroup('lazy_nvim', {})
-vim.api.nvim_create_autocmd({ 'User' }, {
-  pattern = "LazyUpdate",
-  group = sessions,
-  callback = function()
-    vim.cmd("Lazy")
-    vim.cmd("SessionRestore")
-  end,
-})
+-- vim.api.nvim_create_autocmd({ 'User' }, {
+--   pattern = "LazyUpdate",
+--   group = sessions,
+--   callback = function()
+--     -- vim.cmd("Lazy")
+--   end,
+-- })
 -- Auto save session
 vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
   callback = function()
@@ -154,12 +154,11 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
         return
       end
     end
-    require('session_manager').save_current_session()
+    vim.cmd [[SessionSave]]
   end
 })
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   callback = function()
-    require('session_manager').load_current_dir_session()
     -- vim.cmd('TwilightEnable')
   end
 })

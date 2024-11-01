@@ -45,7 +45,7 @@ require 'nvim-treesitter.configs'.setup {
     "pkl",
     "markdown",
     "markdown_inline",
-    "latex",
+    -- "latex",
   },
   sync_install = false,
   auto_install = true,

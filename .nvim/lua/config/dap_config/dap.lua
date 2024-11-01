@@ -5,7 +5,7 @@ local function import(parent, modules)
 end
 import('config.dap_config.lua', {
   'dap_cpp',
-  'dap_flutter',
+  -- 'dap_flutter',
   'dap_haskell'
 })
 local M = {}
@@ -30,7 +30,7 @@ local nvim_dap = require('mason-nvim-dap').setup({
       }
       require('mason-nvim-dap').default_setup(config) -- don't forget this!
     end,
-    cpp = function(config)
+    codelldb = function(config)
       config.adapters = {
         type = "executable",
         command = installer_path .. "codelldb",
