@@ -15,58 +15,51 @@ end
 
 local tabnine = require('cmp_tabnine.config')
 
--- require('tabnine').setup({
---   disable_auto_comment = false,
---   accept_keymap = "<C-TAB>",
---   dismiss_keymap = "<C-e>",
---   debounce_ms = 800,
---   suggestion_color = { gui = "#808080", cterm = 244 },
---   exclude_filetypes = { "TelescopePrompt", "NvimTree", "Vista", "Terminal" },
---   log_file_path = nil, -- absolute path to Tabnine log file
--- })
-
-
-
-tabnine:setup({
-  max_lines = 50000,
-  max_num_results = 100,
-  sort = false,
-  run_on_every_keystroke = true,
-  snippet_placeholder = '..',
-  ignored_file_types = {
-    TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
-  },
-  min_percent = 0,
-  show_prediction_strength = false,
+require('tabnine').setup({
+  disable_auto_comment = false,
+  accept_keymap = "<Tab>",
+  dismiss_keymap = "<C-e>",
+  debounce_ms = 400,
+  suggestion_color = { gui = "#808080", cterm = 244 },
+  exclude_filetypes = { "TelescopePrompt", "NvimTree", "Vista", "Terminal" },
+  log_file_path = nil, -- absolute path to Tabnine log file
 })
 
 
+
+
+
+-- tabnine:setup({
+--   max_lines = 2000,
+--   max_num_results = 20,
+--   sort = true,
+--   run_on_every_keystroke = true,
+--   snippet_placeholder = '..',
+--   ignored_file_types = {
+--     TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
+--   },
+--   min_percent = 0,
+--   show_prediction_strength = true,
+-- })
+
 local cmp_kinds = {
-  Text = '  ',
-  Method = '  ',
-  Function = '  ',
-  Constructor = '  ',
   Field = '  ',
   Variable = '  ',
   Class = '  ',
   Interface = '  ',
   Module = '  ',
   Property = '  ',
-  Unit = '  ',
   Value = '  ',
   Enum = '  ',
   Keyword = '  ',
-  Snippet = '  ',
   Color = '  ',
   File = '  ',
-  Reference = '  ',
   Folder = '  ',
   EnumMember = '  ',
   Constant = '  ',
   Struct = '  ',
   Event = '  ',
   Operator = '  ',
-  TypeParameter = '  ',
 }
 local provider = {
   buffer = "Buffer",
@@ -99,14 +92,25 @@ cmp.setup({
   },
   window = {
     completion = {
-      winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-      col_offset = -3,
-      side_padding = 0,
+      winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:Pmenu",
+      col_offset = 2,
+      side_padding = 1,
+      max_height = 5,
+
+      zindex = 90,
+
     },
     documentation = cmp.config.window.bordered(),
   },
   view = {
-    entries = { name = 'custom', selection_order = 'near_cursor' }
+    entries = {
+      name = 'custom',
+      follow_cursor = true,
+      -- selection_order = 'near_cursor'
+    },
+    -- docs = {
+    --   auto_open = true,
+    -- }
   },
   formatting = {
     fields = { "kind", "abbr" },
@@ -121,17 +125,18 @@ cmp.setup({
 
 
 
-      if cmp_kinds[source] ~= nil then
-        kind_icon = cmp_kinds[source]
-      elseif cmp_kinds[kind] ~= nil then
-        kind_icon = cmp_kinds[kind]
-      end
-
       if icon then
         vim_item.kind_hl_group = hl_group
+        vim_item.kind = (icon) .. " " .. (source or "")
+      elseif cmp_kinds[source] ~= nil then
+        vim_item.kind = (cmp_kinds[source]) .. (source or "")
+      elseif cmp_kinds[kind] ~= nil then
+        vim_item.kind = (cmp_kinds[kind]) .. (source or "")
+      else
+        vim_item.kind = (kind) .. "  " .. (source or "")
       end
 
-      vim_item.kind = (kind_icon or icon) .. " " .. (source or "")
+
 
       if entry.source.name == "cmp_tabnine" then
         local detail = (entry.completion_item.labelDetails or {}).detail
@@ -179,25 +184,27 @@ cmp.setup({
       i = cmp.mapping.abort(),
       c = cmp.mapping.close(),
     }),
-    -- ["<CR>"] = cmp.mapping({
-    --   i = function(fallback)
-    --     if cmp.visible() and cmp.get_active_entry() then
-    --       cmp.confirm {
-    --         behavior = cmp.ConfirmBehavior.Replace,
-    --         select = true,
-    --       }
-    --       neogen.jump_next()
-    --     else
-    --       fallback()
-    --     end
-    --   end,
-    --   s = cmp.mapping.confirm({ select = false }),
-    --   c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
-    --
-    --
-    -- }),
+    ["<CR>"] = cmp.mapping({
+      i = function(fallback)
+        if cmp.visible() and cmp.get_active_entry() then
+          cmp.confirm {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = true,
+          }
+          neogen.jump_next()
+        else
+          fallback()
+        end
+      end,
+      s = cmp.mapping.confirm({ select = false }),
+      c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
+
+
+    }),
     ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() and cmp.get_active_entry() then
+      if require("tabnine.keymaps").has_suggestion() then
+        require("tabnine.keymaps").accept_suggestion()
+      elseif cmp.visible() and cmp.get_active_entry() then
         cmp.confirm {
           behavior = cmp.ConfirmBehavior.Replace,
           select = true,
@@ -226,11 +233,11 @@ cmp.setup({
   },
 
   sources = {
-    { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
-    { name = 'nvim_lsp',    priority = 5, max_item_count = 20, },
-    { name = 'luasnip',     priority = 5, },
-    { name = 'treesitter',  priority = 4, max_item_count = 20, },
-    { name = "tags",        priority = 5, max_item_count = 20, },
+    -- { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
+    { name = 'nvim_lsp',   priority = 5, max_item_count = 20, },
+    { name = 'luasnip',    priority = 5, },
+    { name = 'treesitter', priority = 4, max_item_count = 20, },
+    { name = "tags",       priority = 5, max_item_count = 20, },
     {
       name = "ctags", -- default values
       option = {
@@ -329,10 +336,11 @@ cmp.setup({
     { name = "crates",        priority = 10 }
   },
   performance = {
-    debonce = 200,
-    throttle = 50,
-    fetching_timeout = 200,
-    async_budet = 200,
+    debounce = 200,
+    throttle = 100,
+    fetching_timeout = 100,
+    async_budget = 100,
+    filtering_context_budget = 100,
     max_view_entries = 30,
   },
 
@@ -359,9 +367,11 @@ cmp.setup({
     completeopt = "menu,noselect"
   },
   experimental = {
-    ghost_text = false
+    ghost_text = false,
   },
 })
+
+
 
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
@@ -415,24 +425,6 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({
 
 -- [[ cmp_autopairs.lisp[#cmp_autopairs.lisp+1] = "racket" ]]
 
-vim.cmd([[
-" gray
-highlight! CmpItemAbbrDeprecated guibg=NONE gui=strikethrough guifg=#808080
-" blue
-highlight! CmpItemAbbrMatch guibg=NONE guifg=#569CD6
-highlight! CmpItemAbbrMatchFuzzy guibg=NONE guifg=#569CD6
-" light blue
-highlight! CmpItemKindVariable guibg=NONE guifg=#9CDCFE
-highlight! CmpItemKindInterface guibg=NONE guifg=#9CDCFE
-highlight! CmpItemKindText guibg=NONE guifg=#9CDCFE
-" pink
-highlight! CmpItemKindFunction guibg=NONE guifg=#C586C0
-highlight! CmpItemKindMethod guibg=NONE guifg=#C586C0
-" front
-highlight! CmpItemKindKeyword guibg=NONE guifg=#D4D4D4
-highlight! CmpItemKindProperty guibg=NONE guifg=#D4D4D4
-highlight! CmpItemKindUnit guibg=NONE guifg=#D4D4D4
-]])
 vim.api.nvim_set_hl(0, "CmpItemKindTabNine", { fg = "#6CC644" })
 -- Customization for Pmenu
 vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#282C34", fg = "NONE" })

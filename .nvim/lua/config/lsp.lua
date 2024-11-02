@@ -10,7 +10,9 @@ if not (lspconfig_present or installer_present or server_config_present) then
 end
 M = {}
 
-local installer_path = vim.fn.stdpath('data') .. '/mason/bin/'
+local installer_path = os.getenv("HOME") .. "/" .. ".local/share/nvim/mason/packages/"
+local codelldb_path = installer_path .. "codelldb/extension/adapter/codelldb"
+local liblldb_path = installer_path .. "codelldb/extension/lldb/lib/liblldb.so"
 
 local border = {
   { "🭽", "FloatBorder" },
@@ -258,10 +260,11 @@ local on_attach = function(client, bufnr)
     require("clangd_extensions.inlay_hints").setup_autocmd()
     require("clangd_extensions.inlay_hints").set_inlay_hints()
   elseif vim.tbl_contains({ 'rust', 'toml' }, filetype) then
-    vim.lsp.inlay_hint.enable(bufnr, true)
+    -- vim.lsp.inlay_hint.enable(bufnr, true)
     require('rust-tools').inlay_hints.enable()
 
-    buf_set_keymap("n", "<leader>ge", require("rust-tools").expand_macro.expand_macro, opts)
+    require('rust-tools').hover_actions.hover_actions()
+    require('rust-tools').inlay_hints.enable()
   elseif vim.fn.expand('%:t') == 'Cargo.toml' then
 
   end
@@ -295,6 +298,21 @@ local on_attach = function(client, bufnr)
   }, bufnr)
   -- vim.api.nvim_command('au User LspDiagnosticsChanged lua require("lsp-status/redraw").redraw()')
 
+  vim.lsp.handlers["textDocument/hover"] = function(_, _, _)
+    vim.lsp.with(
+      vim.lsp.handlers.hover,
+      { border = "single" }
+    )
+  end
+
+  vim.lsp.handlers["textDocument/signatureHelp"] = function(_, _, _)
+    vim.lsp.with(
+      vim.lsp.handlers.signature_help,
+      {
+        border = "single"
+      }
+    )
+  end
   vim.lsp.handlers['textDocument/codeAction'] = function(_, _, actions)
     require('lsputil.codeAction').code_action_handler(nil, actions, nil, nil, nil)
   end
@@ -343,12 +361,14 @@ local on_attach = function(client, bufnr)
     if vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
       -- require('crates').show_popup()
       require("crates").show_features_popup()
+    elseif vim.tbl_contains({ 'rust' }, filetype) then
+      require('rust-tools').hover_actions.hover_actions()
     else
       vim.lsp.buf.signature_help()
     end
   end
 
-  function siwtch_to_source_header()
+  function switch_to_source_header()
     if vim.tbl_contains({ 'c', 'cpp', 'h', 'hpp' }, filetype) then
       vim.cmd [[ClangdSwitchSourceHeader]]
     elseif vim.tbl_contains({ 'rust' }, filetype) then
@@ -358,14 +378,18 @@ local on_attach = function(client, bufnr)
     end
   end
 
-  buf_set_keymap("n", "<F2>", vim.lsp.buf.rename, opts)
-  buf_set_keymap("n", "<leader>ca", require("actions-preview").code_actions, opts)
+  function code_action()
+    require("actions-preview").code_actions()
+  end
+
   buf_set_keymap('n', '<leader>gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   buf_set_keymap('n', '<leader>gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', '<leader>gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
   buf_set_keymap('n', '<leader>gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
   buf_set_keymap('n', '<leader>gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  buf_set_keymap('n', '<leader>gf', "<Cmd>lua require('lspsaga.provider').lsp_finder()<CR>", opts)
+
+  buf_set_keymap('n', '<leader>ca', code_action, opts)
+  buf_set_keymap('n', '<leader>gk', vim.lsp.buf.hover, opts)
   buf_set_keymap('n', 'K', "<cmd>lua show_documentation()<CR>", opts)
   buf_set_keymap("n", "<leader>gh", "<cmd>lua siwtch_to_source_header()<CR>", opts)
 
@@ -391,7 +415,8 @@ local on_attach = function(client, bufnr)
       "<cmd>lua vim.lsp.buf.format()<CR>", opts)
   end
   vim.o.updatetime = 250
-  vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false,scope = "cursor"})]]
+  -- popup diagnostic
+  -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false,scope = "cursor"})]]
 
 
 
@@ -468,7 +493,9 @@ server_config.setup_handlers({
     require("rust-tools").setup {
       server = {
         on_attach = on_attach,
-
+        dap = {
+          adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
+        },
         root_dir = require("lspconfig/util").root_pattern("Cargo.toml"),
         settings = {
           ["rust_analyzer"] = {
@@ -481,8 +508,37 @@ server_config.setup_handlers({
               closureCaptureHints = {
                 enable = true,
               },
-            },
+              closureReturnTypeHints = {
+                enable = true,
+              },
+              reborrowHints = {
+                enable = true,
+              },
 
+            },
+            hover = {
+              actions = {
+                references = {
+                  enable = true
+                }
+              }
+            },
+            lens = {
+              references = {
+                method = {
+                  enable = true
+                },
+                trait = {
+                  enable = true,
+                }
+
+              }
+            },
+            signatureInfo = {
+              documentation = {
+                enable = true
+              }
+            },
             diagnostics = {
               enable = true,
             },

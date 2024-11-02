@@ -183,21 +183,16 @@ vim.api.nvim_create_autocmd({ 'CursorHoldI' }, {
     local cursor = vim.api.nvim_win_get_cursor(0)[2]
 
     --
-    -- local current = string.sub(current_line, cursor, cursor + 1)
-    -- if current == "." or current == "," then
-    --   cmp.close()
-    -- end
-    -- local has_words_before = function()
-    --   unpack = unpack or table.unpack
-    --   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-    --   return col ~= 0 and
-    --       vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-    -- end
+    local current = string.sub(current_line, cursor, cursor + 1)
+    if current == "." or current == "," then
+      cmp.close()
+    end
 
     local before_line = string.sub(current_line, 1, cursor + 1)
-    -- local after_line = string.sub(current_line, cursor + 1, -1)
-    -- if not string.match(before_line, '^%s+$') then
-    if string.match(before_line, "$") or #before_line == 0 then
+    --
+    if require("tabnine.keymaps").has_suggestion() then
+      cmp.close()
+    elseif string.match(before_line, "$") or #before_line == 0 then
       cmp.complete()
     end
   end
@@ -222,8 +217,10 @@ vim.api.nvim_create_autocmd({ 'TextChangedP' }, {
     end
     local before_line = string.sub(current_line, 1, cursor + 1)
     local after_line = string.sub(current_line, cursor + 1, -1)
-    -- if not string.match(before_line, '^%s+$') then
-    if after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") or has_words_before() then
+
+    if require("tabnine.keymaps").has_suggestion() then
+      cmp.close()
+    elseif after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") or has_words_before() then
       cmp.complete()
     end
   end
