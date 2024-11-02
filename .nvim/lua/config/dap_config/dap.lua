@@ -1,3 +1,4 @@
+local installer_path = os.getenv("HOME") .. "/" .. ".local/share/nvim/mason/packages/"
 local function import(parent, modules)
   for id, name in ipairs(modules) do
     modules[id] = require(parent .. '.' .. name)
@@ -9,7 +10,6 @@ import('config.dap_config.lua', {
   'dap_haskell'
 })
 local M = {}
-local installer_path = '/Users/randyt/.local/share/nvim/mason/bin/'
 local nvim_dap = require('mason-nvim-dap').setup({
   ensure_installed = { 'codelldb' },
   handlers = {
