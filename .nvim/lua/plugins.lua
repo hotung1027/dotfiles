@@ -126,11 +126,21 @@ return require('lazy').setup(
     {
       'alexghergh/nvim-tmux-navigation'
     },
-    -- { 'otavioschwanck/tmux-awesome-manager.nvim',   config = function() require("config.term") end },
+    { 'otavioschwanck/tmux-awesome-manager.nvim', },
     -- Visual Guide
     --
     {
       'HiPhish/rainbow-delimiters.nvim'
+    },
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      opts = function(_, opts)
+        -- Other blankline configuration here
+        return require("indent-rainbowline").make_opts(opts)
+      end,
+      dependencies = {
+        "TheGLander/indent-rainbowline.nvim",
+      },
     },
     {
       'lukas-reineke/indent-blankline.nvim',
@@ -372,6 +382,8 @@ return require('lazy').setup(
             extensions = {
               h = "c",
               hpp = "cpp",
+              c = "c",
+
             },
           },
         })
@@ -402,8 +414,11 @@ return require('lazy').setup(
       "rmagatti/auto-session",
       config = function()
         require('auto-session').setup {
-          log_level = 'info',
-          enabled = true,
+          log_level = 'error',
+          auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
+          enabled = false,
+          auto_save = false,    -- Enables/disables auto saving session on exit
+          auto_restore = false, -- Enables/disables auto restoring session on start
           bypass_save_filetypes = {
             'gitcommit',
             'gitrebase',
@@ -412,11 +427,26 @@ return require('lazy').setup(
             'trouble',
             'NVIMTREE',
           },
+          auto_create = false,
+
           cwd_change_handling = true,
 
           pre_cwd_changed_cmds = {
-            "tabdo NERDTreeClose" -- Close NERDTree before saving session
+            function()
+              local nvim_tree_api = require('nvim-tree.api')
+              nvim_tree_api.tree.close()
+            end
           },
+          post_restore_cmds = {
+            function()
+              local nvim_tree_api = require('nvim-tree.api')
+              -- Restore nvim-tree after a session is restored
+              nvim_tree_api.tree.open()
+              nvim_tree_api.tree.change_root(vim.fn.getcwd())
+              nvim_tree_api.tree.reload()
+            end
+          },
+
         }
       end
     },
@@ -537,21 +567,27 @@ return require('lazy').setup(
     -- nvim-lsp configuration (it relies on cmp-nvim-lsp, so it should be loaded after cmp-nvim-lsp).
     {
       'williamboman/nvim-lsp-installer',
-      ft = {
-        "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
-        "toml", "json", "python", "dart", "v", "vhdl", "verilog", "mojo"
-      },
+      -- ft = {
+      --   "bash", "sh", "rust", "haskell", "c", "cpp", "lua", "markdown", "go", "html",
+      --   "toml", "json", "python", "dart", "v", "vhdl", "verilog", "mojo"
+      -- },
     },
     {
       "williamboman/mason.nvim"
     },
     {
-      "williamboman/mason-lspconfig.nvim"
+      "williamboman/mason-lspconfig.nvim",
+
     },
     {
       "neovim/nvim-lspconfig",
       dependencies = { "cmp-nvim-lsp", "mason.nvim", "mason-lspconfig.nvim" },
+
       -- config = function() require('config.lsp') end
+    },
+    {
+      "hinell/lsp-timeout.nvim",
+      dependencies = { "neovim/nvim-lspconfig" }
     },
     { "jay-babu/mason-nvim-dap.nvim", config = function() require('mason-nvim-dap').setup() end },
 
@@ -576,12 +612,16 @@ return require('lazy').setup(
       config = function() require('config.trouble') end
     },
 
-    { 'ray-x/lsp_signature.nvim' },
+    {
+      'ray-x/lsp_signature.nvim',
+      opts = {},
+      config = function(_, opts) require 'lsp_signature'.setup(opts) end
+    },
     -- { 'ray-x/guihua.lua',             build = 'cd lua/fzy && make' },
     { 'onsails/diaglist.nvim' },
     { 'RishabhRd/popfix' },
     { 'RishabhRD/nvim-lsputils' },
-    { 'tami5/lspsaga.nvim' },
+    { "aznhe21/actions-preview.nvim", config = true },
     -- Only install these plugins if ctags are installed on the system
     -- plugin to manage your tags
     { "ludovicchabant/vim-gutentags", event = "VimEnter" },
@@ -765,17 +805,39 @@ return require('lazy').setup(
     { 'p00f/clangd_extensions.nvim' },
     -- Rust
     { "rust-lang/rust.vim",         ft = { 'rust' },                 config = function() vim.g.rustfmt_autorsave = 1 end },
+    -- {
+    --   'mrcjkb/rustaceanvim',
+    --   version = '^5', -- Recommended
+    --   lazy = false,   -- This plugin is already lazy
+    --
+    -- },
+    {
+      'vxpm/ferris.nvim',
+    },
     {
       'simrat39/rust-tools.nvim',
       version = '*', -- Recommended
-      ft = { 'rust' },
+      ft = { "rust", "toml" }
+
+
     },
     {
       'saecki/crates.nvim',
       ft = { "rust", "toml" },
-      config = function(_, opts)
+      event = { "BufRead Cargo.toml" },
+      config = function(_)
         local crates = require('crates')
-        crates.setup(opts)
+        crates.setup({
+          completion = {
+            cmp = { enabled = true,
+            },
+            crates = {
+              enabled = true,
+              min_chars = 2,
+              max_results = 8,
+            },
+          }
+        })
         crates.show()
       end
     },
@@ -885,22 +947,23 @@ return require('lazy').setup(
 
 
     {
-      'TimUntersberger/neogit',
-      dependencies = { 'nvim-lua/plenary.nvim', 'sindrets/diffview.nvim' },
-      config = function()
-        require('neogit').setup {
-          integrations = { diffview = true },
-          -- Change the default way of opening neogit
-          kind = "split_above",
-          -- customize displayed signs
-          signs = {
-            -- { CLOSED, OPENED },
-            section = { "", "" },
-            item = { "", "" },
-            hunk = { "", "" },
-          },
-        }
-      end,
+      'NeogitOrg/neogit',
+      dependencies = { 'nvim-lua/plenary.nvim', 'sindrets/diffview.nvim', "nvim-telescope/telescope.nvim", },
+      opts = {
+        integrations = { diffview = true, telescope = true, },
+        -- Change the default way of opening neogit
+        kind = "tab",
+        commit_editor = {
+          kind = "tab",
+        },
+        -- customize displayed signs
+        signs = {
+          -- { CLOSED, OPENED },
+          section = { "", "" },
+          item = { "", "" },
+          hunk = { "", "" },
+        },
+      },
       cmd = "Neogit"
     },
 

@@ -4,7 +4,6 @@ local installer_present, installer = pcall(require, "mason")
 local server_config_present, server_config = pcall(require, "mason-lspconfig")
 
 local lspconfig_present, lspconfig = pcall(require, "lspconfig")
-local lspsaga = require("lspsaga")
 if not (lspconfig_present or installer_present or server_config_present) then
   vim.notify("Fail to setup LSP", vim.log.levels.ERROR, { title = 'plugins' })
   return
@@ -88,8 +87,8 @@ local rust_setting = {
     },
 
   },
-  -- fileypes = { 'rust', "toml" },
-  -- root_dir = require("lspconfig/util").root_pattern("Cargo.toml"),
+  fileypes = { 'rust', "toml" },
+  root_dir = require("lspconfig/util").root_pattern("Cargo.toml"),
 }
 
 local haskell_setting = {
@@ -98,6 +97,7 @@ local haskell_setting = {
     formattingProvider = 'brittany',
   }
 }
+
 
 local lsp_publish_diagnostics_options = {
   virtual_text = {
@@ -112,8 +112,6 @@ local lsp_publish_diagnostics_options = {
   serverity_sort = true,
 }
 
-require 'lspconfig'.julials.setup {}
-require 'lspconfig'.mojo.setup {}
 
 local capabilities = vim.tbl_deep_extend("force",
   vim.lsp.protocol.make_client_capabilities(),
@@ -218,7 +216,7 @@ vim.diagnostic.config(lsp_publish_diagnostics_options)
   show = function(namespace,bufnr,diagnostic,opts)
   local level = opts["info/notify"].log_level
   local name = vim.diagnostic.get_namespace(namespace).name
-  local msg = string.format("%d diagnostics in buffer %d from %s",
+  local msg =string.format("%d diagnostics in buffer %d from %s",
     #diagnostic,
     bufnr,
     name)
@@ -231,26 +229,50 @@ vim.diagnostic.config(lsp_publish_diagnostics_options)
 
 local on_attach = function(client, bufnr)
   local function buf_set_keymap(...)
-    vim.api.nvim_buf_set_keymap(bufnr, ...)
+    local mode, lhs, rhs, opts = ...
+    local attach_opts = { silent = true, buffer = bufnr }
+
+    if opts ~= nil then
+      for k, v in pairs(opts) do
+        attach_opts[k] = v
+      end
+    end
+
+    require('utils').map(mode, lhs, rhs, attach_opts)
   end
+
   local function buf_set_option(...)
-    vim.api.nvim_buf_set_option(bufnr, ...)
+    local name, value, _ = ...
+
+    local attach_opts = { buf = bufnr }
+    vim.api.nvim_set_option_value(name, value, attach_opts)
   end
   if client.config.flags then
     client.config.flags.allow_incremental_sync = true
   end
-  require("clangd_extensions.inlay_hints").setup_autocmd()
-  require("clangd_extensions.inlay_hints").set_inlay_hints()
-  require 'lsp_signature'.on_attach({
-    bind = true,
-    hint_prefix = " ",
-    handler_opts = {
-      border = "rounded",
-    }
-  }, bufnr)
-  lspsaga.setup()
+
+  local filetype = vim.bo.filetype
+
+  local opts = { noremap = true, silent = true }
+  if vim.tbl_contains({ 'c', 'cpp', 'h', 'hpp' }, filetype) then
+    require("clangd_extensions.inlay_hints").setup_autocmd()
+    require("clangd_extensions.inlay_hints").set_inlay_hints()
+  elseif vim.tbl_contains({ 'rust', 'toml' }, filetype) then
+    vim.lsp.inlay_hint.enable(bufnr, true)
+    require('rust-tools').inlay_hints.enable()
+
+    buf_set_keymap("n", "<leader>ge", require("rust-tools").expand_macro.expand_macro, opts)
+  elseif vim.fn.expand('%:t') == 'Cargo.toml' then
+
+  end
+
 
   require("lsp_signature").on_attach({
+
+    bind = true,
+    handler_opts = {
+      border = "rounded",
+    },
     hint_prefix = "👍 ",
     floating_window_off_x = 5,                         -- adjust float windows x position.
     floating_window_off_y = function()                 -- adjust float windows y position. e.g. set to -2 can make floating window move up 2 lines
@@ -317,31 +339,27 @@ local on_attach = function(client, bufnr)
   )
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
   -- Mappings.
-  local opts = { noremap = true, silent = true }
   function show_documentation()
-    local filetype = vim.bo.filetype
     if vim.fn.expand('%:t') == 'Cargo.toml' and require('crates').popup_available() then
-      require('crates').show_popup()
+      -- require('crates').show_popup()
+      require("crates").show_features_popup()
     else
       vim.lsp.buf.signature_help()
     end
   end
 
   function siwtch_to_source_header()
-    local filetype = vim.bo.filetype
-
     if vim.tbl_contains({ 'c', 'cpp', 'h', 'hpp' }, filetype) then
       vim.cmd [[ClangdSwitchSourceHeader]]
     elseif vim.tbl_contains({ 'rust' }, filetype) then
-      vim.cmd [[RustOpenCargo]]
+      require 'rust-tools'.open_cargo_toml.open_cargo_toml()
     elseif vim.fn.expand('%:t') == 'Cargo.toml' then
       vim.cmd [[b main.rs]]
     end
   end
 
-  buf_set_keymap("n", "<F2>", "<cmd>Lspsaga rename<cr>", opts)
-  -- buf_set_keymap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  buf_set_keymap("n", "<leader>ca", "<cmd>Lspsaga code_action<cr>", opts)
+  buf_set_keymap("n", "<F2>", vim.lsp.buf.rename, opts)
+  buf_set_keymap("n", "<leader>ca", require("actions-preview").code_actions, opts)
   buf_set_keymap('n', '<leader>gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
   buf_set_keymap('n', '<leader>gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
   buf_set_keymap('n', '<leader>gt', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
@@ -377,9 +395,9 @@ local on_attach = function(client, bufnr)
 
 
 
-  vim.cmd([[
-      autocmd BufEnter,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
-    ]])
+  -- vim.cmd([[
+  --     autocmd BufEnter,CursorHold,InsertLeave <buffer> lua vim.lsp.codelens.refresh()
+  --   ]])
   if client.server_capabilities.document_highlight then
     vim.cmd [[
         hi LspReferenceRead cterm=bold ctermbg=red guibg=DarkRed
@@ -392,6 +410,7 @@ local on_attach = function(client, bufnr)
         augroup END
       ]]
   end
+  -- vim.lsp.buf_attach_client(bufnr, client)
 end
 -- lspInstall + lspconfig stuff
 
@@ -409,6 +428,7 @@ installer.setup({
 
 server_config.setup({
   ensure_installed = servers,
+  automatic_installation = true,
 })
 
 
@@ -420,23 +440,14 @@ server_config.setup_handlers({
       root_dir = vim.loop.cwd,
       handlers = handlers,
     }
-    local run_custom_extern_settings = false
     if server_name == "lua_ls" then
       opts.settings = lua_setting
-    elseif server_name == 'hls' then
-      opts.settings = haskell_setting
     elseif server_name == "rust_analyzer" then
       opts.settings = rust_setting
-      require("rust-tools").setup({
-        server = opts,
-        dap = {
-          adapter = require("rust-tools.dap").get_codelldb_adapter(installer_path .. 'codelldb', ''),
-        },
-      })
-      run_custom_extern_settings = true
+    elseif server_name == 'hls' then
+      opts.settings = haskell_setting
     elseif server_name == "clangd" then
       opts['on_new_config'] = clangd_setting.on_new_config
-      require('cmake-tools').setup({})
     elseif server_name == "pyright" then
       opts["on_init"] =
           function(client)
@@ -445,17 +456,57 @@ server_config.setup_handlers({
     end
 
 
-    if #vim.lsp.buf_get_clients() > 0 then
+    if #vim.lsp.get_clients() > 0 then
       -- require('lsp-status').status()
     end
     -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
-    if not run_custom_extern_settings then
-      require("lspconfig")[server_name].setup(opts)
-    end
+    require("lspconfig")[server_name].setup(opts)
     vim.cmd([[do User LspAttachBuffer]])
+  end,
+
+  ["rust_analyzer"] = function()
+    require("rust-tools").setup {
+      server = {
+        on_attach = on_attach,
+
+        root_dir = require("lspconfig/util").root_pattern("Cargo.toml"),
+        settings = {
+          ["rust_analyzer"] = {
+
+            cargo = {
+              features = "all",
+            },
+
+            inlayHints = {
+              closureCaptureHints = {
+                enable = true,
+              },
+            },
+
+            diagnostics = {
+              enable = true,
+            },
+
+            imports = {
+              granularity = {
+                group = "module",
+              }
+
+            },
+
+            -- filetypes = { "rust", "toml" }
+
+          },
+        },
+
+      },
+    }
   end,
 })
 
+
+require 'lspconfig'.julials.setup {}
+require 'lspconfig'.mojo.setup {} -- Mojo not exist in Mason
 
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
 
@@ -463,6 +514,7 @@ for type, icon in pairs(signs) do
   local hl = "DiagnosticSign" .. type
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 end
+
 
 M.capabilities = capabilities
 M.on_attach    = on_attach

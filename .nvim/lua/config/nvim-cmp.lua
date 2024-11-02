@@ -40,6 +40,7 @@ tabnine:setup({
   show_prediction_strength = false,
 })
 
+
 local cmp_kinds = {
   Text = '  ',
   Method = '  ',
@@ -67,27 +68,26 @@ local cmp_kinds = {
   Operator = '  ',
   TypeParameter = '  ',
 }
-
 local provider = {
-  buffer = "[Buffer]",
-  nvim_lsp = "[LSP]",
-  luasnip = "[LuaSnip]",
-  nvim_lua = "[Lua]",
-  latex_symbols = "[Latex]",
-  cmp_tabnine = "[Tabnine]",
-  treesitter = "[Treesitter]",
-  tags = "[Tags]",
-  ctags = "[Ctags]",
-  fuzzy_buffer = "[FZF]",
-  rg = "[RG]",
-  path = "[PATH]",
-  spell = "[Grammar]",
-  tmux = "[Tmux]",
-  vimtex = "[Tex]",
-  cmp_zotcite = "[Cite]",
-  nvim_lsp_document_symbol = "[Symbol]",
-  nvim_lsp_signature_help = "[Signature]",
-  cmdline = "[CMD]",
+  buffer = "Buffer",
+  nvim_lsp = "LSP",
+  luasnip = "LuaSnip",
+  nvim_lua = "Lua",
+  latex_symbols = "Latex",
+  cmp_tabnine = "Tabnine",
+  treesitter = "Treesitter",
+  tags = "Tags",
+  ctags = "Ctags",
+  fuzzy_buffer = "FZF",
+  rg = "RG",
+  path = "PATH",
+  spell = "Grammar",
+  tmux = "Tmux",
+  vimtex = "Tex",
+  cmp_zotcite = "Cite",
+  nvim_lsp_document_symbol = "Symbol",
+  nvim_lsp_signature_help = "Signature",
+  cmdline = "cmdline",
 }
 
 cmp.setup({
@@ -105,21 +105,34 @@ cmp.setup({
     },
     documentation = cmp.config.window.bordered(),
   },
-
+  view = {
+    entries = { name = 'custom', selection_order = 'near_cursor' }
+  },
   formatting = {
-    fields = { "kind", "abbr", "menu" },
+    fields = { "kind", "abbr" },
     format = function(entry, vim_item)
-      local vim_item = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
-      local strings = vim.split(vim_item.kind, "%s", { trimempty = true })
-      if vim.tbl_contains({ 'path' }, entry.source.name) then
-        local icon, hl_group = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
-        if icon then
-          vim_item.kind = icon
-          vim_item.kind_hl_group = hl_group
-        end
-      else
-        vim_item.kind = " " .. (strings[1] or cmp_kinds[vim_item.kind]) .. " "
+      local lspkind_ok, lspkind = pcall(require, "lspkind")
+
+      local vim_item            = lspkind.cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
+      local strings             = vim.split(vim_item.kind, "%s", { trimempty = true })
+      local kind                = strings[1]
+      local source              = strings[2]
+      local icon, hl_group      = require('nvim-web-devicons').get_icon(entry:get_completion_item().label)
+
+
+
+      if cmp_kinds[source] ~= nil then
+        kind_icon = cmp_kinds[source]
+      elseif cmp_kinds[kind] ~= nil then
+        kind_icon = cmp_kinds[kind]
       end
+
+      if icon then
+        vim_item.kind_hl_group = hl_group
+      end
+
+      vim_item.kind = (kind_icon or icon) .. " " .. (source or "")
+
       if entry.source.name == "cmp_tabnine" then
         local detail = (entry.completion_item.labelDetails or {}).detail
         vim_item.kind = ""
@@ -131,12 +144,8 @@ cmp.setup({
           vim_item.kind = vim_item.kind .. ' ' .. '[ML]'
         end
       end
-      if strings[2] == "Variable" or strings[2] == "Text" then
-        vim_item.menu = provider[entry.source.name] or ("[" .. (entry.source.name or "") .. "]")
-      else
-        vim_item.menu = (provider[entry.source.name]) or (
-          "  (" .. (strings[2] or entry.source.name or "") .. ")")
-      end
+
+      vim_item.menu = provider[entry.source.name] or (entry.source.name)
       local maxwidth = 80
       vim_item.abbr = string.sub(vim_item.abbr, 1, maxwidth)
       return vim_item
@@ -317,7 +326,7 @@ cmp.setup({
     -- { name = 'nvim_lsp_signature_help',  priority = 10, max_item_count = 10, },
     -- { name = 'cmdline',                  trigger_characters = { ':', '/', '?', '@', }, priority = 5, keyword_length = 2 },
     { name = "latex_symbols", priority = 5, keyword_length = 2, trigger_characters = { '\\' }, option = { strategy = 0 } },
-    { name = "crates",        priority = 6 }
+    { name = "crates",        priority = 10 }
   },
   performance = {
     debonce = 200,
