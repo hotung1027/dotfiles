@@ -21,8 +21,8 @@ trouble.setup {
     cascade = {
       mode       = "diagnostics", -- inherit from diagnostics mode
 
-      auto_open  = true,          -- automatically open the list when you have diagnostics
-      auto_close = true,          -- automatically close the list when you have no diagnostics
+      -- auto_open  = true,          -- automatically open the list when you have diagnostics
+      -- auto_close = true,          -- automatically close the list when you have no diagnostics
       filter     = function(items)
         local severity = vim.diagnostic.severity.HINT
         for _, item in ipairs(items) do
@@ -47,11 +47,11 @@ trouble.setup {
   -- restore       = true,                  -- restores the last location in the list when opening
   -- follow        = true,                  -- Follow the current item
   -- indent_guides = true,                  -- show indent guides true,               -- add an indent guide below the fold icons
-  auto_preview = true,  -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
+  auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
   -- auto_fold     = true,                  -- automatically fold a file trouble list at creation
   -- auto_jump     = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
   --
   pinned       = true,
-  auto_open    = true, -- automatically open the list when you have diagnostics
-  auto_close   = true, -- automatically close the list when you have no diagnostics
+  -- auto_open    = true, -- automatically open the list when you have diagnostics
+  -- auto_close   = true, -- automatically close the list when you have no diagnostics
 }
