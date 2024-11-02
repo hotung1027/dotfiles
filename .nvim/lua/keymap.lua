@@ -1,6 +1,10 @@
 local map = require('utils').map
 local wk = require("which-key")
 local term = require("term")
+
+local tmux_manager = require('tmux-awesome-manager')
+local tmux_term = require('tmux-awesome-manager.src.term')
+
 local conf = {
   window = {
     border = "single",   -- none, single, double, shadow
@@ -259,6 +263,35 @@ map("n", "<leader>hb", "<cmd>lua require'gitsigns'.blame_line{full=true}<CR>")
 map("n", "<leader>hS", "<cmd>Gitsigns stage_buffer<CR>")
 map("n", "<leader>hU", "<cmd>Gitsigns reset_buffer_index<CR>")
 
+local rust_commands = {
+  debug_build     = { cmd = 'cargo build', name = "Debug build" },
+  release_build   = { cmd = 'cargo build --release', name = "Release build" },
+  install_package = { cmd = 'cargo install %1', name = "Cargo Install", questions = { { question = 'package name:', required = true } }, open_as = 'pane', visit_first_call = true, focus_when_call = false },
+  check           = { cmd = 'cargo check', name = "Cargo Check" },
+  clippy          = { cmd = 'cargo clippy', name = "Cargo Insight" },
+
+  test            = { cmd = 'cargo test', name = "Test Case" },
+  bench           = { cmd = 'cargo bench', name = "Benchmark Project" },
+  new             = {
+    cmd = function()
+      vim.ui.input({ prompt = "Directory name: ", }, function(input)
+        local cmd = ""
+        if input == "" or not input then
+          return
+        end
+        cmd = "cargo new " .. " " .. input
+        term.open_term(cmd, { direction = "float" })
+      end)
+    end,
+    name = "Cargo New"
+  },
+
+}
+local clang_commands = {
+  compile = { cmd = "ninja", name = "Compile", open_as = "window", visit_first_call = true, focus_when_call = true },
+  mk_dir = { cmd = "mkdir -p " .. "build", name = "Create directory", visit_first_call = true, focus_when_call = true },
+  config = { cmd = "cd " .. vim.fn.getcwd() .. " && cd build && ccmake ../", name = "CMAKE", open_as = "pane" },
+}
 local function normal_keymap()
   local keymap_f = nil -- File search
   local keymap_p = nil -- Project search
@@ -428,6 +461,27 @@ local function normal_keymap()
       s = { "<cmd>lua require('term').system_info_toggle()<CR>", "System Info" },
       c = { "<cmd>lua require('term').cht()<CR>", "Cheatsheet" },
       i = { "<cmd>lua require('term').interactive_cheatsheet_toggle()<CR>", "Interactive Cheatsheet" },
+      r = {
+        name = "Cargo",
+
+
+        n = rust_commands.new,
+        d = tmux_term.run_wk(rust_commands.debug_build),
+        r = tmux_term.run_wk(rust_commands.release_build),
+        i = tmux_term.run_wk(rust_commands.install_package),
+        c = tmux_term.run_wk(rust_commands.check),
+        f = tmux_term.run_wk(rust_commands.clippy),
+        t = tmux_term.run_wk(rust_commands.test),
+        b = tmux_term.run_wk(rust_commands.bench),
+      },
+      m = {
+        name = "Make",
+
+        m = tmux_term.run_wk(clang_commands.compile),
+        d = tmux_term.run_wk(clang_commands.mk_dir),
+        c = tmux_term.run_wk(clang_commands.config),
+      },
+
     },
 
     z = {

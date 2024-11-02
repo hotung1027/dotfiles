@@ -76,8 +76,7 @@ opt.mouse = 'a'
 opt.pumheight = 10
 opt.foldlevel = 0
 opt.foldenable = false
-
-opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+vim.o.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 vim.cmd([[set formatoptions-=cro]])
 vim.cmd([[set formatoptions+=pqj]])
 opt.hidden = true
@@ -130,13 +129,13 @@ vim.cmd [[filetype plugin indent  on]]
 vim.cmd [[syntax on]]
 
 local sessions = vim.api.nvim_create_augroup('sessions', {})
-vim.api.nvim_create_autocmd({ 'User' }, {
-  pattern = "SessionLoadPost",
-  group = sessions,
-  callback = function()
-    require('nvim-tree.api').tree.toggle(false, true)
-  end,
-})
+-- vim.api.nvim_create_autocmd({ 'User' }, {
+--   pattern = "SessionLoadPost",
+--   group = sessions,
+--   callback = function()
+--     require('nvim-tree.api').tree.toggle(false, true)
+--   end,
+-- })
 -- local lazy_nvim = vim.api.nvim_create_augroup('lazy_nvim', {})
 -- vim.api.nvim_create_autocmd({ 'User' }, {
 --   pattern = "LazyUpdate",
@@ -160,6 +159,8 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
 vim.api.nvim_create_autocmd({ 'VimEnter' }, {
   callback = function()
     -- vim.cmd('TwilightEnable')
+    --
+    vim.cmd [[SessionRestore]]
   end
 })
 local prefetch = vim.api.nvim_create_augroup("prefetch", { clear = true })

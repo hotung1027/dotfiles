@@ -1,4 +1,15 @@
 local M = {}
+local contains = function(dict, key)
+  local within = false
+  for k, _ in pairs(dict) do
+    if k == key then
+      within = true
+      break
+    end
+  end
+  return within
+end
+M.contains = contains
 
 M.map = function(mode, lhs, rhs, opts)
   local options = { noremap = true, silent = true }
@@ -7,7 +18,12 @@ M.map = function(mode, lhs, rhs, opts)
   end
   local stat, error
   if type(rhs) == "string" then
-    stat, error = pcall(vim.api.nvim_set_keymap, mode, lhs, rhs, options)
+    if contains(options, "buffer") then
+      options["buffer"] = nil
+      stat, error = pcall(vim.api.nvim_buf_set_keymap, opts["buffer"], mode, lhs, rhs, options)
+    else
+      stat, error = pcall(vim.api.nvim_set_keymap, mode, lhs, rhs, options)
+    end
   else
     stat, error = pcall(vim.keymap.set, mode, lhs, rhs, options)
   end
