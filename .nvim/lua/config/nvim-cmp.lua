@@ -131,7 +131,7 @@ cmp.setup({
       elseif cmp_kinds[source] ~= nil then
         vim_item.kind = (cmp_kinds[source]) .. (source or "")
       elseif cmp_kinds[kind] ~= nil then
-        vim_item.kind = (cmp_kinds[kind]) .. (source or "")
+        vim_item.kind = (cmp_kinds[kind]) .. (kind or "")
       else
         vim_item.kind = (kind) .. "  " .. (source or "")
       end

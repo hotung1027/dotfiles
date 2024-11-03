@@ -126,7 +126,15 @@ return require('lazy').setup(
     {
       'alexghergh/nvim-tmux-navigation'
     },
-    { 'otavioschwanck/tmux-awesome-manager.nvim', },
+    {
+      'otavioschwanck/tmux-awesome-manager.nvim',
+      opts = {
+        -- project_open_as = 'window', -- Open per_project_commands as.  Default: separated_session
+        -- default_size = '30%', -- on panes, the default size
+        open_new_as = 'pane',            -- open new command as.  options: pane, window, separated_session.
+        default_orientation = 'vertical' -- Can also be horizontal
+      }
+    },
     -- Visual Guide
     --
     {
