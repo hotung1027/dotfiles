@@ -27,9 +27,9 @@ parser_configs.norg_table = {
 vim.cmd("packadd! matchit")
 require 'nvim-treesitter.configs'.setup {
   ensure_installed = {
-    "norg",
-    "norg_meta",
-    "norg_table",
+    -- "norg",
+    -- "norg_meta",
+    -- "norg_table",
     "c",
     "cpp",
     "haskell",
