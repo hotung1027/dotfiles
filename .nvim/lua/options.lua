@@ -191,8 +191,9 @@ vim.api.nvim_create_autocmd({ 'CursorHoldI' }, {
     local before_line = string.sub(current_line, 1, cursor + 1)
     --
     if require("tabnine.keymaps").has_suggestion() then
-      cmp.close()
+      cmp.visible(false)
     elseif string.match(before_line, "$") or #before_line == 0 then
+      cmp.visible(true)
       cmp.complete()
     end
   end
@@ -219,8 +220,9 @@ vim.api.nvim_create_autocmd({ 'TextChangedP' }, {
     local after_line = string.sub(current_line, cursor + 1, -1)
 
     if require("tabnine.keymaps").has_suggestion() then
-      cmp.close()
+      cmp.visible(false)
     elseif after_line == "" or string.match(before_line, " $") or string.match(before_line, "%.$") or has_words_before() then
+      cmp.visible(true)
       cmp.complete()
     end
   end

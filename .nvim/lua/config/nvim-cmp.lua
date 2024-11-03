@@ -13,7 +13,7 @@ local feedkey = function(key, mode)
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, true, true), mode, true)
 end
 
-local tabnine = require('cmp_tabnine.config')
+local has_words_befor
 
 require('tabnine').setup({
   disable_auto_comment = false,
@@ -29,18 +29,22 @@ require('tabnine').setup({
 
 
 
--- tabnine:setup({
---   max_lines = 2000,
---   max_num_results = 20,
---   sort = true,
---   run_on_every_keystroke = true,
---   snippet_placeholder = '..',
---   ignored_file_types = {
---     TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
---   },
---   min_percent = 0,
---   show_prediction_strength = true,
--- })
+
+
+
+local tabnine = require('cmp_tabnine.config')
+tabnine:setup({
+  max_lines = 2000,
+  max_num_results = 20,
+  sort = true,
+  run_on_every_keystroke = true,
+  snippet_placeholder = '..',
+  ignored_file_types = {
+    TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
+  },
+  min_percent = 0,
+  show_prediction_strength = true,
+})
 
 local cmp_kinds = {
   Field = '  ',
@@ -61,6 +65,7 @@ local cmp_kinds = {
   Event = '  ',
   Operator = '  ',
 }
+
 local provider = {
   buffer = "Buffer",
   nvim_lsp = "LSP",
@@ -233,11 +238,11 @@ cmp.setup({
   },
 
   sources = {
-    -- { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
-    { name = 'nvim_lsp',   priority = 5, max_item_count = 20, },
-    { name = 'luasnip',    priority = 5, },
-    { name = 'treesitter', priority = 4, max_item_count = 20, },
-    { name = "tags",       priority = 5, max_item_count = 20, },
+    { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
+    { name = 'nvim_lsp',    priority = 5, max_item_count = 20, },
+    { name = 'luasnip',     priority = 5, },
+    { name = 'treesitter',  priority = 4, max_item_count = 20, },
+    { name = "tags",        priority = 5, max_item_count = 20, },
     {
       name = "ctags", -- default values
       option = {
@@ -336,11 +341,11 @@ cmp.setup({
     { name = "crates",        priority = 10 }
   },
   performance = {
-    debounce = 200,
+    debounce = 400,
     throttle = 100,
-    fetching_timeout = 100,
-    async_budget = 100,
-    filtering_context_budget = 100,
+    fetching_timeout = 200,
+    async_budget = 200,
+    filtering_context_budget = 200,
     max_view_entries = 30,
   },
 
@@ -367,7 +372,7 @@ cmp.setup({
     completeopt = "menu,noselect"
   },
   experimental = {
-    ghost_text = false,
+    ghost_text = true,
   },
 })
 
