@@ -46,10 +46,10 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export RVM_DIR="$HOME/.rvm"
-source "$RVM_DIR/scripts/rvm"
-export GVM_DIR="$HOME/.gvm"
-source "$GVM_DIR/scripts/gvm"
+# export RVM_DIR="$HOME/.rvm"
+# source "$RVM_DIR/scripts/rvm"
+# export GVM_DIR="$HOME/.gvm"
+# source "$GVM_DIR/scripts/gvm"
 
 
 export LD_LIBRARY_PATH="$VULKAN_SDK/lib:$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
@@ -113,7 +113,7 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages ripgrep zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
+plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages  zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
 autoload -U compinit && compinit
 source $ZSH/oh-my-zsh.sh
 
@@ -194,21 +194,17 @@ export ENABLE_JITPROFILING=1
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/randyt/mambaforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/randyt/.miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/randyt/mambaforge/etc/profile.d/conda.sh" ]; then
-        . "/home/randyt/mambaforge/etc/profile.d/conda.sh"
+    if [ -f "/home/randyt/.miniforge3/etc/profile.d/conda.sh" ]; then
+        . "/home/randyt/.miniforge3/etc/profile.d/conda.sh"
     else
-        export PATH="/home/randyt/mambaforge/bin:$PATH"
+        export PATH="/home/randyt/.miniforge3/bin:$PATH"
     fi
 fi
 unset __conda_setup
-
-if [ -f "/home/randyt/mambaforge/etc/profile.d/mamba.sh" ]; then
-    . "/home/randyt/mambaforge/etc/profile.d/mamba.sh"
-fi
 # <<< conda initialize <<<
 [ -f "/home/randyt/.ghcup/env" ] && source "/home/randyt/.ghcup/env" # ghcup-env
 
@@ -225,5 +221,5 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 path=('/home/randyt/.juliaup/bin' $path)
 export PATH
-
+eval "$(zoxide init --cmd=cd zsh)"
 # <<< juliaup initialize <<<
