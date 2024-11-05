@@ -17,8 +17,8 @@ local has_words_befor
 
 require('tabnine').setup({
   disable_auto_comment = false,
-  accept_keymap = "<Tab>",
-  dismiss_keymap = "<C-e>",
+  accept_keymap = false,
+  dismiss_keymap = false,
   debounce_ms = 400,
   suggestion_color = { gui = "#808080", cterm = 244 },
   exclude_filetypes = { "TelescopePrompt", "NvimTree", "Vista", "Terminal" },
@@ -47,23 +47,23 @@ tabnine:setup({
 })
 
 local cmp_kinds = {
-  Field = '  ',
-  Variable = '  ',
-  Class = '  ',
-  Interface = '  ',
-  Module = '  ',
-  Property = '  ',
-  Value = '  ',
-  Enum = '  ',
-  Keyword = '  ',
-  Color = '  ',
-  File = '  ',
-  Folder = '  ',
-  EnumMember = '  ',
-  Constant = '  ',
-  Struct = '  ',
-  Event = '  ',
-  Operator = '  ',
+  Field = '',
+  Variable = '',
+  Class = '',
+  Interface = '',
+  Module = '',
+  Property = '',
+  Value = '',
+  Enum = '',
+  Keyword = '',
+  Color = '',
+  File = '',
+  Folder = '',
+  EnumMember = '',
+  Constant = '',
+  Struct = '',
+  Event = '',
+  Operator = '',
 }
 
 local provider = {
@@ -255,38 +255,38 @@ cmp.setup({
     { name = 'cmp_zotcite', priority = 5, trigger_characters = { '@' } },
     { name = 'vimtex',      priority = 5 },
 
-    {
-      name = 'buffer',
-      priority = 4,
-      max_item_count = 20,
-      option = {
-        get_bufnrs = function()
-          local bufs = {}
-          local function check_size_and_editable(buf)
-            local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
-            -- if buftype ~= 'nofile' and
-            if buftype ~= 'prompt' or buftype == 'help' then
-              local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
-              if byte_size < 10 * 1024 * 1024 then
-                return true
-              end
-            end
-          end
-          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-            if check_size_and_editable(buf) then
-              bufs[buf] = true
-            end
-          end
-          for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            if check_size_and_editable(buf) then
-              bufs[buf] = true
-            end
-          end
-          return vim.tbl_keys(bufs)
-        end
-      }
-    },
+    -- {
+    --   name = 'buffer',
+    --   priority = 4,
+    --   max_item_count = 20,
+    --   option = {
+    --     get_bufnrs = function()
+    --       local bufs = {}
+    --       local function check_size_and_editable(buf)
+    --         local buftype = vim.api.nvim_buf_get_option(buf, 'buftype')
+    --         -- if buftype ~= 'nofile' and
+    --         if buftype ~= 'prompt' or buftype == 'help' then
+    --           local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+    --           if byte_size < 10 * 1024 * 1024 then
+    --             return true
+    --           end
+    --         end
+    --       end
+    --       for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    --         if check_size_and_editable(buf) then
+    --           bufs[buf] = true
+    --         end
+    --       end
+    --       for _, win in ipairs(vim.api.nvim_list_wins()) do
+    --         local buf = vim.api.nvim_win_get_buf(win)
+    --         if check_size_and_editable(buf) then
+    --           bufs[buf] = true
+    --         end
+    --       end
+    --       return vim.tbl_keys(bufs)
+    --     end
+    --   }
+    -- },
 
     {
       name = 'fuzzy_buffer',
