@@ -425,7 +425,7 @@ return require('lazy').setup(
           log_level = 'error',
           auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
           enabled = false,
-          auto_save = false,    -- Enables/disables auto saving session on exit
+          auto_save = true,     -- Enables/disables auto saving session on exit
           auto_restore = false, -- Enables/disables auto restoring session on start
           bypass_save_filetypes = {
             'gitcommit',
