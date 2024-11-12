@@ -40,7 +40,11 @@ tabnine:setup({
   run_on_every_keystroke = true,
   snippet_placeholder = '..',
   ignored_file_types = {
-    TelescopePrompt = true, NvimTree = true, Vista = true, Terminal = true,
+    TelescopePrompt = true,
+    NvimTree        = true,
+    Vista           = true,
+    Terminal        = true,
+
   },
   min_percent = 0,
   show_prediction_strength = true,
@@ -65,6 +69,7 @@ local cmp_kinds = {
   Event = '',
   Operator = '',
 }
+
 
 local provider = {
   buffer = "Buffer",
@@ -236,7 +241,6 @@ cmp.setup({
       end
     end, { "i", "s" }),
   },
-
   sources = {
     { name = 'cmp_tabnine', priority = 5, keyword_length = 0, },
     { name = 'nvim_lsp',    priority = 5, max_item_count = 20, },
@@ -287,6 +291,7 @@ cmp.setup({
     --     end
     --   }
     -- },
+    --
 
     {
       name = 'fuzzy_buffer',
@@ -364,7 +369,7 @@ cmp.setup({
       cmp.config.compare.length,
       cmp.config.compare.order,
     },
-    priority_weight = 1,
+    priority_weight = 2,
   },
   completion = {
     -- autocomplete = true,

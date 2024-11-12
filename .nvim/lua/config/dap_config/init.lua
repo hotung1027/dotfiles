@@ -16,8 +16,8 @@ local function import(parent, modules)
 end
 import('config.dap_config.lua', {
   'dap_cpp',
-  'dap_flutter',
-  'dap_haskell'
+  -- 'dap_flutter',
+  -- 'dap_haskell'
 })
 local installer_path = require('config.dap_config.dap').installer_path
 local nvim_dap = require('mason-nvim-dap').setup({
@@ -43,7 +43,7 @@ local nvim_dap = require('mason-nvim-dap').setup({
     cpp = function(config)
       config.adapters = {
         type = "executable",
-        command = installer_path .. "codelldb",
+        command = "codelldb",
         port = "${port}",
         args = {
           "--port",

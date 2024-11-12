@@ -393,6 +393,9 @@ return require('lazy').setup(
               c = "c",
 
             },
+            complex = {
+              ["Dockerfile*"] = "dockerfile",
+            }
           },
         })
       end
@@ -540,8 +543,8 @@ return require('lazy').setup(
     { "hrsh7th/cmp-buffer",                   dependencies = { "hrsh7th/nvim-cmp" }, },
     { "tzachar/cmp-fuzzy-buffer",             dependencies = { "hrsh7th/nvim-cmp", 'tzachar/fuzzy.nvim' }, },
     { "lukas-reineke/cmp-rg",                 dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  dependencies = { "hrsh7th/nvim-cmp" }, },
-    { 'codota/tabnine-nvim',                  build = tabnine_build_path },
+    { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  vdependencies = { "hrsh7th/nvim-cmp" }, },
+    { 'codota/tabnine-nvim',                  build = tabnine_build_path() },
     { "lukas-reineke/cmp-under-comparator",   dependencies = { "hrsh7th/nvim-cmp" }, },
     { "ray-x/cmp-treesitter",                 dependencies = { "hrsh7th/nvim-cmp" }, },
     { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { "hrsh7th/nvim-cmp" }, },
@@ -967,13 +970,41 @@ return require('lazy').setup(
     { "tpope/vim-fugitive",          ft = "Git" },
 
     -- Better git log display
+    -- {
+    --   "rbong/vim-flog",
+    --   lazy = true,
+    --   cmd = { "Flog", "Flogsplit", "Floggit" },
+    --   dependencies = {
+    --     "tpope/vim-fugitive",
+    --   },
+    -- },
+    --
     {
-      "rbong/vim-flog",
-      lazy = true,
-      cmd = { "Flog", "Flogsplit", "Floggit" },
-      dependencies = {
-        "tpope/vim-fugitive",
+      'SuperBo/fugit2.nvim',
+      opts = {
+        width = 100,
+        external_diffview = true, -- tell fugit2 to use diffview.nvim instead of builtin implementation.
+        libgit2_path = 'libgit2.so.1.8.2',
       },
+      dependencies = {
+        'MunifTanjim/nui.nvim',
+        'nvim-tree/nvim-web-devicons',
+        'nvim-lua/plenary.nvim',
+        {
+          'chrisgrieser/nvim-tinygit', -- optional: for Github PR view
+          dependencies = { 'stevearc/dressing.nvim' }
+        },
+      },
+      cmd = { 'Fugit2', 'Fugit2Blame', 'Fugit2Diff', 'Fugit2Graph' },
+
+    },
+    {
+      'sindrets/diffview.nvim',
+      dependencies = { 'nvim-tree/nvim-web-devicons' },
+      -- lazy, only load diffview by these commands
+      cmd = {
+        'DiffviewFileHistory', 'DiffviewOpen', 'DiffviewToggleFiles', 'DiffviewFocusFiles', 'DiffviewRefresh'
+      }
     },
     {
       'tanvirtin/vgit.nvim',
@@ -1037,6 +1068,18 @@ return require('lazy').setup(
     --   build = 'make install',
     -- },
     -- Mark Down Plugins
+    -- install without yarn or npm
+    {
+      "iamcco/markdown-preview.nvim",
+      cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+      ft = { "markdown" },
+      build = "cd app && yarn install",
+      init = function()
+        vim.g.mkdp_filetypes = { "markdown" }
+      end,
+    },
+
+
     -- Another markdown plugin
     { "plasticboy/vim-markdown",     ft = { "markdown" }, },
     { 'vim-pandoc/vim-pandoc' },

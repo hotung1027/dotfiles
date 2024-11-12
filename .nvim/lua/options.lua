@@ -80,7 +80,7 @@ vim.o.sessionoptions = "buffers,curdir,folds,help,tabpages,winsize,winpos,termin
 vim.cmd([[set formatoptions-=cro]])
 vim.cmd([[set formatoptions+=pqj]])
 opt.hidden = true
-
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 -- Changed home directory here
 local backup_dir = vim.fn.stdpath("cache") .. "/backup"
 local backup_stat = pcall(os.execute, "mkdir -p " .. backup_dir)
@@ -157,13 +157,14 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
     vim.cmd [[SessionSave]]
   end
 })
-vim.api.nvim_create_autocmd({ 'VimEnter' }, {
+vim.api.nvim_create_autocmd({ 'BufReadPre' }, {
   callback = function()
     -- vim.cmd('TwilightEnable')
     --
     vim.cmd [[SessionRestore]]
   end
 })
+
 local prefetch = vim.api.nvim_create_augroup("prefetch", { clear = true })
 
 vim.api.nvim_create_autocmd('BufRead', {
@@ -175,7 +176,6 @@ vim.api.nvim_create_autocmd('BufRead', {
 })
 
 local nvim_cmp = vim.api.nvim_create_augroup("nvim-cmp", { clear = true })
-
 vim.api.nvim_create_autocmd({ 'CursorHoldI' }, {
   group = nvim_cmp,
   callback = function()

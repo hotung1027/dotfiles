@@ -506,6 +506,7 @@ local function normal_keymap()
       --   "<cmd>lua require'gitlinker'.get_buf_range_url('n', {action_callback = require'gitlinker.actions'.open_in_browser})<cr>",
       --   "Link",
       -- },
+      f = { '<cmd>Fugit2<CR>' },
       g = { "<cmd>lua require('telescope').extensions.gh.gist()<CR>", "Gist" },
       z = { "<cmd>lua require('term').git_client_toggle()<CR>", "Git TUI" },
       h = { name = "Hunk" },

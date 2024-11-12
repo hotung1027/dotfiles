@@ -1,5 +1,5 @@
 require('gitsigns').setup {
-  signs                   = {
+  signs = {
     add = {
       text = '▎',
     },
@@ -73,3 +73,14 @@ require('gitsigns').setup {
   word_diff               = false,
   diff_opts               = { internal = true }
 }
+
+vim.api.nvim_set_hl(0, 'GitSignsAdd', { link = 'GitSignsAdd' })
+vim.api.nvim_set_hl(0, 'GitSignsAddLn', { link = 'true' })
+vim.api.nvim_set_hl(0, 'GitSignsChange', { link = 'GitSignsChange' })
+vim.api.nvim_set_hl(0, 'GitSignsChangeLn', { link = 'true' })
+vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { link = 'GitSignsChange' })
+vim.api.nvim_set_hl(0, 'GitSignsChangedeleteLn', { link = 'true' })
+vim.api.nvim_set_hl(0, 'GitSignsDelete', { link = 'GitSignsDelete' })
+vim.api.nvim_set_hl(0, 'GitSignsDeleteLn', { link = 'true' })
+vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { link = 'GitSignsDelete' })
+vim.api.nvim_set_hl(0, 'GitSignsTopdeleteLn', { link = 'true' })

@@ -210,6 +210,8 @@ local handlers = {
 
   ["textDocument/definition"] = goto_definition('split'),
 
+
+
 }
 
 
@@ -317,44 +319,6 @@ local on_attach = function(client, bufnr)
     require('lsputil.codeAction').code_action_handler(nil, actions, nil, nil, nil)
   end
 
-  vim.lsp.handlers['textDocument/references'] = function(_, _, result)
-    require('lsputil.locations').references_handler(nil, result, { bufnr = bufnr }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/definition'] = function(_, method, result)
-    require('lsputil.locations').definition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/declaration'] = function(_, method, result)
-    require('lsputil.locations').declaration_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/typeDefinition'] = function(_, method, result)
-    require('lsputil.locations').typeDefinition_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/implementation'] = function(_, method, result)
-    require('lsputil.locations').implementation_handler(nil, result, { bufnr = bufnr, method = method }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/documentSymbol'] = function(_, _, result, _, bufn)
-    require('lsputil.symbols').document_handler(nil, result, { bufnr = bufn }, nil)
-  end
-
-  vim.lsp.handlers['textDocument/symbol'] = function(_, _, result, _, bufn)
-    require('lsputil.symbols').workspace_handler(nil, result, { bufnr = bufn }, nil)
-  end
-  vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
-    vim.lsp.diagnostic.on_publish_diagnostics,
-    {
-      underline = true,
-      virtual_text = {
-        spacing = 5,
-        severity_limit = 'Warning',
-      },
-      update_in_insert = true,
-    }
-  )
   buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
   -- Mappings.
   function show_documentation()
@@ -418,6 +382,33 @@ local on_attach = function(client, bufnr)
   -- popup diagnostic
   -- vim.cmd [[autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false,scope = "cursor"})]]
 
+  -- Code Lens
+  local status_ok, codelens_supported = pcall(function()
+    return client.supports_method("textDocument/codeLens")
+  end)
+
+  local group = "lsp_code_lens_refresh"
+  local cl_events = { "BufEnter", "InsertLeave" }
+  local ok, cl_autocmds = pcall(vim.api.nvim_get_autocmds, {
+    group = group,
+    buffer = bufnr,
+    event = cl_events,
+  })
+  local cb = function()
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_buf_is_valid(bufnr) and codelens_supported then
+      vim.lsp.codelens.refresh({ bufnr = bufnr })
+    end
+  end
+
+
+  if ok and #cl_autocmds > 0 then
+    vim.api.nvim_create_augroup(group, { clear = false })
+    vim.api.nvim_create_autocmd(cl_events, {
+      group = group,
+      buffer = bufnr,
+      callback = cb,
+    })
+  end
 
 
   -- vim.cmd([[
@@ -425,19 +416,19 @@ local on_attach = function(client, bufnr)
   --   ]])
   if client.server_capabilities.document_highlight then
     vim.cmd [[
-        hi LspReferenceRead cterm=bold ctermbg=red guibg=DarkRed
-        hi LspReferenceText cterm=bold ctermbg=red guibg=DarkRed
-        hi LspReferenceWrite cterm=bold ctermbg=red guibg=DarkRed
+        hi lspreferenceread cterm=bold ctermbg=red guibg=darkred
+        hi lspreferencetext cterm=bold ctermbg=red guibg=darkred
+        hi lspreferencewrite cterm=bold ctermbg=red guibg=darkred
         augroup lsp_document_highlight
           autocmd! * <buffer>
-          autocmd CursorHold <buffer> lua vim.lsp.buf.document_highlight()
-          autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()
-        augroup END
+          autocmd cursorhold <buffer> lua vim.lsp.buf.document_highlight()
+          autocmd cursormoved <buffer> lua vim.lsp.buf.clear_references()
+        augroup end
       ]]
   end
   -- vim.lsp.buf_attach_client(bufnr, client)
 end
--- lspInstall + lspconfig stuff
+-- lspinstall + lspconfig stuff
 
 
 
@@ -453,7 +444,7 @@ installer.setup({
 
 server_config.setup({
   ensure_installed = servers,
-  automatic_installation = true,
+  automatic_installation = { exclude = { "rust_analyzer", } },
 })
 
 
@@ -476,7 +467,7 @@ server_config.setup_handlers({
     elseif server_name == "pyright" then
       opts["on_init"] =
           function(client)
-            client.config.settings.python.pythonPath = get_python_path(client.config.root_dir)
+            client.config.settings.python.pythonpath = get_python_path(client.config.root_dir)
           end
     end
 
