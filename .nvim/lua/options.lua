@@ -161,7 +161,7 @@ vim.api.nvim_create_autocmd({ 'BufReadPre' }, {
   callback = function()
     -- vim.cmd('TwilightEnable')
     --
-    vim.cmd [[SessionRestore]]
+    -- vim.cmd [[SessionRestore]]
   end
 })
 

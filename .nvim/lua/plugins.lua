@@ -162,11 +162,44 @@ return require('lazy').setup(
       config = function() require("config.comment") end,
     },
     { "JoosepAlviste/nvim-ts-context-commentstring" },
+    ---- Task/Workflow
     ---- TO-DO Highlight
     {
       "folke/todo-comments.nvim",
       dependencies = { "nvim-lua/plenary.nvim" },
       opts = {}
+    },
+    {
+      'duckdm/neowarrior.nvim',
+      event = 'VeryLazy',
+      dependencies = {
+        'nvim-telescope/telescope.nvim',
+        --- Optional but recommended for nicer inputs
+        --- 'folke/noice.nvim',
+      },
+      config = function()
+        local nw = require('neowarrior')
+        local home = vim.env.HOME
+        nw.setup({
+          report = "next",
+          filter = "\\(due.before:2d or due: \\)",
+          dir_setup = {
+            {
+              dir = home .. "/dev/nvim/neowarrior.nvim",
+              filter = "project:neowarrior",
+              mode = "tree",
+              expanded = true,
+            },
+          }
+        })
+        vim.keymap.set("n", "<leader>nl", function() nw.open_left() end, { desc = "Open nwarrior on the left side" })
+        vim.keymap.set("n", "<leader>nc", function() nw.open_current() end,
+          { desc = "Open nwarrior below current buffer" })
+        vim.keymap.set("n", "<leader>nb", function() nw.open_below() end, { desc = "Open nwarrior below current buffer" })
+        vim.keymap.set("n", "<leader>na", function() nw.open_above() end, { desc = "Open nwarrior above current buffer" })
+        vim.keymap.set("n", "<leader>nr", function() nw.open_right() end, { desc = "Open nwarrior on the right side" })
+        vim.keymap.set("n", "<leader>nt", function() nw.focus() end, { desc = "Focus nwarrior" })
+      end
     },
     -- Float Terminal
     {
@@ -395,6 +428,8 @@ return require('lazy').setup(
             },
             complex = {
               ["Dockerfile*"] = "dockerfile",
+              [".*urdf.*"] = "xml"
+
             }
           },
         })
@@ -427,7 +462,8 @@ return require('lazy').setup(
         require('auto-session').setup {
           log_level = 'error',
           auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
-          enabled = false,
+          auto_restore_last_session = false,
+          enabled = true,
           auto_save = true,     -- Enables/disables auto saving session on exit
           auto_restore = false, -- Enables/disables auto restoring session on start
           bypass_save_filetypes = {
@@ -538,27 +574,74 @@ return require('lazy').setup(
 
 
     -- completeion source
-    { "hrsh7th/cmp-nvim-lua",                 dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "hrsh7th/cmp-path",                     dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "hrsh7th/cmp-buffer",                   dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "tzachar/cmp-fuzzy-buffer",             dependencies = { "hrsh7th/nvim-cmp", 'tzachar/fuzzy.nvim' }, },
-    { "lukas-reineke/cmp-rg",                 dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  vdependencies = { "hrsh7th/nvim-cmp" }, },
-    { 'codota/tabnine-nvim',                  build = tabnine_build_path() },
-    { "lukas-reineke/cmp-under-comparator",   dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "ray-x/cmp-treesitter",                 dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "hrsh7th/cmp-nvim-lsp-signature-help",  dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "f3fora/cmp-spell",                     dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "andersevenrud/cmp-tmux",               dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "hrsh7th/cmp-cmdline",                  dependencies = { "hrsh7th/nvim-cmp" }, },
-    { "quangnguyen30192/cmp-nvim-tags",       dependencies = { "hrsh7th/nvim-cmp" },                       ft = { 'haskell', 'c', 'cpp', 'h', 'hpp' }, },
-    { "kdheepak/cmp-latex-symbols",           dependencies = { "hrsh7th/nvim-cmp", }, },
+    -- { "hrsh7th/cmp-nvim-lua",                 dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "hrsh7th/cmp-path",                     dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "hrsh7th/cmp-buffer",                   dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "tzachar/cmp-fuzzy-buffer",             dependencies = { "hrsh7th/nvim-cmp", 'tzachar/fuzzy.nvim' }, },
+    -- { "lukas-reineke/cmp-rg",                 dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "tzachar/cmp-tabnine",                  build = { "./install.sh" },                                  vdependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { 'codota/tabnine-nvim',                  build = tabnine_build_path() },
+    -- { "lukas-reineke/cmp-under-comparator",   dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "ray-x/cmp-treesitter",                 dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "hrsh7th/cmp-nvim-lsp-document-symbol", dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "hrsh7th/cmp-nvim-lsp-signature-help",  dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "f3fora/cmp-spell",                     dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "andersevenrud/cmp-tmux",               dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "hrsh7th/cmp-cmdline",                  dependencies = { "hrsh7th/nvim-cmp" }, },
+    -- { "quangnguyen30192/cmp-nvim-tags",       dependencies = { "hrsh7th/nvim-cmp" },                       ft = { 'haskell', 'c', 'cpp', 'h', 'hpp' }, },
+    -- { "kdheepak/cmp-latex-symbols",           dependencies = { "hrsh7th/nvim-cmp", }, },
     { 'onsails/lspkind-nvim' },
+    -- {
+    --   "hrsh7th/nvim-cmp",
+    --   dependencies = "lspkind-nvim",
+    --   config = function() require('config.nvim-cmp') end
+    -- },
     {
-      "hrsh7th/nvim-cmp",
+      "saghen/blink.cmp",
+      version = "1.*",
       dependencies = "lspkind-nvim",
-      config = function() require('config.nvim-cmp') end
+      opts = {
+        keymap = { preset = 'super-tab' },
+        cmdline = {enable = true},
+        keyword = {range = 'full'},
+        list = {selection = { preselect = function(ctx) return vim.bo.filetype ~= 'markdown' end, auto_insert = true}},
+        menu = {
+          auto_show =true,
+        },
+        documentation = {auto_show = true, authow_delay_ms = 500},
+        ghost_text = {enabled = true},
+        snippets = { preset = 'luasnip' },
+        signature = { enabled = true },
+        fuzzy = {
+          implementation = "prefer_rust_with_warning",
+          sorts = {
+            'exact',
+            'score',
+            'sort_text',
+            'label',
+            'kind'
+          }
+        },
+
+        sources = {
+          default = {'lsp', 'paths', 'snippets', 'buffers'},
+          providers = {
+            lsp = {
+              async = true,
+            },
+            ctags
+            =
+              {
+                name= "ctags",
+                module = "ctags-lsp.nvim",
+
+              }
+
+
+          }
+        },
+      },
+      -- config = function() require('config.nvim-cmp') end
     },
     -- doc string generation
 

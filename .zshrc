@@ -1,12 +1,8 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.qq
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
-
- #If you come from bash you might have to change your $PATH.
+#If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 # Path to your oh-my-zsh installation.
 export ZSH="/home/randyt/.oh-my-zsh"
@@ -15,7 +11,10 @@ export ZSH="/home/randyt/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME="spaceship"
+
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 
 # Colorized terminal 
 ZSH_COLORIZE_TOOL=chroma
@@ -34,8 +33,11 @@ export SURF_HOME="$HOME/.local/share/surf"
 export YARN_HOME="$HOME/.yarn"
 export CUDA_HOME="/usr/local/cuda"
 export DPCPP_HOME="$HOME/sycl_workspace"
+export ISAAC_ROS_WS="$HOME/workspace/issac_ros2_ws"
 
 # VULKAN SDK
+export SPACESHIP_CONFIG="$HOME/dotfiles/spaceship.zsh"
+
 export VULKAN_SDK="$HOME/VulkanSDK/1.3.216/macOS"
 export VK_ICD_FILENAMES=$VULKAN_SDK/etc/vulkan/icd.d/MoltenVK_icd.json
 export VK_LAYER_PATH=$VULKAN_SDK/etc/vulkan/explicit_layer.d
@@ -52,7 +54,10 @@ export NVM_DIR="$HOME/.nvm"
 # source "$GVM_DIR/scripts/gvm"
 
 
-export LD_LIBRARY_PATH="$VULKAN_SDK/lib:$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
+# export LD_LIBRARY_PATH="$VULKAN_SDK/lib:$DPCPP_HOME/llvm/build/lib:/usr/local/cuda-11.8/lib64:$CUDA_HOME/lib64:/usr/lib/x86_64-linux-gnu:/usr/local/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH"
+# A simplified LD_LIBRARY_PATH for testing:
+# export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib:$LD_LIBRARY_PATH" 
+
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -85,7 +90,7 @@ export LD_LIBRARY_PATH="$VULKAN_SDK/lib:$DPCPP_HOME/llvm/build/lib:/usr/local/cu
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+# ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # Caution: this setting can cause issues with multiline prompts (zsh 5.7.1 and newer seem to work)
@@ -113,9 +118,12 @@ ENABLE_CORRECTION="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages  zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
+plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages rust zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
 autoload -U compinit && compinit
 source $ZSH/oh-my-zsh.sh
+source /etc/bash_completion.d/lxc
+
+
 
 # User configuration
 # FZF Configuration for in terminal seraching 
@@ -159,14 +167,14 @@ _fzf_comprun() {
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -181,8 +189,6 @@ _fzf_comprun() {
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 GITSTATUS_LOG_LEVEL=DEBUG
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # JULIA ENV
 export JULIA_NUM_THREADS=8
@@ -194,14 +200,14 @@ export ENABLE_JITPROFILING=1
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/randyt/.miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$('/home/randyt/.miniforge/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/home/randyt/.miniforge3/etc/profile.d/conda.sh" ]; then
-        . "/home/randyt/.miniforge3/etc/profile.d/conda.sh"
+    if [ -f "/home/randyt/.miniforge/etc/profile.d/conda.sh" ]; then
+        . "/home/randyt/.miniforge/etc/profile.d/conda.sh"
     else
-        export PATH="/home/randyt/.miniforge3/bin:$PATH"
+        export PATH="/home/randyt/.miniforge/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -222,4 +228,18 @@ export PATH="$PATH:$HOME/.rvm/bin"
 path=('/home/randyt/.juliaup/bin' $path)
 export PATH
 eval "$(zoxide init --cmd=cd zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
+eval "$(uv generate-shell-completion zsh)"
+if [ -n "$ZSH_VERSION" ]; then
+    eval "$(_ADE_COMPLETE=source_zsh ade)"
+else
+    eval "$(_ADE_COMPLETE=source ade)"
+fi
+
 # <<< juliaup initialize <<<
+
+# . "$HOME/.local/bin/env"
+
+
+
+
