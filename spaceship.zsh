@@ -15,6 +15,8 @@ SPACESHIP_PROMPT_ORDER=(
   dir            # Current directory section
   host           # Hostname section
 
+
+  nix_shell      # Nix shell
   git            # Git section (git_branch + git_status)
 #   hg             # Mercurial section (hg_branch  + hg_status)
   package        # Package version
@@ -59,10 +61,8 @@ SPACESHIP_PROMPT_ORDER=(
 #   terraform      # Terraform workspace section
 #   pulumi         # Pulumi stack section
 #   ibmcloud       # IBM Cloud section
-  nix_shell      # Nix shell
   gnu_screen     # GNU Screen section
   exec_time      # Execution time
-  async          # Async jobs indicator
   time           # Time stamps section
   line_sep       # Line break
 
@@ -70,7 +70,7 @@ SPACESHIP_PROMPT_ORDER=(
   jobs           # Background jobs indicator
   exit_code      # Exit code section
   sudo           # Sudo indicator
-#   vi_mode        # Vi-mode indicator
+  # vi_mode        # Vi-mode indicator
   char           # Prompt character
 )
 

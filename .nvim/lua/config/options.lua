@@ -4,3 +4,7 @@
 --
 vim.g.mapleader = ";"
 vim.g.lazyvim_cmp = "blink"
+-- Enable autoread option
+vim.o.autoread = true
+-- Resolve LazyVim and Trouble conflict
+vim.g.trouble_lualine = false

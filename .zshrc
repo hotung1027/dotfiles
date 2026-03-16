@@ -35,6 +35,7 @@ export CUDA_HOME="/usr/local/cuda"
 export DPCPP_HOME="$HOME/sycl_workspace"
 export ISAAC_ROS_WS="$HOME/workspace/issac_ros2_ws"
 
+
 # VULKAN SDK
 export SPACESHIP_CONFIG="$HOME/dotfiles/spaceship.zsh"
 
@@ -121,7 +122,7 @@ export NVM_DIR="$HOME/.nvm"
 plugins=(git  docker docker-compose ssh-agent conda-zsh-completion yarn tmux history fzf colorize colored-man-pages rust zsh-interactive-cd zsh-autosuggestions zsh-syntax-highlighting zsh-completions)
 autoload -U compinit && compinit
 source $ZSH/oh-my-zsh.sh
-source /etc/bash_completion.d/lxc
+#source /etc/bash_completion.d/lxc
 
 
 
@@ -227,14 +228,6 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 path=('/home/randyt/.juliaup/bin' $path)
 export PATH
-eval "$(zoxide init --cmd=cd zsh)"
-eval "$(uvx --generate-shell-completion zsh)"
-eval "$(uv generate-shell-completion zsh)"
-if [ -n "$ZSH_VERSION" ]; then
-    eval "$(_ADE_COMPLETE=source_zsh ade)"
-else
-    eval "$(_ADE_COMPLETE=source ade)"
-fi
 
 # <<< juliaup initialize <<<
 
@@ -243,3 +236,7 @@ fi
 
 
 
+export PATH="/home/randyt/.pixi/bin:$PATH"
+
+# opencode
+export PATH=/home/randyt/.opencode/bin:$PATH
