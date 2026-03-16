@@ -205,7 +205,7 @@ return {
 				function()
 					-- You can filter by installed tools using { filter = { installed = true } }
 					-- or just leave it empty to see all supported tools.
-					require("sidekick.cli").toggle({ name = "copilot", focus = true })
+					require("sidekick.cli").toggle({ name = "opencode", focus = true })
 				end,
 				mode = { "n", "v" },
 				desc = "Select Sidekick Agent",
